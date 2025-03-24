@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/ArtContext';
+import { patterns } from '@/contexts/ArtContext';
 
 /**
  * A component for navigating between patterns
  */
 const PatternNavigation: React.FC = () => {
   const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = useArt();
-  const { patterns } = useArt as any; // Using 'as any' to access patterns from context
   const [showPatternList, setShowPatternList] = useState(false);
 
   const handlePatternClick = (index: number) => {
@@ -66,7 +66,7 @@ const PatternNavigation: React.FC = () => {
           exit={{ opacity: 0, y: 10 }}
           className="absolute bottom-16 bg-black/70 backdrop-blur-sm border border-mystic/20 rounded-lg p-2 w-48"
         >
-          {patterns.map((pattern: any, index: number) => (
+          {patterns.map((pattern, index) => (
             <button
               key={pattern.id}
               onClick={() => handlePatternClick(index)}

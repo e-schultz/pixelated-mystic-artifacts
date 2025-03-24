@@ -52,7 +52,7 @@
   }
 
   body {
-    @apply bg-mystic-dark text-mystic overflow-hidden;
+    @apply bg-black text-mystic overflow-hidden;
   }
 
   .pixelated {
@@ -90,5 +90,57 @@
     background-size: 100% 2px, 3px 100%;
     pointer-events: none;
     z-index: 10;
+  }
+
+  /* 3D perspective effect for depth */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  /* Glass morphism utilities */
+  .neo-blur {
+    @apply backdrop-blur-xl bg-black/40 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
+  }
+
+  /* Animation classes */
+  .animate-spin-slow {
+    animation: spin 10s linear infinite;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }

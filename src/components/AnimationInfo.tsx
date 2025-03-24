@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AnimationInfoProps {
@@ -30,37 +31,50 @@ const AnimationInfo: React.FC<AnimationInfoProps> = ({
   }, [title]);
   
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: visible ? 1 : 0, x: visible ? 0 : -20 }}
+      transition={{ duration: 0.5 }}
       className={cn(
-        "fixed bottom-6 left-6 max-w-sm backdrop-blur-sm bg-black/40 border border-mystic/10 rounded-lg p-4 transition-all duration-500 z-10",
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+        "fixed bottom-8 left-8 max-w-sm backdrop-blur-xl bg-black/40 border border-white/10 rounded-lg p-5 z-10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)]",
         className
       )}
     >
-      <h2 className="text-mystic text-xl font-light tracking-wider mb-2">
-        {title}
-      </h2>
-      <p className="text-mystic/80 text-sm mb-4">
-        {description}
-      </p>
-      <div className="flex flex-col space-y-2">
-        {isAutoCycling && (
-          <div className="flex items-center space-x-2">
-            <div className="h-1 flex-grow bg-mystic/20 rounded-full">
-              <div className="h-1 bg-mystic/50 rounded-full animate-pulse" style={{ width: '60%' }}></div>
-            </div>
-            <span className="text-mystic/60 text-xs">Auto-cycling</span>
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5">
+          <div className="w-8 h-8 rounded-full border border-cyan-500/20 flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-purple-500/10">
+            <Info className="w-4 h-4 text-cyan-300" />
           </div>
-        )}
+        </div>
         
-        {showAsciiOverlay && (
-          <div className="flex items-center space-x-2 mt-1">
-            <div className="h-1 w-4 bg-green-400/50 rounded-full animate-pulse"></div>
-            <span className="text-green-400/90 text-xs font-mono">ASCII MODE</span>
+        <div>
+          <h2 className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300 text-xl font-light tracking-wider mb-2">
+            {title}
+          </h2>
+          <p className="text-white/70 text-sm leading-relaxed mb-4">
+            {description}
+          </p>
+          
+          <div className="flex flex-col space-y-2.5">
+            {isAutoCycling && (
+              <div className="flex items-center space-x-3">
+                <div className="h-1 flex-grow bg-blue-900/50 rounded-full overflow-hidden">
+                  <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+                </div>
+                <span className="text-cyan-300/70 text-xs">Auto-sync</span>
+              </div>
+            )}
+            
+            {showAsciiOverlay && (
+              <div className="flex items-center space-x-2 mt-1">
+                <div className="h-1 w-4 bg-green-400/50 rounded-full animate-pulse"></div>
+                <span className="text-green-400/90 text-xs font-mono">QUANTUM MODE</span>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -15,7 +15,7 @@ const PatternNavigation: React.FC = () => {
     prevPattern: () => console.log('Previous pattern clicked'),
     isAutoPlaying: false,
     currentPattern: 0,
-    setCurrentPattern: () => {},
+    setCurrentPattern: (_index: number) => {}, // Fix: Add parameter to match signature
     selectRandomPattern: () => console.log('Random pattern clicked')
   };
 
@@ -40,7 +40,7 @@ const PatternNavigation: React.FC = () => {
   const isMobile = useIsMobile();
 
   const handlePatternClick = (index: number) => {
-    setCurrentPattern(index);
+    setCurrentPattern(index); // Fix: This passes an index and is now type-compatible
     setShowPatternList(false);
   };
 

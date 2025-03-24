@@ -1,107 +1,75 @@
 
 import React, { useState, useEffect } from 'react';
 import UnifiedCanvasManager from '@/components/geometry/UnifiedCanvasManager';
-import UnifiedControlPanel from '@/components/UnifiedControlPanel';
 import AnimationInfoPanel from '@/components/AnimationInfoPanel';
-import { useVisualization } from '@/contexts/VisualizationContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useIsMobile } from '@/hooks/use-mobile';
+import UnifiedControlPanel from '@/components/UnifiedControlPanel';
 import UnifiedPatternNavigation from '@/components/UnifiedPatternNavigation';
+import { useVisualization } from '@/contexts/VisualizationContext';
+import { motion } from 'framer-motion';
 
 const HomePage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const isMobile = useIsMobile();
+  const [showControlPanel, setShowControlPanel] = useState(false);
   const { 
-    currentPattern, 
-    handleNextPattern, 
-    handlePrevPattern,
-    isControlsVisible,
-    toggleControlsVisibility,
-    showAsciiOverlay,
-    isAutoCycling,
-    getCurrentPatternInfo
+    isControlsVisible, 
+    toggleControlsVisibility, 
+    showAsciiOverlay, 
+    isLowPerformanceMode,
+    currentPattern
   } = useVisualization();
 
-  // Simulate loading for visual effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1800);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Track current pattern changes for debugging
   useEffect(() => {
     console.log('HomePage: Current pattern is', currentPattern);
   }, [currentPattern]);
 
-  // Get current pattern info
-  const patternInfo = getCurrentPatternInfo();
+  const toggleControlPanel = () => {
+    setShowControlPanel(!showControlPanel);
+  };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
-      {isLoading ? (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-50">
-          <div className="w-16 h-16 mb-8 border-2 border-white/50 border-t-white/90 rounded-full animate-spin"></div>
-          <h1 className="text-white text-xl tracking-[0.5em] font-light">
-            LOADING
-          </h1>
-          <div className="mt-12 w-64 h-8 border border-white/20 overflow-hidden">
-            <div className="h-full bg-white/10 animate-pulse"></div>
+    <div className="relative w-full h-screen overflow-hidden">
+      <UnifiedCanvasManager className="w-full h-full" />
+      
+      <header className="fixed top-0 left-0 right-0 p-6 z-10">
+        <motion.h1 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.8, duration: 0.5 }}
+          className="text-white text-2xl font-light tracking-[0.2em] text-center"
+        >
+          SACRED GEOMETRY
+        </motion.h1>
+      </header>
+      
+      <AnimationInfoPanel />
+      
+      <UnifiedPatternNavigation />
+      
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.5 }}
+        onClick={toggleControlsVisibility}
+        className="fixed top-6 right-6 z-10 w-10 h-10 border border-white/30 rounded-full flex items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition-all"
+      >
+        ⚙️
+      </motion.button>
+      
+      {isControlsVisible && (
+        <UnifiedControlPanel onClose={toggleControlsVisibility} />
+      )}
+      
+      {showAsciiOverlay && (
+        <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
+          <div className="text-green-400/80 font-mono text-xs tracking-widest">
+            SACRED.SYS [VERSION 8.15.23]
           </div>
         </div>
-      ) : (
-        <>
-          {/* Main Canvas */}
-          <UnifiedCanvasManager className="absolute inset-0 z-0" />
-          
-          {/* Header */}
-          <header className="absolute top-0 left-0 right-0 p-6 flex justify-center">
-            <h1 className="text-white text-2xl font-light tracking-[0.3em]">
-              NEO ARTIFACTS
-            </h1>
-            <button 
-              onClick={toggleControlsVisibility}
-              className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/20"
-            >
-              <span className="text-white/70">⚙️</span>
-            </button>
-          </header>
-          
-          {/* Controls Panel */}
-          <AnimatePresence>
-            {isControlsVisible && (
-              <UnifiedControlPanel onClose={toggleControlsVisibility} />
-            )}
-          </AnimatePresence>
-          
-          {/* Pattern Navigation */}
-          <UnifiedPatternNavigation />
-          
-          {/* Pattern Info Panel */}
-          <AnimationInfoPanel />
-          
-          {/* System Status Bar */}
-          <div className="absolute bottom-6 left-0 right-0 px-6">
-            <div className={`mx-auto w-full ${isMobile ? 'max-w-full' : 'max-w-md'} border border-green-400/30 bg-black/60 rounded-lg px-3 py-1`}>
-              <div className="text-green-400/90 font-mono text-xs tracking-widest flex justify-between items-center">
-                <span>NEOSYS [VER 2.3]</span>
-                {isMobile && (
-                  <span>PATTERN: {currentPattern + 1}</span>
-                )}
-              </div>
-            </div>
-            
-            {/* Terminal Mode Indicator */}
-            {showAsciiOverlay && !isMobile && (
-              <div className="absolute left-6 bottom-0 text-green-400/90 text-xs font-mono tracking-widest flex items-center">
-                <span className="w-2 h-2 bg-green-400/90 mr-2 rounded-full animate-pulse"></span>
-                TERMINAL MODE
-              </div>
-            )}
-          </div>
-        </>
+      )}
+      
+      {isLowPerformanceMode && (
+        <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
+          Performance Mode
+        </div>
       )}
     </div>
   );

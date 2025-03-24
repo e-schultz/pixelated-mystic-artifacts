@@ -10,10 +10,10 @@ const UnifiedPatternNavigation: React.FC = () => {
     isAutoCycling, 
     currentPattern, 
     setCurrentPattern, 
-    selectRandomPattern 
+    selectRandomPattern,
+    patterns
   } = useVisualization();
   
-  const { patterns } = useVisualization as any; // Using 'as any' to access patterns from context
   const [showPatternList, setShowPatternList] = useState(false);
 
   const handlePatternClick = (index: number) => {
@@ -71,7 +71,7 @@ const UnifiedPatternNavigation: React.FC = () => {
           exit={{ opacity: 0, y: 10 }}
           className="absolute bottom-16 bg-black/70 backdrop-blur-sm border border-mystic/20 rounded-lg p-2 w-48"
         >
-          {patterns.map((pattern: any, index: number) => (
+          {patterns.map((pattern, index) => (
             <button
               key={pattern.id}
               onClick={() => handlePatternClick(index)}

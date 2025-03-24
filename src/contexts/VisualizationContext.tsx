@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { 
@@ -70,6 +69,9 @@ interface VisualizationState {
 
 // Define context interface
 interface VisualizationContextType extends VisualizationState {
+  // Pattern data
+  patterns: typeof patterns;
+  
   // Pattern navigation methods
   setCurrentPattern: (index: number) => void;
   handleNextPattern: () => void;
@@ -86,7 +88,7 @@ interface VisualizationContextType extends VisualizationState {
   
   // UI convenience methods
   getCurrentPatternInfo: () => { title: string; description: string };
-  toggleControlsVisibility: () => void; // Add this missing method
+  toggleControlsVisibility: () => void;
 }
 
 // Create context
@@ -243,6 +245,7 @@ export function VisualizationProvider({ children }: { children: React.ReactNode 
     <VisualizationContext.Provider
       value={{
         ...state,
+        patterns,
         setCurrentPattern,
         handleNextPattern,
         handlePrevPattern,
@@ -254,7 +257,7 @@ export function VisualizationProvider({ children }: { children: React.ReactNode 
         toggleAsciiOverlay,
         toggleControls,
         getCurrentPatternInfo,
-        toggleControlsVisibility // Add the new method to the context value
+        toggleControlsVisibility
       }}
     >
       {children}

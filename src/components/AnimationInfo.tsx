@@ -6,12 +6,14 @@ import { cn } from '@/lib/utils';
 interface AnimationInfoProps {
   title: string;
   description: string;
+  isAutoCycling?: boolean;
   className?: string;
 }
 
 const AnimationInfo: React.FC<AnimationInfoProps> = ({ 
   title, 
   description, 
+  isAutoCycling = true,
   className 
 }) => {
   const [visible, setVisible] = useState(false);
@@ -39,12 +41,14 @@ const AnimationInfo: React.FC<AnimationInfoProps> = ({
       <p className="text-mystic/80 text-sm mb-4">
         {description}
       </p>
-      <div className="flex items-center space-x-2">
-        <div className="h-1 flex-grow bg-mystic/20 rounded-full">
-          <div className="h-1 bg-mystic/50 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+      {isAutoCycling && (
+        <div className="flex items-center space-x-2">
+          <div className="h-1 flex-grow bg-mystic/20 rounded-full">
+            <div className="h-1 bg-mystic/50 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+          </div>
+          <span className="text-mystic/60 text-xs">Auto-cycling</span>
         </div>
-        <span className="text-mystic/60 text-xs">Auto-cycling</span>
-      </div>
+      )}
     </div>
   );
 };

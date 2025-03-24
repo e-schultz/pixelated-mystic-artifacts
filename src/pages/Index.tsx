@@ -2,12 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import AnimationInfo from '@/components/AnimationInfo';
+import ControlPanel from '@/components/ControlPanel';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 
 const Index = () => {
   const [currentAnimation, setCurrentAnimation] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAutoCycling, setIsAutoCycling] = useState(true);
+  const [animationSpeed, setAnimationSpeed] = useState(1);
+  const [showControlPanel, setShowControlPanel] = useState(false);
 
   useEffect(() => {
     // Simulate loading delay
@@ -19,13 +23,28 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    // Auto-cycle through animations
-    const intervalId = setInterval(() => {
-      setCurrentAnimation((prev) => (prev + 1) % animations.length);
-    }, 10000);
-    
-    return () => clearInterval(intervalId);
-  }, []);
+    // Auto-cycle through animations if enabled
+    if (isAutoCycling) {
+      const cycleTime = 10000 / animationSpeed;
+      const intervalId = setInterval(() => {
+        setCurrentAnimation((prev) => (prev + 1) % animations.length);
+      }, cycleTime);
+      
+      return () => clearInterval(intervalId);
+    }
+  }, [isAutoCycling, animationSpeed]);
+
+  const handlePrevAnimation = () => {
+    setCurrentAnimation((prev) => (prev - 1 + animations.length) % animations.length);
+  };
+
+  const handleNextAnimation = () => {
+    setCurrentAnimation((prev) => (prev + 1) % animations.length);
+  };
+
+  const toggleControlPanel = () => {
+    setShowControlPanel(prev => !prev);
+  };
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
@@ -54,7 +73,10 @@ const Index = () => {
       )}
 
       {/* Main content */}
-      <SacredGeometryCanvas />
+      <SacredGeometryCanvas 
+        currentAnimation={currentAnimation}
+        animationSpeed={animationSpeed}
+      />
       
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 p-6 z-10">
@@ -72,7 +94,57 @@ const Index = () => {
       <AnimationInfo
         title={animations[currentAnimation].title}
         description={animations[currentAnimation].description}
+        isAutoCycling={isAutoCycling}
       />
+      
+      {/* Navigation controls */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.5 }}
+        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex items-center space-x-4"
+      >
+        <button 
+          onClick={handlePrevAnimation}
+          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        >
+          ←
+        </button>
+        <button
+          onClick={() => setIsAutoCycling(!isAutoCycling)}
+          className={`px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isAutoCycling ? 'bg-mystic/20' : ''}`}
+        >
+          {isAutoCycling ? 'AUTO' : 'MANUAL'}
+        </button>
+        <button 
+          onClick={handleNextAnimation}
+          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        >
+          →
+        </button>
+      </motion.div>
+      
+      {/* Settings button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.5 }}
+        onClick={toggleControlPanel}
+        className="fixed top-6 right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+      >
+        ⚙️
+      </motion.button>
+      
+      {/* Control panel */}
+      {showControlPanel && (
+        <ControlPanel 
+          animationSpeed={animationSpeed}
+          setAnimationSpeed={setAnimationSpeed}
+          isAutoCycling={isAutoCycling}
+          setIsAutoCycling={setIsAutoCycling}
+          onClose={toggleControlPanel}
+        />
+      )}
       
       {/* Footer */}
       <motion.footer

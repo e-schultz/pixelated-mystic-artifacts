@@ -13,13 +13,18 @@ import {
 } from '../utils/geometryUtils';
 
 interface SacredGeometryCanvasProps {
+  currentAnimation?: number;
+  animationSpeed?: number;
   className?: string;
 }
 
-const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }) => {
+const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ 
+  currentAnimation = 0,
+  animationSpeed = 1,
+  className 
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<p5 | null>(null);
-  const [currentAnimation, setCurrentAnimation] = useState<number>(0);
   
   // Animation settings
   const animations = [
@@ -49,15 +54,6 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }
       settings: getDefaultSettings({ segments: 6, pixelSize: 3 })
     }
   ];
-  
-  useEffect(() => {
-    // Change animation every 10 seconds
-    const intervalId = setInterval(() => {
-      setCurrentAnimation((prev) => (prev + 1) % animations.length);
-    }, 10000);
-    
-    return () => clearInterval(intervalId);
-  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -112,7 +108,9 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }
       
       p.draw = () => {
         p.background(18, 18, 18, 10); // Slight trail effect
-        time += 0.005;
+        
+        // Use animationSpeed to control the time increment
+        time += 0.005 * animationSpeed;
         
         // Draw main animation
         const currentAnim = animations[currentAnimation];
@@ -133,7 +131,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }
         p.push();
         p.noStroke();
         smallShapes.forEach(shape => {
-          shape.rotation += shape.speed;
+          shape.rotation += shape.speed * animationSpeed;
           const shapeSettings = {
             ...shape.settings,
             rotation: shape.rotation,
@@ -157,7 +155,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }
         }
         
         // Rarely regenerate small shapes
-        if (p.random() < 0.005) {
+        if (p.random() < 0.005 * animationSpeed) {
           generateSmallShapes();
         }
       };
@@ -174,7 +172,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ className }
         canvasRef.current.remove();
       }
     };
-  }, [currentAnimation]);
+  }, [currentAnimation, animationSpeed]);
 
   return (
     <div ref={containerRef} className={className} />

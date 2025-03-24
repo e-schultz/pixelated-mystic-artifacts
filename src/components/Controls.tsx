@@ -22,6 +22,11 @@ const Controls: React.FC<ControlsProps> = ({ onClose }) => {
     toggleAutoPlay
   } = useArt();
   
+  const handlePatternSelect = (index: number) => {
+    console.log(`Selecting pattern ${index}`);
+    setCurrentPattern(index);
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -47,7 +52,7 @@ const Controls: React.FC<ControlsProps> = ({ onClose }) => {
             {patterns.map((pattern, index) => (
               <button
                 key={pattern.id}
-                onClick={() => setCurrentPattern(index)}
+                onClick={() => handlePatternSelect(index)}
                 className={`
                   w-full aspect-square border
                   flex items-center justify-center text-xs

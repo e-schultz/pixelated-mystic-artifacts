@@ -1,4 +1,3 @@
-
 interface RenderOptions {
   time: number;
   isPixelated: boolean;

@@ -1,187 +1,121 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import ArtCanvas from '@/components/ArtCanvas';
-import PatternInfo from '@/components/PatternInfo';
 import Controls from '@/components/Controls';
-import { useArt, patterns } from '@/contexts/ArtContext';
-import { useToast } from "@/components/ui/use-toast";
+import PatternInfo from '@/components/PatternInfo';
+import { useArt } from '@/contexts/ArtContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { patterns } from '@/contexts/ArtContext';
 
 const HomePage = () => {
-  const {
-    currentPattern,
-    nextPattern,
-    prevPattern,
-    isTerminalMode,
-    isControlsVisible,
-    toggleControls
-  } = useArt();
-  
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-  
-  // Handle initial loading animation
+  const { 
+    currentPattern, 
+    nextPattern, 
+    prevPattern,
+    isControlsVisible,
+    toggleControls,
+    isTerminalMode,
+    isAutoPlaying,
+  } = useArt();
+
+  // Simulate loading for visual effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      
-      // Display toast when app is ready
-      toast({
-        title: "Neo Artifacts Ready",
-        description: "Navigate through patterns using arrows below",
-      });
-    }, 2000);
+    }, 1800);
     
     return () => clearTimeout(timer);
-  }, [toast]);
-  
-  // Log pattern changes
+  }, []);
+
+  // Track current pattern changes for debugging
   useEffect(() => {
-    console.log(`HomePage: Current pattern is ${currentPattern}`);
+    console.log('HomePage: Current pattern is', currentPattern);
   }, [currentPattern]);
-  
-  // Handle keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        prevPattern();
-      } else if (e.key === 'ArrowRight') {
-        nextPattern();
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextPattern, prevPattern]);
-  
+
+  // Get current pattern info
+  const patternInfo = patterns[currentPattern];
+
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black text-white font-mono">
-      {/* Loading Screen */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="w-16 h-16 mb-6 border-2 border-white rounded-full flex items-center justify-center"
-            >
-              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-            </motion.div>
-            
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-white/70 text-sm tracking-widest"
-            >
-              NEO ARTIFACTS INITIALIZING
-            </motion.p>
-            
-            <motion.pre
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="text-green-400/70 text-xs font-mono mt-8 max-w-[300px] text-center"
-            >
-{`[SYSTEM] Loading patterns
-[SYSTEM] Calibrating display
-[SYSTEM] Initializing generators`}
-            </motion.pre>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Main Canvas */}
-      <ArtCanvas />
-      
-      {/* UI Header */}
-      <header className="fixed top-0 left-0 right-0 p-4 z-10">
-        <motion.h1 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2, duration: 0.5 }}
-          className="text-white text-center text-xl font-light tracking-[0.2em]"
-        >
-          NEO ARTIFACTS
-        </motion.h1>
-      </header>
-      
-      {/* Pattern Info */}
-      <PatternInfo 
-        title={patterns[currentPattern]?.title || "Loading..."}
-        description={patterns[currentPattern]?.description || "Please wait..."}
-      />
-      
-      {/* Controls Panel */}
-      <AnimatePresence>
-        {isControlsVisible && (
-          <Controls onClose={toggleControls} />
-        )}
-      </AnimatePresence>
-      
-      {/* Navigation Controls */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex items-center space-x-4"
-      >
-        <button 
-          onClick={prevPattern}
-          className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white/70 hover:bg-white/10 transition-all"
-          aria-label="Previous pattern"
-        >
-          ←
-        </button>
-        
-        <button
-          onClick={nextPattern}
-          className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white/70 hover:bg-white/10 transition-all"
-          aria-label="Next pattern"
-        >
-          →
-        </button>
-      </motion.div>
-      
-      {/* Controls Toggle Button */}
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        onClick={toggleControls}
-        className="fixed top-4 right-4 z-10 w-10 h-10 border border-white/30 rounded-full flex items-center justify-center text-white/70 hover:bg-white/10 transition-all"
-        aria-label="Toggle controls"
-      >
-        ⚙️
-      </motion.button>
-      
-      {/* Terminal Overlay */}
-      {isTerminalMode && (
+    <div className="relative h-screen w-full overflow-hidden bg-black">
+      {isLoading ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-50">
+          <div className="w-16 h-16 mb-8 border-2 border-white/50 border-t-white/90 rounded-full animate-spin"></div>
+          <h1 className="text-white text-xl tracking-[0.5em] font-light">
+            LOADING
+          </h1>
+          <div className="mt-12 w-64 h-8 border border-white/20 overflow-hidden">
+            <div className="h-full bg-white/10 animate-pulse"></div>
+          </div>
+        </div>
+      ) : (
         <>
-          <div className="fixed top-16 left-4 right-4 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
-            <div className="flex justify-between items-center">
-              <div className="text-green-400/80 font-mono text-xs tracking-widest">
-                NEOSYS [VER 2.3.1]
-              </div>
-              <div className="text-green-400/60 font-mono text-xs tracking-widest">
-                {`PATTERN: ${currentPattern + 1}/${patterns.length}`}
+          {/* Main Canvas */}
+          <ArtCanvas />
+          
+          {/* Header */}
+          <header className="absolute top-0 left-0 right-0 p-6 flex justify-center">
+            <h1 className="text-white text-2xl font-light tracking-[0.3em]">
+              NEO ARTIFACTS
+            </h1>
+            <button 
+              onClick={toggleControls}
+              className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center rounded-full bg-white/5 border border-white/20"
+            >
+              <span className="text-white/70">⚙️</span>
+            </button>
+          </header>
+          
+          {/* Controls Panel */}
+          <AnimatePresence>
+            {isControlsVisible && (
+              <Controls onClose={toggleControls} />
+            )}
+          </AnimatePresence>
+          
+          {/* Pattern Info and Navigation */}
+          <div className="absolute bottom-6 left-0 right-0 px-6 space-y-4">
+            {/* System Status Bar */}
+            <div className="mx-auto w-full max-w-md border border-green-400/30 bg-black/60 rounded-lg px-3 py-1">
+              <div className="text-green-400/90 font-mono text-xs tracking-widest">
+                NEOSYS [VER 2.3
               </div>
             </div>
+            
+            {/* Pattern Info */}
+            <PatternInfo 
+              title={patternInfo.title} 
+              description={patternInfo.description} 
+              isTerminal={isTerminalMode}
+              isAutoCycling={isAutoPlaying}
+            />
+            
+            {/* Navigation Controls */}
+            <div className="flex justify-center items-center space-x-6">
+              <motion.button 
+                onClick={prevPattern}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10"
+                whileTap={{ scale: 0.9 }}
+              >
+                ←
+              </motion.button>
+              <motion.button 
+                onClick={nextPattern}
+                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10"
+                whileTap={{ scale: 0.9 }}
+              >
+                →
+              </motion.button>
+            </div>
+            
+            {/* Terminal Mode Indicator */}
+            {isTerminalMode && (
+              <div className="absolute left-6 bottom-0 text-green-400/90 text-xs font-mono tracking-widest flex items-center">
+                <span className="w-2 h-2 bg-green-400/90 mr-2 rounded-full animate-pulse"></span>
+                TERMINAL MODE
+              </div>
+            )}
           </div>
-          
-          <pre className="fixed left-4 bottom-32 z-9 text-green-400/60 text-xs font-mono">
-{`,--.   ,--. ,-----. ,-----. 
-|  \\  |  | |  |__  |  |__  
-|   \\ |  | |  __|| |  __|| 
-|  |\\ |  | |  |___ |  |___ 
-|__| \\|__| |______||______|`}
-          </pre>
         </>
       )}
     </div>

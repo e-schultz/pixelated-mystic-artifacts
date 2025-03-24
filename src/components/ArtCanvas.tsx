@@ -20,12 +20,19 @@ const ArtCanvas: React.FC = () => {
   useEffect(() => {
     if (!canvasRef.current) return;
     
+    // Clean up any existing p5 instance to prevent duplication
+    if (p5InstanceRef.current) {
+      p5InstanceRef.current.remove();
+      p5InstanceRef.current = null;
+    }
+    
     const sketch = (p: any) => {
       let time = 0;
       let lastFrameTime = 0;
       const targetFrameRate = isLowPerformanceMode ? 30 : 60;
       
       p.setup = () => {
+        console.log('Setting up p5 canvas with pattern:', currentPattern);
         const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
         canvas.parent(canvasRef.current!);
         p.background(0);
@@ -111,10 +118,8 @@ const ArtCanvas: React.FC = () => {
       };
     };
     
-    // Create p5 instance only once
-    if (!p5InstanceRef.current) {
-      p5InstanceRef.current = new p5(sketch);
-    }
+    // Create p5 instance
+    p5InstanceRef.current = new p5(sketch);
     
     // Cleanup
     return () => {
@@ -123,15 +128,7 @@ const ArtCanvas: React.FC = () => {
         p5InstanceRef.current = null;
       }
     };
-  }, []); // Empty dependency array - canvas created once
-
-  // Force redraw when pattern changes
-  useEffect(() => {
-    // This ensures the canvas updates when pattern changes
-    if (p5InstanceRef.current) {
-      // We don't need to recreate the canvas, it will update in the next draw cycle
-    }
-  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]);
+  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]); // Include all dependencies
 
   return <div ref={canvasRef} className="absolute inset-0 z-0" />;
 };

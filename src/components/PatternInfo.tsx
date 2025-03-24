@@ -6,10 +6,21 @@ import { useArt } from '@/contexts/ArtContext';
 interface PatternInfoProps {
   title: string;
   description: string;
+  isTerminal?: boolean;
+  isAutoCycling?: boolean;
 }
 
-const PatternInfo: React.FC<PatternInfoProps> = ({ title, description }) => {
+const PatternInfo: React.FC<PatternInfoProps> = ({ 
+  title, 
+  description, 
+  isTerminal,
+  isAutoCycling 
+}) => {
   const { isAutoPlaying, isTerminalMode } = useArt();
+  
+  // Use props if provided, otherwise fall back to context values
+  const displayAutoPlaying = isAutoCycling !== undefined ? isAutoCycling : isAutoPlaying;
+  const displayTerminalMode = isTerminal !== undefined ? isTerminal : isTerminalMode;
   
   return (
     <motion.div
@@ -26,7 +37,7 @@ const PatternInfo: React.FC<PatternInfoProps> = ({ title, description }) => {
       </p>
       
       <div className="flex flex-col space-y-2">
-        {isAutoPlaying && (
+        {displayAutoPlaying && (
           <div className="flex items-center space-x-2">
             <div className="h-1 flex-grow bg-white/20 rounded-full">
               <div className="h-1 bg-white/50 rounded-full animate-pulse" style={{ width: '60%' }}></div>
@@ -35,7 +46,7 @@ const PatternInfo: React.FC<PatternInfoProps> = ({ title, description }) => {
           </div>
         )}
         
-        {isTerminalMode && (
+        {displayTerminalMode && (
           <div className="flex items-center space-x-2 mt-1">
             <div className="h-1 w-4 bg-green-400/50 rounded-full animate-pulse"></div>
             <span className="text-green-400/90 text-xs font-mono">TERMINAL MODE</span>

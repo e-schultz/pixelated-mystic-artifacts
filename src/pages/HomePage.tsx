@@ -86,8 +86,6 @@ const HomePage = () => {
             <PatternInfo 
               title={patternInfo.title} 
               description={patternInfo.description} 
-              isTerminal={isTerminalMode}
-              isAutoCycling={isAutoPlaying}
             />
             
             {/* Navigation Controls */}

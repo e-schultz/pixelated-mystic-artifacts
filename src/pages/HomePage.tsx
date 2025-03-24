@@ -12,10 +12,12 @@ import { patterns } from '@/contexts/ArtContext';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 import { Settings, Terminal } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showControlPanel, setShowControlPanel] = useState(false);
+  const isMobile = useIsMobile();
   
   const {
     currentAnimation,
@@ -80,7 +82,7 @@ const HomePage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="text-green-400/70 text-xs font-mono mt-8 tracking-widest"
+            className="text-green-400/70 text-xs font-mono mt-8 tracking-widest px-4 text-center max-w-full overflow-x-hidden"
           >
 {`[...............]\n INITIALIZING SACRED GEOMETRY\n LOADING VISUAL MATRIX\n CALIBRATING MYSTIC FREQUENCIES`}
           </motion.pre>
@@ -90,15 +92,15 @@ const HomePage = () => {
       {/* Main Canvas */}
       <SacredGeometryCanvas />
       
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 p-6 z-10">
+      {/* Header - Responsive adjustments */}
+      <header className="fixed top-0 left-0 right-0 p-4 sm:p-6 z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, duration: 0.5 }}
           className="flex flex-col items-center"
         >
-          <h1 className="text-mystic text-2xl font-light tracking-[0.2em]">
+          <h1 className="text-mystic text-xl sm:text-2xl font-light tracking-[0.2em] text-center">
             PIXELATED MYSTIC ARTIFACTS
           </h1>
           {!isLoading && (
@@ -109,19 +111,19 @@ const HomePage = () => {
         </motion.div>
       </header>
       
-      {/* Animation Info Display */}
-      <OptimizedAnimationInfo />
+      {/* Animation Info Display - Responsive sizing */}
+      <OptimizedAnimationInfo className={isMobile ? "mx-4 max-w-[calc(100%-2rem)]" : ""} />
       
       {/* Pattern Navigation and Sequencer */}
       <PatternNavigation />
       <PatternSequencer />
       
-      {/* Bottom Information */}
+      {/* Bottom Information - Responsive adjustments */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 0.5 }}
-        className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-10 flex items-center space-x-3"
       >
         <button
           onClick={toggleAsciiOverlay}
@@ -141,18 +143,18 @@ const HomePage = () => {
           )}
         </button>
         
-        <p className="text-mystic/50 text-xs">
+        <p className="text-mystic/50 text-xs hidden sm:block">
           sacred geometry {new Date().getFullYear()}
         </p>
       </motion.div>
       
-      {/* Settings Button */}
+      {/* Settings Button - Responsive position */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 0.5 }}
         onClick={toggleControlPanel}
-        className="fixed top-6 right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        className="fixed top-4 sm:top-6 right-4 sm:right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
         aria-label="Toggle settings panel"
       >
         <Settings className="h-5 w-5" />
@@ -166,33 +168,42 @@ const HomePage = () => {
         <OptimizedControlPanel onClose={toggleControlPanel} />
       )}
       
-      {/* ASCII Overlay Elements */}
+      {/* ASCII Overlay Elements - Mobile responsive */}
       {showAsciiOverlay && (
         <>
-          <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
+          <div className="fixed top-16 left-4 right-4 sm:left-6 sm:right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
             <div className="flex justify-between items-center">
-              <div className="text-green-400/80 font-mono text-xs tracking-widest">
+              <div className="text-green-400/80 font-mono text-[10px] sm:text-xs tracking-widest truncate">
                 MYSTIC.SYS [VERSION 8.15.23]
               </div>
-              <div className="text-green-400/60 font-mono text-xs tracking-widest">
+              <div className="text-green-400/60 font-mono text-[10px] sm:text-xs tracking-widest truncate ml-2">
                 {`${currentPatternData.title} | ${animationSpeed.toFixed(1)}X`}
               </div>
             </div>
           </div>
           
-          <pre className="fixed left-6 bottom-32 z-9 text-green-400/60 text-xs font-mono">
+          <pre className="fixed left-4 sm:left-6 bottom-24 sm:bottom-32 z-9 text-green-400/60 text-[8px] sm:text-xs font-mono hidden sm:block">
 {`,--.    ,--.   ,--. ,---.,---.  ,--.  ,---.  
 |   \\ ,-'  '-. \`.' |/ .--' ,-. \\ |  | /  .-'  
 |  . \\'-.  .-'  /  || \\--. | | | |\`-'' \`--.   
 |  |\\  \\|  |   /|  |\\.-. \\' | | |,--.  .-'   
 \`--' '--'   '--' '--'\`----' -----'/\`--' \`----'`}
           </pre>
+          
+          {/* Mobile version of ASCII art */}
+          <pre className="fixed left-4 bottom-24 z-9 text-green-400/60 text-[8px] font-mono sm:hidden">
+{`,--.    ,--.   ,--.,---. 
+|   \\ ,-'  '-. \`.' / .--'
+|  . \\'-.  .-'  / | \\--. 
+|  |\\  \\|  |   /| \\.-. \\
+\`--' '--'   '--' '--'\`----'`}
+          </pre>
         </>
       )}
       
-      {/* Performance Mode Indicator */}
+      {/* Performance Mode Indicator - Responsive position */}
       {performanceMode && (
-        <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
+        <div className="fixed top-16 right-4 sm:right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-[10px] sm:text-xs">
           Performance Mode
         </div>
       )}

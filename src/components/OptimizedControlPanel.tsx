@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
 import { X, Info, Zap, EyeOff, Eye, Gauge, SkipForward } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ControlPanelProps {
   onClose: () => void;
@@ -26,6 +27,8 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
     togglePixelated
   } = useArt();
 
+  const isMobile = useIsMobile();
+
   // Memoized handlers
   const handleSpeedChange = React.useCallback((values: number[]) => {
     setAnimationSpeed(values[0]);
@@ -44,9 +47,14 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className="fixed top-20 right-6 z-20 w-72 bg-black/60 backdrop-blur-md border border-mystic/20 rounded-lg overflow-hidden"
+      className={cn(
+        "fixed z-20 bg-black/60 backdrop-blur-md border border-mystic/20 rounded-lg overflow-hidden",
+        isMobile 
+          ? "top-16 right-4 left-4 max-h-[calc(100vh-8rem)]" 
+          : "top-20 right-6 w-72"
+      )}
     >
-      <div className="flex justify-between items-center p-5 border-b border-mystic/10">
+      <div className="flex justify-between items-center p-4 border-b border-mystic/10">
         <h3 className="text-mystic text-lg font-light tracking-wider">Settings</h3>
         <button 
           onClick={onClose}
@@ -57,7 +65,10 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
         </button>
       </div>
       
-      <div className="space-y-6 p-5">
+      <div className={cn(
+        "space-y-5 p-4",
+        isMobile && "overflow-y-auto max-h-[calc(100vh-16rem)]"
+      )}>
         <div className="space-y-3">
           <div className="flex items-center mb-1">
             <Gauge className="h-4 w-4 text-mystic/70 mr-2" />
@@ -149,5 +160,10 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
     </motion.div>
   );
 };
+
+// Helper function to avoid importing cn separately
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
 export default React.memo(OptimizedControlPanel);

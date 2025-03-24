@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from '@/lib/utils';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { animations } from '@/data/animationData';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AnimationInfoProps {
   className?: string;
@@ -13,21 +14,34 @@ const OptimizedAnimationInfo: React.FC<AnimationInfoProps> = ({
   className 
 }) => {
   const { currentAnimation, isAutoCycling, showAsciiOverlay } = useAnimation();
+  const isMobile = useIsMobile();
   const title = animations[currentAnimation].title;
   const description = animations[currentAnimation].description;
+  
+  // For mobile, truncate the description if it's too long
+  const mobileDescription = isMobile && description.length > 120 
+    ? `${description.substring(0, 120)}...` 
+    : description;
   
   return (
     <div 
       className={cn(
         "fixed bottom-6 left-6 max-w-sm backdrop-blur-sm bg-black/40 border border-mystic/10 rounded-lg p-4 transition-all duration-500 z-10 opacity-100 translate-y-0",
+        isMobile && "bottom-4 left-4 max-w-[calc(100vw-2rem)] p-3",
         className
       )}
     >
-      <h2 className="text-mystic text-xl font-light tracking-wider mb-2">
+      <h2 className={cn(
+        "text-mystic font-light tracking-wider mb-2",
+        isMobile ? "text-lg" : "text-xl"
+      )}>
         {title}
       </h2>
-      <p className="text-mystic/80 text-sm mb-4">
-        {description}
+      <p className={cn(
+        "text-mystic/80 mb-4",
+        isMobile ? "text-xs" : "text-sm"
+      )}>
+        {isMobile ? mobileDescription : description}
       </p>
       <div className="flex flex-col space-y-2">
         {isAutoCycling && (

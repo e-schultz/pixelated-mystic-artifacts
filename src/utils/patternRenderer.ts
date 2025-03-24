@@ -187,144 +187,208 @@ function drawTesseractMatrix(
   p.translate(centerX, centerY);
   
   const pixelSize = isPixelated ? 2 : 1;
-  const cubeSize = size * 0.6;
-  const innerCubeSize = cubeSize * 0.6;
-  const rotation = time * 0.2;
-  
   p.stroke(255, 180);
   p.strokeWeight(pixelSize);
   p.noFill();
   
-  // Draw outer cube
-  p.push();
-  p.rotateX(rotation * 0.6);
-  p.rotateY(rotation * 0.4);
-  p.rotateZ(rotation * 0.3);
+  // Create proper 3D-to-2D projection
+  const scale = size * 0.35;
+  const innerScale = scale * 0.6;
   
-  if (isPixelated) {
-    drawPixelatedCube(p, 0, 0, 0, cubeSize, pixelSize);
-  } else {
-    drawCube(p, 0, 0, 0, cubeSize);
-  }
+  // Animation parameters
+  const rotationX = time * 0.2;
+  const rotationY = time * 0.15;
+  const rotationZ = time * 0.1;
+  
+  // Draw the outer cube first
+  drawRotatedCube(p, 0, 0, 0, scale, rotationX, rotationY, rotationZ, pixelSize, isPixelated);
+  
+  // Draw the inner cube with different rotation
+  drawRotatedCube(p, 0, 0, 0, innerScale, rotationX * 1.5, rotationY * 1.2, rotationZ * 0.8, pixelSize, isPixelated);
+  
+  // Connect vertices between inner and outer cubes to create the tesseract effect
+  connectTesseractVertices(p, scale, innerScale, rotationX, rotationY, rotationZ, pixelSize, isPixelated);
+  
   p.pop();
-  
-  // Draw inner cube
-  p.push();
-  p.rotateX(rotation);
-  p.rotateY(rotation * 0.7);
-  p.rotateZ(rotation * 0.5);
-  
-  if (isPixelated) {
-    drawPixelatedCube(p, 0, 0, 0, innerCubeSize, pixelSize);
-  } else {
-    drawCube(p, 0, 0, 0, innerCubeSize);
-  }
-  p.pop();
-  
-  // Draw connecting lines between cubes
-  p.push();
-  const halfOuter = cubeSize / 2;
-  const halfInner = innerCubeSize / 2;
-  
-  // Connection points - map 8 corners
-  const connectPoints = [
-    { x: -1, y: -1, z: -1 },
-    { x: 1, y: -1, z: -1 },
-    { x: 1, y: 1, z: -1 },
-    { x: -1, y: 1, z: -1 },
-    { x: -1, y: -1, z: 1 },
-    { x: 1, y: -1, z: 1 },
-    { x: 1, y: 1, z: 1 },
-    { x: -1, y: 1, z: 1 }
+}
+
+// Helper function to draw a 3D cube with proper rotation and projection
+function drawRotatedCube(
+  p: any, 
+  x: number, 
+  y: number, 
+  z: number, 
+  size: number, 
+  rotX: number, 
+  rotY: number, 
+  rotZ: number, 
+  pixelSize: number,
+  isPixelated: boolean
+) {
+  // Cube vertices in 3D space (centered at origin)
+  const halfSize = size / 2;
+  const vertices = [
+    [-halfSize, -halfSize, -halfSize], // 0: left-bottom-back
+    [halfSize, -halfSize, -halfSize],  // 1: right-bottom-back
+    [halfSize, halfSize, -halfSize],   // 2: right-top-back
+    [-halfSize, halfSize, -halfSize],  // 3: left-top-back
+    [-halfSize, -halfSize, halfSize],  // 4: left-bottom-front
+    [halfSize, -halfSize, halfSize],   // 5: right-bottom-front
+    [halfSize, halfSize, halfSize],    // 6: right-top-front
+    [-halfSize, halfSize, halfSize]    // 7: left-top-front
   ];
   
-  p.stroke(255, 100);
+  // Edges connecting vertices (each pair of indices forms an edge)
+  const edges = [
+    [0, 1], [1, 2], [2, 3], [3, 0], // back face
+    [4, 5], [5, 6], [6, 7], [7, 4], // front face
+    [0, 4], [1, 5], [2, 6], [3, 7]  // connecting edges
+  ];
   
-  // Only draw some connections for aesthetic effect
-  for (let i = 0; i < connectPoints.length; i += 2) {
-    const pt = connectPoints[i];
+  // Apply 3D rotations and project to 2D
+  const projectedVertices = vertices.map(v => {
+    let [vx, vy, vz] = v;
     
-    // Project to 2D with rotation
-    const outerX = pt.x * halfOuter * Math.cos(rotation * 0.6);
-    const outerY = pt.y * halfOuter * Math.cos(rotation * 0.4);
+    // Apply rotations
+    // Rotate around X-axis
+    const y1 = vy * Math.cos(rotX) - vz * Math.sin(rotX);
+    const z1 = vy * Math.sin(rotX) + vz * Math.cos(rotX);
     
-    const innerX = pt.x * halfInner * Math.cos(rotation);
-    const innerY = pt.y * halfInner * Math.cos(rotation * 0.7);
+    // Rotate around Y-axis
+    const x2 = vx * Math.cos(rotY) + z1 * Math.sin(rotY);
+    const z2 = -vx * Math.sin(rotY) + z1 * Math.cos(rotY);
+    
+    // Rotate around Z-axis
+    const x3 = x2 * Math.cos(rotZ) - y1 * Math.sin(rotZ);
+    const y3 = x2 * Math.sin(rotZ) + y1 * Math.cos(rotZ);
+    
+    // Simple perspective projection (just scale based on z-distance)
+    const zDepth = 1200; // Controls perspective strength
+    const scale = zDepth / (zDepth + z2);
+    
+    return [x3 * scale + x, y3 * scale + y];
+  });
+  
+  // Draw the edges
+  p.stroke(255, 180);
+  p.strokeWeight(pixelSize);
+  
+  edges.forEach(([i, j]) => {
+    const [x1, y1] = projectedVertices[i];
+    const [x2, y2] = projectedVertices[j];
     
     if (isPixelated) {
-      drawPixelatedLine(p, outerX, outerY, innerX, innerY, pixelSize);
+      drawPixelatedLine(p, x1, y1, x2, y2, pixelSize);
     } else {
-      p.line(outerX, outerY, innerX, innerY);
+      p.line(x1, y1, x2, y2);
     }
-  }
-  p.pop();
+  });
   
-  p.pop();
+  // Draw subtle vertex points
+  p.fill(255, 200);
+  p.noStroke();
+  
+  projectedVertices.forEach(([x, y]) => {
+    if (isPixelated) {
+      p.rect(x, y, pixelSize, pixelSize);
+    } else {
+      p.circle(x, y, pixelSize * 1.5);
+    }
+  });
 }
 
-// Helper: Draw a 3D cube in 2D space
-function drawCube(p: any, x: number, y: number, z: number, size: number) {
-  const half = size / 2;
+// Helper to connect tesseract vertices between inner and outer cubes
+function connectTesseractVertices(
+  p: any, 
+  outerSize: number, 
+  innerSize: number, 
+  rotX: number, 
+  rotY: number, 
+  rotZ: number, 
+  pixelSize: number,
+  isPixelated: boolean
+) {
+  const outerHalf = outerSize / 2;
+  const innerHalf = innerSize / 2;
   
-  // Front face
-  p.beginShape();
-  p.vertex(x - half, y - half, z + half);
-  p.vertex(x + half, y - half, z + half);
-  p.vertex(x + half, y + half, z + half);
-  p.vertex(x - half, y + half, z + half);
-  p.vertex(x - half, y - half, z + half);
-  p.endShape();
-  
-  // Back face
-  p.beginShape();
-  p.vertex(x - half, y - half, z - half);
-  p.vertex(x + half, y - half, z - half);
-  p.vertex(x + half, y + half, z - half);
-  p.vertex(x - half, y + half, z - half);
-  p.vertex(x - half, y - half, z - half);
-  p.endShape();
-  
-  // Connecting edges
-  p.line(x - half, y - half, z + half, x - half, y - half, z - half);
-  p.line(x + half, y - half, z + half, x + half, y - half, z - half);
-  p.line(x + half, y + half, z + half, x + half, y + half, z - half);
-  p.line(x - half, y + half, z + half, x - half, y + half, z - half);
-}
-
-// Helper: Draw a pixelated cube
-function drawPixelatedCube(p: any, x: number, y: number, z: number, size: number, pixelSize: number) {
-  const half = size / 2;
-  
-  // Draw a simplified cube with pixelated lines
-  // Front face (projected to 2D)
-  drawPixelatedRect(p, x, y, size, size, pixelSize);
-  
-  // Depth lines (simplified for 2D)
-  const cornerOffset = half * 0.7; // Perspective effect
-  
-  // Connect front corners to back corners with depth
-  const corners = [
-    { x: -half, y: -half },
-    { x: half, y: -half },
-    { x: half, y: half },
-    { x: -half, y: half }
+  // Create 4D-like connections by connecting specific vertices
+  // between the inner and outer cubes
+  const outerVertices = [
+    [-outerHalf, -outerHalf, -outerHalf], // 0
+    [outerHalf, -outerHalf, -outerHalf],  // 1 
+    [outerHalf, outerHalf, -outerHalf],   // 2
+    [-outerHalf, outerHalf, -outerHalf],  // 3
   ];
   
-  for (const corner of corners) {
-    const x1 = x + corner.x;
-    const y1 = y + corner.y;
-    const x2 = x1 - cornerOffset * 0.5;
-    const y2 = y1 - cornerOffset * 0.5;
+  const innerVertices = [
+    [-innerHalf, -innerHalf, innerHalf],  // 4
+    [innerHalf, -innerHalf, innerHalf],   // 5
+    [innerHalf, innerHalf, innerHalf],    // 6
+    [-innerHalf, innerHalf, innerHalf]    // 7
+  ];
+  
+  // Apply same rotations and projection to both sets of vertices
+  const projectVertex = (v: number[]) => {
+    let [vx, vy, vz] = v;
     
-    drawPixelatedLine(p, x1, y1, x2, y2, pixelSize);
+    // Apply rotations (same as in drawRotatedCube)
+    const y1 = vy * Math.cos(rotX) - vz * Math.sin(rotX);
+    const z1 = vy * Math.sin(rotX) + vz * Math.cos(rotX);
+    
+    const x2 = vx * Math.cos(rotY) + z1 * Math.sin(rotY);
+    const z2 = -vx * Math.sin(rotY) + z1 * Math.cos(rotY);
+    
+    const x3 = x2 * Math.cos(rotZ) - y1 * Math.sin(rotZ);
+    const y3 = x2 * Math.sin(rotZ) + y1 * Math.cos(rotZ);
+    
+    // Perspective projection
+    const zDepth = 1200;
+    const scale = zDepth / (zDepth + z2);
+    
+    return [x3 * scale, y3 * scale];
+  };
+  
+  const projectedOuter = outerVertices.map(projectVertex);
+  const projectedInner = innerVertices.map(projectVertex);
+  
+  // Draw connections with varying opacity based on rotation
+  p.stroke(255, 70 + Math.sin(rotX * 2) * 30);
+  p.strokeWeight(pixelSize);
+  
+  // Connect corresponding vertices
+  for (let i = 0; i < 4; i++) {
+    const [x1, y1] = projectedOuter[i];
+    const [x2, y2] = projectedInner[i];
+    
+    if (isPixelated) {
+      drawPixelatedLine(p, x1, y1, x2, y2, pixelSize);
+    } else {
+      p.line(x1, y1, x2, y2);
+    }
+    
+    // Add some diagonal connections for more complex visual
+    if (i % 2 === 0) {
+      const nextI = (i + 1) % 4;
+      const [x3, y3] = projectedInner[nextI];
+      
+      if (isPixelated) {
+        drawPixelatedLine(p, x1, y1, x3, y3, pixelSize);
+      } else {
+        p.line(x1, y1, x3, y3);
+      }
+    }
   }
   
-  // Back face (simplified)
-  const backSize = size * 0.7; // Smaller for perspective
-  const backX = x - cornerOffset * 0.25;
-  const backY = y - cornerOffset * 0.25;
+  // Draw a pulsing center point for added effect
+  const pulseSize = (Math.sin(rotX * 3) + 1) * 2 + 2;
+  p.fill(255, 220);
+  p.noStroke();
   
-  drawPixelatedRect(p, backX, backY, backSize, backSize, pixelSize);
+  if (isPixelated) {
+    drawPixelatedCircle(p, 0, 0, pulseSize, pixelSize);
+  } else {
+    p.circle(0, 0, pulseSize * 2);
+  }
 }
 
 // Pattern 3: Sacred Geometry

@@ -29,7 +29,7 @@ const PatternInfo: React.FC<PatternInfoProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 2, duration: 0.5 }}
-      className={`${isMobile ? 'fixed bottom-16 left-4 right-4 max-w-full' : 'fixed bottom-6 left-6 max-w-sm'} backdrop-blur-sm bg-black/40 border border-white/10 rounded-lg p-4 z-10`}
+      className={`${isMobile ? 'fixed bottom-40 left-4 right-4 max-w-full' : 'fixed bottom-6 left-6 max-w-sm'} backdrop-blur-sm bg-black/40 border border-white/10 rounded-lg p-4 z-10`}
     >
       <h2 className="text-white text-xl font-light tracking-wider mb-2">
         {title}

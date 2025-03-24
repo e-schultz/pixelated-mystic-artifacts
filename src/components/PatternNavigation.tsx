@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/ArtContext';
 import { patterns } from '@/contexts/ArtContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 /**
  * A component for navigating between patterns
@@ -10,6 +11,7 @@ import { patterns } from '@/contexts/ArtContext';
 const PatternNavigation: React.FC = () => {
   const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = useArt();
   const [showPatternList, setShowPatternList] = useState(false);
+  const isMobile = useIsMobile();
 
   const handlePatternClick = (index: number) => {
     setCurrentPattern(index);
@@ -21,42 +23,53 @@ const PatternNavigation: React.FC = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 2.2, duration: 0.5 }}
-      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center"
+      className={`fixed ${isMobile ? 'bottom-8 left-0 right-0 px-4' : 'bottom-6 left-1/2 transform -translate-x-1/2'} z-10 flex flex-col items-center`}
     >
-      <div className="flex items-center space-x-4 mb-2">
+      <div className={`flex items-center ${isMobile ? 'justify-center w-full space-x-8' : 'space-x-4'} mb-2`}>
         <button 
           onClick={prevPattern}
           aria-label="Previous pattern"
-          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+          className={`${isMobile ? 'w-14 h-14' : 'w-10 h-10'} rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isMobile ? 'text-xl' : ''}`}
         >
           ←
         </button>
         
-        <button
-          onClick={() => setShowPatternList(!showPatternList)}
-          className="px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
-        >
-          <span className={`${isAutoPlaying ? 'text-mystic' : 'text-mystic/70'}`}>
-            {currentPattern + 1}/{patterns.length}
-          </span>
-        </button>
+        {!isMobile && (
+          <button
+            onClick={() => setShowPatternList(!showPatternList)}
+            className="px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+          >
+            <span className={`${isAutoPlaying ? 'text-mystic' : 'text-mystic/70'}`}>
+              {currentPattern + 1}/{patterns.length}
+            </span>
+          </button>
+        )}
         
         <button 
           onClick={nextPattern}
           aria-label="Next pattern"
-          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+          className={`${isMobile ? 'w-14 h-14' : 'w-10 h-10'} rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isMobile ? 'text-xl' : ''}`}
         >
           →
         </button>
       </div>
       
-      {/* Random pattern button */}
-      <button
-        onClick={selectRandomPattern}
-        className="text-xs text-mystic/50 hover:text-mystic/80 transition-colors"
-      >
-        Random Pattern
-      </button>
+      {/* Small indicator for mobile */}
+      {isMobile && (
+        <div className="mt-2 text-xs text-mystic/60">
+          {currentPattern + 1}/{patterns.length}
+        </div>
+      )}
+      
+      {/* Random pattern button - hide on mobile */}
+      {!isMobile && (
+        <button
+          onClick={selectRandomPattern}
+          className="text-xs text-mystic/50 hover:text-mystic/80 transition-colors"
+        >
+          Random Pattern
+        </button>
+      )}
       
       {/* Pattern selection dropdown */}
       {showPatternList && (

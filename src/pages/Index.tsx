@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
@@ -18,7 +17,6 @@ const Index = () => {
     isAutoCycling,
     animationSpeed,
     showAsciiOverlay,
-    setShowAsciiOverlay,
     performanceMode
   } = useAnimation();
 
@@ -33,15 +31,6 @@ const Index = () => {
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
   };
-
-  // Fix the toggleAsciiOverlay function to actually call setShowAsciiOverlay
-  const toggleAsciiOverlay = () => {
-    setShowAsciiOverlay(!showAsciiOverlay);
-  };
-
-  // Add safety check for animations length
-  const animationsLength = animations?.length || 0;
-  const currentAnimationIndex = currentAnimation >= 0 && currentAnimation < animationsLength ? currentAnimation : 0;
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
@@ -102,7 +91,7 @@ const Index = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={toggleAsciiOverlay} // Fixed: proper function call
+          onClick={() => showAsciiOverlay}
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
@@ -146,7 +135,7 @@ const Index = () => {
                 MYSTIC.SYS [VERSION 8.15.23]
               </div>
               <div className="text-green-400/60 font-mono text-xs tracking-widest">
-                {`${currentAnimationIndex + 1}/${animationsLength} | ${animationSpeed.toFixed(1)}X`}
+                {`${currentAnimation + 1}/${animations.length} | ${animationSpeed.toFixed(1)}X`}
               </div>
             </div>
           </div>

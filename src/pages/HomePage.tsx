@@ -10,6 +10,7 @@ import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
+import { Settings, Terminal } from 'lucide-react';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,8 +25,16 @@ const HomePage = () => {
     performanceMode
   } = useAnimation();
 
-  const { currentPattern } = useArt();
+  const { currentPattern, patterns } = useArt();
   
+  // Safety checks for animations length
+  const animationsLength = animations?.length || 0;
+  const currentAnimationIndex = currentAnimation >= 0 && currentAnimation < animationsLength ? currentAnimation : 0;
+  
+  // Safety checks for patterns
+  const patternsArray = patterns || [];
+  const currentPatternData = patternsArray[currentPattern] || { title: "Unknown Pattern" };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -34,25 +43,17 @@ const HomePage = () => {
     return () => clearTimeout(timer);
   }, [performanceMode]);
 
-  useEffect(() => {
-    console.log('HomePage: Current pattern is', currentPattern);
-  }, [currentPattern]);
-
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
   };
 
-  // Fix the toggleAsciiOverlay function to actually call setShowAsciiOverlay
   const toggleAsciiOverlay = () => {
     setShowAsciiOverlay(!showAsciiOverlay);
   };
 
-  // Add safety check for animations length
-  const animationsLength = animations?.length || 0;
-  const currentAnimationIndex = currentAnimation >= 0 && currentAnimation < animationsLength ? currentAnimation : 0;
-
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
+      {/* Loading Screen */}
       {isLoading && (
         <div className="fixed inset-0 bg-mystic-dark flex flex-col items-center justify-center z-50">
           <motion.div
@@ -85,25 +86,36 @@ const HomePage = () => {
         </div>
       )}
 
+      {/* Main Canvas */}
       <SacredGeometryCanvas />
       
+      {/* Header */}
       <header className="fixed top-0 left-0 right-0 p-6 z-10">
-        <motion.h1 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, duration: 0.5 }}
-          className="text-mystic text-2xl font-light tracking-[0.2em] text-center"
+          className="flex flex-col items-center"
         >
-          PIXELATED MYSTIC ARTIFACTS
-        </motion.h1>
+          <h1 className="text-mystic text-2xl font-light tracking-[0.2em]">
+            PIXELATED MYSTIC ARTIFACTS
+          </h1>
+          {!isLoading && (
+            <p className="text-mystic/50 text-xs mt-2">
+              {currentPatternData.title}
+            </p>
+          )}
+        </motion.div>
       </header>
       
+      {/* Animation Info Display */}
       <OptimizedAnimationInfo />
       
-      {/* Navigation and Sequencer */}
+      {/* Pattern Navigation and Sequencer */}
       <PatternNavigation />
       <PatternSequencer />
       
+      {/* Bottom Information */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -111,13 +123,15 @@ const HomePage = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={toggleAsciiOverlay} // Fixed: proper function call
+          onClick={toggleAsciiOverlay}
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
               : 'border-mystic/30 text-mystic/60 hover:bg-mystic/10 hover:text-mystic'
           }`}
+          aria-pressed={showAsciiOverlay}
         >
+          <Terminal className="h-3 w-3 mr-1" />
           <span className="font-mono tracking-wide">
             {showAsciiOverlay ? 'ASCII ON' : 'ASCII'}
           </span>
@@ -131,22 +145,27 @@ const HomePage = () => {
         </p>
       </motion.div>
       
+      {/* Settings Button */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 0.5 }}
         onClick={toggleControlPanel}
         className="fixed top-6 right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        aria-label="Toggle settings panel"
       >
-        ⚙️
+        <Settings className="h-5 w-5" />
       </motion.button>
       
+      {/* Performance Monitor */}
       <PerformanceMonitor />
       
+      {/* Settings Panel */}
       {showControlPanel && (
         <OptimizedControlPanel onClose={toggleControlPanel} />
       )}
       
+      {/* ASCII Overlay Elements */}
       {showAsciiOverlay && (
         <>
           <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
@@ -155,7 +174,7 @@ const HomePage = () => {
                 MYSTIC.SYS [VERSION 8.15.23]
               </div>
               <div className="text-green-400/60 font-mono text-xs tracking-widest">
-                {`${currentAnimationIndex + 1}/${animationsLength} | ${animationSpeed.toFixed(1)}X`}
+                {`${currentPatternData.title} | ${animationSpeed.toFixed(1)}X`}
               </div>
             </div>
           </div>
@@ -170,6 +189,7 @@ const HomePage = () => {
         </>
       )}
       
+      {/* Performance Mode Indicator */}
       {performanceMode && (
         <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
           Performance Mode

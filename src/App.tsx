@@ -9,7 +9,7 @@ import { AnimationProvider } from "@/contexts/AnimationContext";
 import { SequenceProvider } from "@/contexts/SequenceContext";
 
 // Lazy-load pages for better performance
-const Index = lazy(() => import("@/pages/Index"));
+const HomePage = lazy(() => import("@/pages/HomePage"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 // Loading component for suspense fallback
@@ -29,7 +29,7 @@ const App = () => (
           <BrowserRouter>
             <Suspense fallback={<Loading />}>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<HomePage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

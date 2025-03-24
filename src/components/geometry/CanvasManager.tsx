@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import p5 from 'p5';
 import { useAnimation } from '@/contexts/AnimationContext';
@@ -211,7 +210,7 @@ const CanvasManager: React.FC<CanvasManagerProps> = ({ className }) => {
       };
       
       // Optimized resize handling
-      let resizeTimeout: number;
+      let resizeTimeout: ReturnType<typeof setTimeout>;
       p.windowResized = () => {
         // Debounce resize to prevent multiple canvas recreations
         clearTimeout(resizeTimeout);

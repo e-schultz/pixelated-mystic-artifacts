@@ -25,12 +25,14 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
   }, [setAnimationSpeed]);
 
   const toggleAutoCycle = React.useCallback(() => {
-    setIsAutoCycling(prev => !prev);
-  }, [setIsAutoCycling]);
+    // Fixed: changed from passing a function to passing the opposite boolean value directly
+    setIsAutoCycling(!isAutoCycling);
+  }, [setIsAutoCycling, isAutoCycling]);
 
   const toggleAsciiOverlay = React.useCallback(() => {
-    setShowAsciiOverlay(prev => !prev);
-  }, [setShowAsciiOverlay]);
+    // Fixed: changed from passing a function to passing the opposite boolean value directly
+    setShowAsciiOverlay(!showAsciiOverlay);
+  }, [setShowAsciiOverlay, showAsciiOverlay]);
 
   return (
     <motion.div

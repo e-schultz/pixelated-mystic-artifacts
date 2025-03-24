@@ -188,62 +188,12 @@ function drawTesseractMatrix(
   
   const pixelSize = isPixelated ? 2 : 1;
   const cubeSize = size * 0.6;
+  const innerCubeSize = cubeSize * 0.6;
   const rotation = time * 0.2;
   
   p.stroke(255, 180);
   p.strokeWeight(pixelSize);
   p.noFill();
-  
-  // Draw inner cube
-  p.push();
-  p.rotateX(rotation);
-  p.rotateY(rotation * 0.7);
-  p.rotateZ(rotation * 0.5);
-  
-  const innerSize = cubeSize * 0.6;
-  const vertices = [];
-  
-  // Create cube vertices
-  for (let x = -1; x <= 1; x += 2) {
-    for (let y = -1; y <= 1; y += 2) {
-      for (let z = -1; z <= 1; z += 2) {
-        vertices.push({
-          x: x * innerSize / 2,
-          y: y * innerSize / 2,
-          z: z * innerSize / 2
-        });
-      }
-    }
-  }
-  
-  // Draw edges
-  for (let i = 0; i < vertices.length; i++) {
-    for (let j = i + 1; j < vertices.length; j++) {
-      const v1 = vertices[i];
-      const v2 = vertices[j];
-      
-      // Only connect vertices that share exactly one coordinate
-      const sharedAxes = 
-        (v1.x === v2.x ? 1 : 0) + 
-        (v1.y === v2.y ? 1 : 0) + 
-        (v1.z === v2.z ? 1 : 0);
-      
-      if (sharedAxes === 2) {
-        // Project 3D to 2D
-        const x1 = v1.x;
-        const y1 = v1.y;
-        const x2 = v2.x;
-        const y2 = v2.y;
-        
-        if (isPixelated) {
-          drawPixelatedLine(p, x1, y1, x2, y2, pixelSize);
-        } else {
-          p.line(x1, y1, x2, y2);
-        }
-      }
-    }
-  }
-  p.pop();
   
   // Draw outer cube
   p.push();
@@ -252,13 +202,129 @@ function drawTesseractMatrix(
   p.rotateZ(rotation * 0.3);
   
   if (isPixelated) {
-    drawPixelatedRect(p, 0, 0, cubeSize, cubeSize, pixelSize);
+    drawPixelatedCube(p, 0, 0, 0, cubeSize, pixelSize);
   } else {
-    p.rect(-cubeSize/2, -cubeSize/2, cubeSize, cubeSize);
+    drawCube(p, 0, 0, 0, cubeSize);
+  }
+  p.pop();
+  
+  // Draw inner cube
+  p.push();
+  p.rotateX(rotation);
+  p.rotateY(rotation * 0.7);
+  p.rotateZ(rotation * 0.5);
+  
+  if (isPixelated) {
+    drawPixelatedCube(p, 0, 0, 0, innerCubeSize, pixelSize);
+  } else {
+    drawCube(p, 0, 0, 0, innerCubeSize);
+  }
+  p.pop();
+  
+  // Draw connecting lines between cubes
+  p.push();
+  const halfOuter = cubeSize / 2;
+  const halfInner = innerCubeSize / 2;
+  
+  // Connection points - map 8 corners
+  const connectPoints = [
+    { x: -1, y: -1, z: -1 },
+    { x: 1, y: -1, z: -1 },
+    { x: 1, y: 1, z: -1 },
+    { x: -1, y: 1, z: -1 },
+    { x: -1, y: -1, z: 1 },
+    { x: 1, y: -1, z: 1 },
+    { x: 1, y: 1, z: 1 },
+    { x: -1, y: 1, z: 1 }
+  ];
+  
+  p.stroke(255, 100);
+  
+  // Only draw some connections for aesthetic effect
+  for (let i = 0; i < connectPoints.length; i += 2) {
+    const pt = connectPoints[i];
+    
+    // Project to 2D with rotation
+    const outerX = pt.x * halfOuter * Math.cos(rotation * 0.6);
+    const outerY = pt.y * halfOuter * Math.cos(rotation * 0.4);
+    
+    const innerX = pt.x * halfInner * Math.cos(rotation);
+    const innerY = pt.y * halfInner * Math.cos(rotation * 0.7);
+    
+    if (isPixelated) {
+      drawPixelatedLine(p, outerX, outerY, innerX, innerY, pixelSize);
+    } else {
+      p.line(outerX, outerY, innerX, innerY);
+    }
   }
   p.pop();
   
   p.pop();
+}
+
+// Helper: Draw a 3D cube in 2D space
+function drawCube(p: any, x: number, y: number, z: number, size: number) {
+  const half = size / 2;
+  
+  // Front face
+  p.beginShape();
+  p.vertex(x - half, y - half, z + half);
+  p.vertex(x + half, y - half, z + half);
+  p.vertex(x + half, y + half, z + half);
+  p.vertex(x - half, y + half, z + half);
+  p.vertex(x - half, y - half, z + half);
+  p.endShape();
+  
+  // Back face
+  p.beginShape();
+  p.vertex(x - half, y - half, z - half);
+  p.vertex(x + half, y - half, z - half);
+  p.vertex(x + half, y + half, z - half);
+  p.vertex(x - half, y + half, z - half);
+  p.vertex(x - half, y - half, z - half);
+  p.endShape();
+  
+  // Connecting edges
+  p.line(x - half, y - half, z + half, x - half, y - half, z - half);
+  p.line(x + half, y - half, z + half, x + half, y - half, z - half);
+  p.line(x + half, y + half, z + half, x + half, y + half, z - half);
+  p.line(x - half, y + half, z + half, x - half, y + half, z - half);
+}
+
+// Helper: Draw a pixelated cube
+function drawPixelatedCube(p: any, x: number, y: number, z: number, size: number, pixelSize: number) {
+  const half = size / 2;
+  
+  // Draw a simplified cube with pixelated lines
+  // Front face (projected to 2D)
+  drawPixelatedRect(p, x, y, size, size, pixelSize);
+  
+  // Depth lines (simplified for 2D)
+  const cornerOffset = half * 0.7; // Perspective effect
+  
+  // Connect front corners to back corners with depth
+  const corners = [
+    { x: -half, y: -half },
+    { x: half, y: -half },
+    { x: half, y: half },
+    { x: -half, y: half }
+  ];
+  
+  for (const corner of corners) {
+    const x1 = x + corner.x;
+    const y1 = y + corner.y;
+    const x2 = x1 - cornerOffset * 0.5;
+    const y2 = y1 - cornerOffset * 0.5;
+    
+    drawPixelatedLine(p, x1, y1, x2, y2, pixelSize);
+  }
+  
+  // Back face (simplified)
+  const backSize = size * 0.7; // Smaller for perspective
+  const backX = x - cornerOffset * 0.25;
+  const backY = y - cornerOffset * 0.25;
+  
+  drawPixelatedRect(p, backX, backY, backSize, backSize, pixelSize);
 }
 
 // Pattern 3: Sacred Geometry

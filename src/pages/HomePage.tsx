@@ -8,6 +8,7 @@ import PatternSequencer from '@/components/PatternSequencer';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
+import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 
 const HomePage = () => {

@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { VisualizationProvider } from "@/contexts/VisualizationContext";
+import { ArtProvider } from "@/contexts/ArtContext";
+import { AnimationProvider } from "@/contexts/AnimationContext";
 
 // Lazy-load pages for better performance
 const HomePage = lazy(() => import("@/pages/HomePage"));
@@ -19,18 +20,20 @@ const Loading = () => (
 
 const App = () => (
   <TooltipProvider>
-    <VisualizationProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<Loading />}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </VisualizationProvider>
+    <ArtProvider>
+      <AnimationProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </AnimationProvider>
+    </ArtProvider>
   </TooltipProvider>
 );
 

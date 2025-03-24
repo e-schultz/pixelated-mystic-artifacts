@@ -1,6 +1,8 @@
 
 import { useArt } from '@/contexts/ArtContext';
 import { drawPatterns } from '@/utils/patternRenderer';
+import { useCallback, useMemo } from 'react';
+import { recordFrameTime, isPerformanceMonitoring } from '@/utils/performanceMonitor';
 
 // This hook handles the creation of the sketch function for the art canvas
 export function useArtCanvasSketch() {
@@ -13,11 +15,18 @@ export function useArtCanvasSketch() {
   } = useArt();
 
   // Create the sketch function
-  const createSketch = () => {
+  const createSketch = useCallback(() => {
     return (p: any) => {
       let time = 0;
       let lastFrameTime = 0;
+      let lastTerminalUpdate = 0;
       const targetFrameRate = isLowPerformanceMode ? 30 : 60;
+      
+      // Pre-calculate terminal rendering settings
+      const terminalUpdateInterval = isLowPerformanceMode ? 200 : 100; // ms
+      const terminalCharSize = isLowPerformanceMode ? 16 : 12;
+      const terminalCols = Math.floor(window.innerWidth / terminalCharSize);
+      const terminalRows = Math.floor(window.innerHeight / terminalCharSize);
       
       p.setup = () => {
         console.log('Setting up p5 canvas with pattern:', currentPattern);
@@ -41,12 +50,14 @@ export function useArtCanvasSketch() {
       
       p.draw = () => {
         // Calculate delta time for smooth animations
+        const frameStartTime = performance.now();
         const currentTime = p.millis();
         const deltaTime = (currentTime - lastFrameTime) / 1000;
         lastFrameTime = currentTime;
         
-        // Clear with trail effect
-        p.background(0, 12);
+        // Clear with trail effect - optimize based on device
+        const alphaValue = isLowPerformanceMode ? 30 : 12; // Higher alpha = less trail for performance
+        p.background(0, alphaValue);
         
         // Update time based on animation speed
         time += 0.01 * speed * deltaTime * 60;
@@ -66,31 +77,38 @@ export function useArtCanvasSketch() {
           }
         );
         
-        // Draw terminal overlay if enabled
-        if (isTerminalMode && (!isLowPerformanceMode || p.frameCount % 3 === 0)) {
-          drawTerminalOverlay(p);
+        // Draw terminal overlay if enabled - optimized to run less frequently
+        if (isTerminalMode && currentTime - lastTerminalUpdate > terminalUpdateInterval) {
+          drawTerminalOverlay(p, terminalCols, terminalRows, terminalCharSize);
+          lastTerminalUpdate = currentTime;
+        }
+        
+        // Calculate and record frame time for performance monitoring
+        if (isPerformanceMonitoring()) {
+          const frameTime = performance.now() - frameStartTime;
+          recordFrameTime(frameTime);
         }
       };
       
-      const drawTerminalOverlay = (p: any) => {
-        const charSize = isLowPerformanceMode ? 16 : 12;
-        const cols = Math.floor(p.width / charSize);
-        const rows = Math.floor(p.height / charSize);
-        
+      // Optimized terminal overlay with pre-calculated values
+      const drawTerminalOverlay = (p: any, cols: number, rows: number, charSize: number) => {
         p.push();
         p.fill(0, 220, 0, 40);
         p.textSize(charSize);
         p.textFont('monospace');
         
         // Skip rows for performance
-        const rowStep = isLowPerformanceMode ? 2 : 1;
-        const colStep = isLowPerformanceMode ? 2 : 1;
+        const rowStep = isLowPerformanceMode ? 3 : 2;
+        const colStep = isLowPerformanceMode ? 3 : 2;
+        
+        // Pre-defined character set for better performance
+        const chars = ['0', '1', '.', ' ', '|', '/', '\\', '*'];
+        const charsLength = chars.length;
         
         for (let y = 0; y < rows; y += rowStep) {
           for (let x = 0; x < cols; x += colStep) {
             if (Math.random() < 0.3) {
-              const chars = ['0', '1', '.', ' ', '|', '/', '\\', '*'];
-              const char = chars[Math.floor(Math.random() * chars.length)];
+              const char = chars[Math.floor(Math.random() * charsLength)];
               p.text(char, x * charSize, y * charSize + charSize);
             }
           }
@@ -98,19 +116,22 @@ export function useArtCanvasSketch() {
         p.pop();
       };
       
-      // Handle window resize
+      // Optimized window resize handler with debounce
       let resizeTimeout: ReturnType<typeof setTimeout>;
       p.windowResized = () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           p.resizeCanvas(window.innerWidth, window.innerHeight);
-        }, 100);
+        }, 200); // Increased debounce time for better performance
       };
     };
-  };
+  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]);
+
+  // Memoize the sketch creation and dependencies for improved rendering performance
+  const sketch = useMemo(() => createSketch(), [createSketch]);
 
   return {
-    createSketch,
+    createSketch: () => sketch,
     dependencies: [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]
   };
 }

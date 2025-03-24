@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
 import OptimizedControlPanel from '@/components/OptimizedControlPanel';
+import PerformanceMonitor from '@/components/PerformanceMonitor';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
@@ -21,11 +21,10 @@ const Index = () => {
     performanceMode
   } = useAnimation();
 
-  // Loading screen effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, performanceMode ? 1000 : 1500); // Shorter loading time on mobile
+    }, performanceMode ? 1000 : 1500);
 
     return () => clearTimeout(timer);
   }, [performanceMode]);
@@ -145,6 +144,8 @@ const Index = () => {
       >
         ⚙️
       </motion.button>
+      
+      <PerformanceMonitor />
       
       {showControlPanel && (
         <OptimizedControlPanel onClose={toggleControlPanel} />

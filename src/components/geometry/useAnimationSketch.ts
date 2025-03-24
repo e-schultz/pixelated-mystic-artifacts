@@ -1,6 +1,8 @@
 
 import { useAnimation } from '@/contexts/AnimationContext';
 import { getAnimationConfig } from './animationConfigs';
+import { useCallback, useMemo } from 'react';
+import { recordFrameTime, isPerformanceMonitoring } from '@/utils/performanceMonitor';
 
 // This hook creates the sketch function used by p5
 export function useAnimationSketch() {
@@ -11,8 +13,8 @@ export function useAnimationSketch() {
     performanceMode 
   } = useAnimation();
 
-  // Create the sketch function
-  const createSketch = () => {
+  // Create the sketch function with optimizations
+  const createSketch = useCallback(() => {
     return (p: any) => {
       // Animation state
       let time = 0;
@@ -29,9 +31,16 @@ export function useAnimationSketch() {
       // Frame rate control
       let targetFrameRate = performanceMode ? 30 : 60;
       let lastFrameTime = 0;
+      let lastAsciiUpdate = 0;
       
       // Configuration
       const maxSmallShapes = performanceMode ? 5 : 15;
+      const asciiUpdateInterval = performanceMode ? 250 : 150; // ms
+      
+      // Precalculate ASCII dimensions once
+      const charSize = performanceMode ? 16 : 12;
+      const cols = Math.floor(p.width / charSize);
+      const rows = Math.floor(p.height / charSize);
       
       // Animation setup
       p.setup = () => {
@@ -47,40 +56,45 @@ export function useAnimationSketch() {
       
       // Generate background shapes - optimized for performance
       const generateSmallShapes = () => {
-        smallShapes = [];
-        // Fewer shapes on mobile
-        const numShapes = performanceMode ? 
-          Math.floor(p.random(3, 6)) : 
-          Math.floor(p.random(5, 15));
-        
-        for (let i = 0; i < numShapes; i++) {
-          // Use simplified shapes on mobile
-          const shapeConfig = getAnimationConfig(p, currentAnimation, performanceMode);
-          smallShapes.push({
-            x: p.random(p.width),
-            y: p.random(p.height),
-            size: p.random(20, 70),
-            rotation: p.random(p.TWO_PI),
-            speed: p.random(0.0005, 0.002) * (performanceMode ? 0.7 : 1),
-            drawFunction: shapeConfig.drawFunction,
-            settings: {
-              ...shapeConfig.settings,
-              pixelSize: Math.max(1, Math.floor(p.random(1, performanceMode ? 2 : 3))),
-              opacity: p.random(0.3, 0.8)
-            }
-          });
+        // Only regenerate if needed to avoid GC pressure
+        if (smallShapes.length === 0) {
+          smallShapes = [];
+          // Fewer shapes on mobile
+          const numShapes = performanceMode ? 
+            Math.floor(p.random(3, 5)) : 
+            Math.floor(p.random(5, 12));
+          
+          for (let i = 0; i < numShapes; i++) {
+            // Use simplified shapes on mobile
+            const shapeConfig = getAnimationConfig(p, currentAnimation, performanceMode);
+            smallShapes.push({
+              x: p.random(p.width),
+              y: p.random(p.height),
+              size: p.random(20, 70),
+              rotation: p.random(p.TWO_PI),
+              speed: p.random(0.0005, 0.002) * (performanceMode ? 0.7 : 1),
+              drawFunction: shapeConfig.drawFunction,
+              settings: {
+                ...shapeConfig.settings,
+                pixelSize: Math.max(1, Math.floor(p.random(1, performanceMode ? 2 : 3))),
+                opacity: p.random(0.3, 0.8)
+              }
+            });
+          }
         }
       };
       
       // Draw function with delta time for consistent animation speed
       p.draw = () => {
+        const frameStartTime = performance.now();
+        
         // Calculate delta time for smooth animations regardless of frame rate
         const currentTime = p.millis();
         const deltaTime = (currentTime - lastFrameTime) / 1000; // in seconds
         lastFrameTime = currentTime;
         
         // Clear background with trail effect
-        p.background(18, 18, 18, 10);
+        p.background(18, 18, 18, performanceMode ? 20 : 10);
         
         // Update time based on animation speed and delta time
         // This ensures consistent animation speed regardless of frame rate
@@ -104,14 +118,14 @@ export function useAnimationSketch() {
         animation.drawFunction(p, centerX, centerY, size, animSettings);
         
         // Draw background shapes with performance optimizations
-        if (!performanceMode || p.frameCount % 2 === 0) { // Skip every other frame on mobile
+        // Skip frames based on performance mode
+        if (!performanceMode || p.frameCount % 2 === 0) {
           p.push();
           p.noStroke();
           
-          // Only update a subset of shapes each frame on mobile
-          const shapesToUpdate = performanceMode ? 
-            smallShapes.filter((_, i) => i % 2 === p.frameCount % 2) : 
-            smallShapes;
+          // Only update a subset of shapes each frame for better performance
+          const updateRatio = performanceMode ? 0.5 : 0.75;
+          const shapesToUpdate = smallShapes.filter(() => Math.random() < updateRatio);
             
           shapesToUpdate.forEach(shape => {
             shape.rotation += shape.speed * animationSpeed * deltaTime * 60;
@@ -126,12 +140,13 @@ export function useAnimationSketch() {
           p.pop();
         }
         
-        // Draw subtle grid in background - simplified on mobile
-        if (!performanceMode || p.frameCount % 3 === 0) {
+        // Draw subtle grid in background - simplified and throttled on mobile
+        if ((!performanceMode && p.frameCount % 3 === 0) || 
+            (performanceMode && p.frameCount % 6 === 0)) {
           p.stroke(240, 240, 228, 10);
           p.strokeWeight(1);
-          const gridSize = performanceMode ? 60 : 30;
-          const gridThreshold = performanceMode ? 0.96 : 0.92; 
+          const gridSize = performanceMode ? 80 : 30;
+          const gridThreshold = performanceMode ? 0.97 : 0.92; 
           
           for (let x = 0; x < p.width; x += gridSize) {
             for (let y = 0; y < p.height; y += gridSize) {
@@ -142,80 +157,71 @@ export function useAnimationSketch() {
           }
         }
         
-        // Draw ASCII overlay if enabled - optimized
-        if (showAsciiOverlay) {
-          drawAsciiOverlay(p);
+        // Draw ASCII overlay if enabled - optimized to update less frequently
+        if (showAsciiOverlay && currentTime - lastAsciiUpdate > asciiUpdateInterval) {
+          drawAsciiOverlay(p, cols, rows, charSize);
+          lastAsciiUpdate = currentTime;
         }
         
-        // Regenerate small shapes occasionally - less frequently on mobile
-        const regenerateThreshold = performanceMode ? 0.001 : 0.005;
+        // Regenerate small shapes occasionally - much less frequently on mobile
+        const regenerateThreshold = performanceMode ? 0.0005 : 0.002;
         if (p.random() < regenerateThreshold * animationSpeed) {
           generateSmallShapes();
+        }
+        
+        // Record performance metrics
+        if (isPerformanceMonitoring()) {
+          const frameTime = performance.now() - frameStartTime;
+          recordFrameTime(frameTime);
         }
       };
       
       // ASCII art overlay effect - optimized for performance
-      const drawAsciiOverlay = (p: any) => {
-        // Larger character size on mobile for better performance
-        const charSize = performanceMode ? 16 : 12;
-        const cols = Math.floor(p.width / charSize);
-        const rows = Math.floor(p.height / charSize);
-        
+      const drawAsciiOverlay = (p: any, cols: number, rows: number, charSize: number) => {
         p.push();
         p.fill(240, 240, 228, 160);
         p.textSize(charSize);
         p.textFont('monospace');
         
         // On mobile, skip rows to improve performance
-        const rowStep = performanceMode ? 2 : 1;
-        const colStep = performanceMode ? 2 : 1;
+        const rowStep = performanceMode ? 3 : 2;
+        const colStep = performanceMode ? 3 : 2;
         
-        // Only redraw ASCII every few frames on mobile
-        if (performanceMode && p.frameCount % 3 !== 0) {
-          p.pop();
-          return;
-        }
+        // Pre-defined character patterns for better performance
+        const chars = ['.', '*', '/', '|', '\\', ' '];
         
         for (let y = 0; y < rows; y += rowStep) {
           for (let x = 0; x < cols; x += colStep) {
-            const pixelX = x * charSize;
-            const pixelY = y * charSize;
+            // Use deterministic pattern instead of pure random for better performance
+            const patternValue = (x * 3 + y * 5 + p.frameCount) % 13;
+            const charIndex = patternValue % chars.length;
             
-            // Simplified pattern calculation
-            let char = '';
-            const patternValue = (x * 3 + y * 5) % 13;
-            
-            // Simplified character selection
-            if (patternValue < 2) char = '.';
-            else if (patternValue < 4) char = '*';
-            else if (patternValue < 6) char = '/';
-            else if (patternValue < 8) char = '|';
-            else if (patternValue < 10) char = '\\';
-            else char = ' ';
-            
-            // More aggressive random filtering on mobile
-            if (Math.random() < (performanceMode ? 0.5 : 0.7)) {
-              p.text(char, pixelX, pixelY + charSize);
+            // More aggressive filtering on mobile
+            if (patternValue < (performanceMode ? 5 : 9)) {
+              p.text(chars[charIndex], x * charSize, y * charSize + charSize);
             }
           }
         }
         p.pop();
       };
       
-      // Optimized resize handling
+      // Optimized resize handling with increased debounce
       let resizeTimeout: ReturnType<typeof setTimeout>;
       p.windowResized = () => {
         // Debounce resize to prevent multiple canvas recreations
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
           p.resizeCanvas(window.innerWidth, window.innerHeight);
-        }, 100);
+        }, 200);
       };
     };
-  };
+  }, [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode]);
+
+  // Memoize the sketch creation for better performance
+  const sketch = useMemo(() => createSketch(), [createSketch]);
 
   return {
-    createSketch,
+    createSketch: () => sketch,
     dependencies: [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode]
   };
 }

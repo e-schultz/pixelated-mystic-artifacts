@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import { useCanvasSetup } from './geometry/useCanvasSetup';
 import { useArtCanvasSketch } from './useArtCanvasSketch';
 
@@ -15,4 +15,5 @@ const ArtCanvas: React.FC = () => {
   return <div ref={canvasRef} className="absolute inset-0 z-0" />;
 };
 
-export default ArtCanvas;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(ArtCanvas);

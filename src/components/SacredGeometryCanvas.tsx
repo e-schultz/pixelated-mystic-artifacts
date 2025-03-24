@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import CanvasManager from './geometry/CanvasManager';
 
 interface SacredGeometryCanvasProps {
@@ -26,4 +26,12 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
   );
 };
 
-export default React.memo(SacredGeometryCanvas);
+// Memoize with custom equality check to only re-render when necessary
+export default memo(SacredGeometryCanvas, (prevProps, nextProps) => {
+  return (
+    prevProps.currentAnimation === nextProps.currentAnimation &&
+    prevProps.animationSpeed === nextProps.animationSpeed &&
+    prevProps.showAsciiOverlay === nextProps.showAsciiOverlay &&
+    prevProps.className === nextProps.className
+  );
+});

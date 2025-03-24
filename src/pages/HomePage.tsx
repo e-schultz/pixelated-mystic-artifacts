@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
@@ -8,6 +9,7 @@ import PerformanceMonitor from '@/components/PerformanceMonitor';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
 import { patterns } from '@/contexts/ArtContext';
+import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 import { Settings, Terminal } from 'lucide-react';
 

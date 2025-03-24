@@ -3,23 +3,20 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAnimation } from '@/context/AnimationContext';
+import { animations } from '@/data/animationData';
 
 interface AnimationInfoProps {
-  title: string;
-  description: string;
-  isAutoCycling?: boolean;
-  showAsciiOverlay?: boolean;
   className?: string;
 }
 
-const AnimationInfo: React.FC<AnimationInfoProps> = ({ 
-  title, 
-  description, 
-  isAutoCycling = true,
-  showAsciiOverlay = false,
-  className 
-}) => {
+const AnimationInfo: React.FC<AnimationInfoProps> = ({ className }) => {
+  const { state } = useAnimation();
+  const { currentAnimation, isAutoCycling, showAsciiOverlay } = state;
   const [visible, setVisible] = useState(false);
+  
+  const title = animations[currentAnimation].title;
+  const description = animations[currentAnimation].description;
   
   useEffect(() => {
     // Show animation info with a delay for a nice entrance effect

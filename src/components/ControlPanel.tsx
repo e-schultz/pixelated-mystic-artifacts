@@ -2,26 +2,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Slider } from "@/components/ui/slider";
+import { useAnimation } from '@/context/AnimationContext';
 
 interface ControlPanelProps {
-  animationSpeed: number;
-  setAnimationSpeed: (speed: number) => void;
-  isAutoCycling: boolean;
-  setIsAutoCycling: (isAuto: boolean) => void;
-  showAsciiOverlay: boolean;
-  setShowAsciiOverlay: (showAscii: boolean) => void;
   onClose: () => void;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({
-  animationSpeed,
-  setAnimationSpeed,
-  isAutoCycling,
-  setIsAutoCycling,
-  showAsciiOverlay,
-  setShowAsciiOverlay,
-  onClose
-}) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
+  const { state, dispatch } = useAnimation();
+  const { animationSpeed, isAutoCycling, showAsciiOverlay } = state;
+
+  const handleSpeedChange = (values: number[]) => {
+    dispatch({ type: 'SET_ANIMATION_SPEED', payload: values[0] });
+  };
+
+  const toggleAutoCycling = () => {
+    dispatch({ type: 'TOGGLE_AUTO_CYCLING' });
+  };
+
+  const toggleAsciiOverlay = () => {
+    dispatch({ type: 'TOGGLE_ASCII_OVERLAY' });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -49,7 +51,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
               min={0.5}
               max={3}
               step={0.1}
-              onValueChange={(values) => setAnimationSpeed(values[0])}
+              onValueChange={handleSpeedChange}
               className="flex-1"
             />
             <span className="text-mystic/60 text-xs">Fast</span>
@@ -62,7 +64,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         <div className="space-y-3">
           <p className="text-mystic/80 text-sm">Auto-Cycling</p>
           <button
-            onClick={() => setIsAutoCycling(!isAutoCycling)}
+            onClick={toggleAutoCycling}
             className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isAutoCycling ? 'bg-mystic/20' : ''}`}
           >
             {isAutoCycling ? 'Enabled' : 'Disabled'}
@@ -72,7 +74,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         <div className="space-y-3">
           <p className="text-mystic/80 text-sm">ASCII Terminal Overlay</p>
           <button
-            onClick={() => setShowAsciiOverlay(!showAsciiOverlay)}
+            onClick={toggleAsciiOverlay}
             className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${showAsciiOverlay ? 'bg-green-800/30 text-green-400/90 border-green-400/30' : ''}`}
           >
             {showAsciiOverlay ? 'Enabled' : 'Disabled'}

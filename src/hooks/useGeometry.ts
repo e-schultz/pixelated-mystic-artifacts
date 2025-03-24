@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { GeometrySettings, getRandomGeometryFunction } from '@/utils/geometryUtils';
 
 export function useGeometry(animationSpeed: number) {
@@ -15,7 +15,7 @@ export function useGeometry(animationSpeed: number) {
   }>>([]);
 
   // Generate random small background shapes
-  const generateSmallShapes = () => {
+  const generateSmallShapes = useCallback(() => {
     const numShapes = Math.floor(Math.random() * 10) + 5; // 5-15 shapes
     const newShapes = [];
     
@@ -42,7 +42,7 @@ export function useGeometry(animationSpeed: number) {
     }
     
     setSmallShapes(newShapes);
-  };
+  }, []);
 
   // Update time based on animation speed
   useEffect(() => {
@@ -63,7 +63,7 @@ export function useGeometry(animationSpeed: number) {
     }
 
     return () => clearInterval(intervalId);
-  }, [animationSpeed, smallShapes.length]);
+  }, [animationSpeed, smallShapes.length, generateSmallShapes]);
 
   // Update small shapes based on animation speed
   useEffect(() => {

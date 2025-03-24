@@ -93,7 +93,7 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: 'SET_LOADING', payload: false });
-    }, 1500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);

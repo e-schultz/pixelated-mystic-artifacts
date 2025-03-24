@@ -9,7 +9,7 @@ import {
   drawLightPrism,
   drawRetroComputer,
   getDefaultSettings
-} from '@/utils/geometryUtils';
+} from '@/utils/geometry';
 
 // Get animation configuration based on index and performance mode
 export const getAnimationConfig = (p5: any, index: number, performanceMode: boolean = false) => {

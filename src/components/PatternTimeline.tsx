@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useSequence } from '@/contexts/SequenceContext';
 import { useArt } from '@/contexts/ArtContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { patterns } from '@/contexts/ArtContext';
 
 const PatternTimeline: React.FC = () => {
   const { 
@@ -15,7 +16,6 @@ const PatternTimeline: React.FC = () => {
     getTotalDuration
   } = useSequence();
   
-  const { patterns } = useArt() as any;
   const isMobile = useIsMobile();
   const timelineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -88,6 +88,9 @@ const PatternTimeline: React.FC = () => {
           {sequence.map((item, index) => {
             // Calculate width percentage for this segment
             const widthPercentage = (item.duration / totalDuration) * 100;
+            const patternTitle = item.patternId < patterns.length 
+              ? patterns[item.patternId]?.title 
+              : `Pattern ${item.patternId + 1}`;
             
             return (
               <div 
@@ -96,7 +99,7 @@ const PatternTimeline: React.FC = () => {
                 style={{ width: `${widthPercentage}%` }}
               >
                 <div className={`absolute inset-0 flex items-center justify-center ${isMobile ? 'text-[10px]' : 'text-xs'} text-mystic/70 truncate px-1`}>
-                  {patterns[item.patternId]?.title || `Pattern ${item.patternId + 1}`}
+                  {patternTitle}
                 </div>
               </div>
             );

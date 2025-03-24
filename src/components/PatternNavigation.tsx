@@ -4,13 +4,13 @@ import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/ArtContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ChevronLeft, ChevronRight, Shuffle, ChevronDown } from 'lucide-react';
+import { patterns } from '@/contexts/ArtContext';
 
 /**
  * A component for navigating between patterns
  */
 const PatternNavigation: React.FC = () => {
   const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = useArt();
-  const { patterns } = useArt as any; // Using 'as any' to access patterns from context
   const [showPatternList, setShowPatternList] = useState(false);
   const isMobile = useIsMobile();
 
@@ -70,7 +70,7 @@ const PatternNavigation: React.FC = () => {
           exit={{ opacity: 0, y: 10 }}
           className={`absolute ${isMobile ? 'bottom-20 w-56' : 'bottom-16 w-48'} bg-black/70 backdrop-blur-sm border border-mystic/20 rounded-lg p-2`}
         >
-          {patterns.map((pattern: any, index: number) => (
+          {patterns.map((pattern, index) => (
             <button
               key={pattern.id}
               onClick={() => handlePatternClick(index)}

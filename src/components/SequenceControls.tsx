@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Play, Pause, SkipBack, SkipForward, Repeat, Plus, Minus } from 'lucide-react';
 import { useSequence } from '@/contexts/SequenceContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useArt } from '@/contexts/ArtContext';
+import { patterns } from '@/contexts/ArtContext';
 
 const SequenceControls: React.FC = () => {
   const {
@@ -20,7 +20,6 @@ const SequenceControls: React.FC = () => {
     toggleLooping
   } = useSequence();
   
-  const { patterns } = useArt() as any;
   const isMobile = useIsMobile();
   
   // Go to previous item in sequence
@@ -64,6 +63,16 @@ const SequenceControls: React.FC = () => {
     setPlaybackSpeed(newSpeed);
   };
 
+  // Safely get pattern title
+  const getCurrentPatternTitle = () => {
+    if (currentItemIndex >= 0 && 
+        currentItemIndex < sequence.length && 
+        sequence[currentItemIndex].patternId < patterns.length) {
+      return patterns[sequence[currentItemIndex].patternId]?.title || 'Unknown Pattern';
+    }
+    return 'None';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -75,8 +84,7 @@ const SequenceControls: React.FC = () => {
       <div className={`text-center ${isMobile ? 'mb-2 w-full' : 'mr-4'}`}>
         <div className="text-xs text-mystic/50">CURRENT PATTERN</div>
         <div className="text-sm text-mystic">
-          {currentItemIndex >= 0 && currentItemIndex < sequence.length && 
-            patterns[sequence[currentItemIndex].patternId]?.title || 'None'}
+          {getCurrentPatternTitle()}
         </div>
       </div>
       

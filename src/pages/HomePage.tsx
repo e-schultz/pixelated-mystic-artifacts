@@ -20,6 +20,7 @@ const HomePage = () => {
     isAutoCycling,
     animationSpeed,
     showAsciiOverlay,
+    setShowAsciiOverlay,
     performanceMode
   } = useAnimation();
 
@@ -39,6 +40,10 @@ const HomePage = () => {
 
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
+  };
+
+  const toggleAsciiOverlay = () => {
+    setShowAsciiOverlay(!showAsciiOverlay);
   };
 
   return (
@@ -101,7 +106,7 @@ const HomePage = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={() => showAsciiOverlay}
+          onClick={toggleAsciiOverlay}
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 

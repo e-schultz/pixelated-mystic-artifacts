@@ -17,7 +17,25 @@ const PatternInfo: React.FC<PatternInfoProps> = ({
   isTerminal,
   isAutoCycling 
 }) => {
-  const { isAutoPlaying, isTerminalMode } = useArt();
+  // Try to use context with graceful fallback
+  let artContext = {
+    isAutoPlaying: false,
+    isTerminalMode: false
+  };
+  
+  try {
+    const context = useArt();
+    if (context) {
+      artContext = {
+        isAutoPlaying: context.isAutoPlaying,
+        isTerminalMode: context.isTerminalMode
+      };
+    }
+  } catch (error) {
+    console.warn("Art context not available, using defaults", error);
+  }
+  
+  const { isAutoPlaying, isTerminalMode } = artContext;
   const isMobile = useIsMobile();
   
   // Use props if provided, otherwise fall back to context values

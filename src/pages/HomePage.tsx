@@ -12,12 +12,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
+  
+  // Use safe access to context
   const { 
-    currentPattern, 
-    isControlsVisible,
-    toggleControls,
-    isTerminalMode,
-    isAutoPlaying,
+    currentPattern = 0, 
+    isControlsVisible = false,
+    toggleControls = () => {},
+    isTerminalMode = false,
+    isAutoPlaying = false,
   } = useArt();
 
   // Simulate loading for visual effect
@@ -34,8 +36,11 @@ const HomePage = () => {
     console.log('HomePage: Current pattern is', currentPattern);
   }, [currentPattern]);
 
-  // Get current pattern info
-  const patternInfo = patterns[currentPattern];
+  // Safe access to pattern info
+  const patternInfo = patterns[currentPattern] || {
+    title: "Loading...",
+    description: "Please wait while we load the patterns."
+  };
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">

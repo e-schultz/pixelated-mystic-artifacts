@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
@@ -12,13 +13,37 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showControlPanel, setShowControlPanel] = useState(false);
   
+  // Use try/catch to safely access the context
+  let animationContext = {
+    currentAnimation: 0,
+    isAutoCycling: true,
+    animationSpeed: 1,
+    showAsciiOverlay: false,
+    performanceMode: false
+  };
+
+  try {
+    const context = useAnimation();
+    if (context) {
+      animationContext = {
+        currentAnimation: context.currentAnimation,
+        isAutoCycling: context.isAutoCycling,
+        animationSpeed: context.animationSpeed,
+        showAsciiOverlay: context.showAsciiOverlay,
+        performanceMode: context.performanceMode
+      };
+    }
+  } catch (error) {
+    console.warn("Animation context not available, using defaults", error);
+  }
+
   const {
     currentAnimation,
     isAutoCycling,
     animationSpeed,
     showAsciiOverlay,
     performanceMode
-  } = useAnimation();
+  } = animationContext;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -91,7 +116,7 @@ const Index = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={() => showAsciiOverlay}
+          onClick={() => {}}
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 

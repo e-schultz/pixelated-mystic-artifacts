@@ -9,7 +9,33 @@ import { useIsMobile } from '@/hooks/use-mobile';
  * A component for navigating between patterns
  */
 const PatternNavigation: React.FC = () => {
-  const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = useArt();
+  // Try to use context, but provide fallbacks if not available
+  let artContext = {
+    nextPattern: () => console.log('Next pattern clicked'),
+    prevPattern: () => console.log('Previous pattern clicked'),
+    isAutoPlaying: false,
+    currentPattern: 0,
+    setCurrentPattern: () => {},
+    selectRandomPattern: () => console.log('Random pattern clicked')
+  };
+
+  try {
+    const context = useArt();
+    if (context) {
+      artContext = {
+        nextPattern: context.nextPattern,
+        prevPattern: context.prevPattern,
+        isAutoPlaying: context.isAutoPlaying,
+        currentPattern: context.currentPattern,
+        setCurrentPattern: context.setCurrentPattern,
+        selectRandomPattern: context.selectRandomPattern
+      };
+    }
+  } catch (error) {
+    console.warn("Art context not available, using fallbacks", error);
+  }
+
+  const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = artContext;
   const [showPatternList, setShowPatternList] = useState(false);
   const isMobile = useIsMobile();
 

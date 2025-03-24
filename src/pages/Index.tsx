@@ -5,9 +5,6 @@ import AnimationInfo from '@/components/AnimationInfo';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 
-// Add framer-motion for smooth animations
-<lov-add-dependency>framer-motion@latest</lov-add-dependency>
-
 const Index = () => {
   const [currentAnimation, setCurrentAnimation] = useState(0);
   const [isLoading, setIsLoading] = useState(true);

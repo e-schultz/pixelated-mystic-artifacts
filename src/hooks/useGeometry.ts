@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { 
   GeometrySettings, 
@@ -28,6 +27,7 @@ export function useGeometry(animationSpeed: number) {
   const requestRef = useRef<number>();
   const previousTimeRef = useRef<number>();
   const speedFactorRef = useRef(animationSpeed);
+  const lastRegenerateTimeRef = useRef<number>(0);
   
   // Update speed factor when animationSpeed changes
   useEffect(() => {
@@ -49,30 +49,43 @@ export function useGeometry(animationSpeed: number) {
     
     for (let i = 0; i < numShapes; i++) {
       const drawFunction = drawFunctions[Math.floor(Math.random() * drawFunctions.length)];
+      
+      // Position shapes with more spacing and avoid screen edges
+      const padding = 50;
+      const x = padding + Math.random() * (window.innerWidth - padding * 2);
+      const y = padding + Math.random() * (window.innerHeight - padding * 2);
+      
+      // Keep sizes more consistent to avoid visual clutter
+      const baseSize = isMobile ? 20 : 35;
+      const variance = isMobile ? 10 : 15;
+      const size = baseSize + Math.random() * variance;
+      
       newShapes.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * (isMobile ? 30 : 50) + (isMobile ? 10 : 20),
+        x,
+        y,
+        size,
         rotation: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.001 + 0.0005, // Slower on mobile
+        speed: (Math.random() * 0.0005 + 0.0003) * (isMobile ? 0.7 : 1), // Even slower on mobile
         drawFunction,
         settings: {
           scale: 0.8,
           rotation: 0,
-          opacity: Math.random() * 0.3 + 0.1, // Lower opacity on mobile
-          segments: isMobile ? 4 : 8,
+          opacity: Math.random() * 0.2 + 0.08, // Lower opacity to reduce flicker
+          segments: isMobile ? 4 : 6, // Simplify geometry on mobile
           variance: 0.2,
           pixelSize: isMobile ? 1 : 2,
-          color: `rgba(240, 240, 228, ${Math.random() * 0.3 + 0.1})`,
+          color: `rgba(240, 240, 228, ${Math.random() * 0.15 + 0.05})`,
           speed: 0.005
         }
       });
     }
     
+    // We use a functional update to ensure we're not creating a state update loop
     setSmallShapes(newShapes);
+    lastRegenerateTimeRef.current = Date.now();
   }, [isMobile]);
 
-  // Animation frame loop using requestAnimationFrame
+  // Animation frame loop using requestAnimationFrame with smoother timing
   const animate = useCallback((time: number) => {
     if (previousTimeRef.current === undefined) {
       previousTimeRef.current = time;
@@ -81,28 +94,34 @@ export function useGeometry(animationSpeed: number) {
     const deltaTime = time - (previousTimeRef.current || 0);
     previousTimeRef.current = time;
     
-    // Use delta time for smoother animation
-    const timeIncrement = (deltaTime / 1000) * 0.1 * speedFactorRef.current;
+    // Cap deltaTime to prevent large jumps after tab switching or sleep
+    const cappedDeltaTime = Math.min(deltaTime, 100);
+    
+    // Use delta time for smoother animation with a dampening factor
+    const timeIncrement = (cappedDeltaTime / 1000) * 0.1 * speedFactorRef.current;
     setTime(prevTime => prevTime + timeIncrement);
     
-    // Less frequent shape regeneration
-    if (Math.random() < 0.0005) {
+    // Regenerate shapes very infrequently to avoid flickering
+    // Only regenerate after a minimum time has passed (15 seconds)
+    const timeSinceLastRegenerate = Date.now() - lastRegenerateTimeRef.current;
+    if (timeSinceLastRegenerate > 15000 && Math.random() < 0.01) {
       generateSmallShapes();
     }
     
-    // Update shape rotations
+    // Update shape rotations with smoother interpolation
     setSmallShapes(prev => 
       prev.map(shape => ({
         ...shape,
-        rotation: shape.rotation + (shape.speed * deltaTime * 0.01)
+        rotation: shape.rotation + (shape.speed * cappedDeltaTime * 0.01 * (isMobile ? 0.7 : 1))
       }))
     );
     
     requestRef.current = requestAnimationFrame(animate);
-  }, [generateSmallShapes]);
+  }, [generateSmallShapes, isMobile]);
 
   // Set up and clean up animation frame
   useEffect(() => {
+    // Generate shapes once at start
     generateSmallShapes();
     requestRef.current = requestAnimationFrame(animate);
     

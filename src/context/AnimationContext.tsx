@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { animations } from '@/data/animationData';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -80,21 +80,33 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
 export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(animationReducer, initialState);
   const isMobile = useIsMobile();
+  const autoCycleTimerRef = useRef<number | null>(null);
 
-  // Set up auto-cycling effect
+  // Set up auto-cycling effect with debounce to avoid rapid transitions
   useEffect(() => {
+    // Clear any existing timer
+    if (autoCycleTimerRef.current) {
+      clearTimeout(autoCycleTimerRef.current);
+      autoCycleTimerRef.current = null;
+    }
+    
     if (state.isAutoCycling) {
-      // Shorter cycle time on mobile
-      const cycleTime = isMobile ? 10000 : 15000;
-      const adjustedTime = cycleTime / Math.max(0.8, state.animationSpeed);
+      // Longer cycle time on mobile to reduce visual fatigue
+      const cycleTime = isMobile ? 12000 : 15000;
+      // Adjust time based on animation speed, but with limits to prevent extremes
+      const adjustedTime = cycleTime / Math.max(0.6, Math.min(state.animationSpeed, 1.5));
       
-      const intervalId = setInterval(() => {
+      autoCycleTimerRef.current = window.setTimeout(() => {
         dispatch({ type: 'NEXT_ANIMATION' });
       }, adjustedTime);
       
-      return () => clearInterval(intervalId);
+      return () => {
+        if (autoCycleTimerRef.current) {
+          clearTimeout(autoCycleTimerRef.current);
+        }
+      };
     }
-  }, [state.isAutoCycling, state.animationSpeed, isMobile]);
+  }, [state.isAutoCycling, state.animationSpeed, state.currentAnimation, isMobile]);
 
   // Initial loading effect - shorter on mobile
   useEffect(() => {

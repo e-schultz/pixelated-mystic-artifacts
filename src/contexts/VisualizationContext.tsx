@@ -86,6 +86,7 @@ interface VisualizationContextType extends VisualizationState {
   
   // UI convenience methods
   getCurrentPatternInfo: () => { title: string; description: string };
+  toggleControlsVisibility: () => void; // Add this missing method
 }
 
 // Create context
@@ -181,6 +182,11 @@ export function VisualizationProvider({ children }: { children: React.ReactNode 
   const toggleControls = useCallback(() => {
     dispatch({ type: 'TOGGLE_CONTROLS_VISIBLE' });
   }, []);
+
+  // Add the toggleControlsVisibility method as an alias to toggleControls
+  const toggleControlsVisibility = useCallback(() => {
+    toggleControls();
+  }, [toggleControls]);
   
   // Helper method to get the current pattern info
   const getCurrentPatternInfo = useCallback(() => {
@@ -247,7 +253,8 @@ export function VisualizationProvider({ children }: { children: React.ReactNode 
         toggleAutoCycling,
         toggleAsciiOverlay,
         toggleControls,
-        getCurrentPatternInfo
+        getCurrentPatternInfo,
+        toggleControlsVisibility // Add the new method to the context value
       }}
     >
       {children}

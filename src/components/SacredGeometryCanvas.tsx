@@ -9,12 +9,21 @@ interface SacredGeometryCanvasProps {
   className?: string;
 }
 
-// This is now a thin wrapper around the CanvasManager
-// All the heavy lifting happens in the CanvasManager component
+// This component now properly passes all props to the CanvasManager
 const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ 
+  currentAnimation,
+  animationSpeed,
+  showAsciiOverlay,
   className
 }) => {
-  return <CanvasManager className={className} />;
+  return (
+    <CanvasManager 
+      currentAnimation={currentAnimation}
+      animationSpeed={animationSpeed}
+      showAsciiOverlay={showAsciiOverlay}
+      className={className} 
+    />
+  );
 };
 
 export default React.memo(SacredGeometryCanvas);

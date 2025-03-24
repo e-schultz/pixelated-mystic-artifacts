@@ -8,9 +8,9 @@ import Header from '@/components/Header';
 import NavigationControls from '@/components/NavigationControls';
 import UtilityActions from '@/components/UtilityActions';
 import AsciiOverlay from '@/components/AsciiOverlay';
-import { AnimationProvider, useAnimation } from '@/context/AnimationContext';
+import { useAnimation } from '@/context/AnimationContext';
 
-const IndexContent: React.FC = () => {
+const Index: React.FC = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
   const { state } = useAnimation();
   const { isLoading, currentAnimation, animationSpeed, showAsciiOverlay } = state;
@@ -40,14 +40,6 @@ const IndexContent: React.FC = () => {
       
       {showAsciiOverlay && <AsciiOverlay />}
     </div>
-  );
-};
-
-const Index: React.FC = () => {
-  return (
-    <AnimationProvider>
-      <IndexContent />
-    </AnimationProvider>
   );
 };
 

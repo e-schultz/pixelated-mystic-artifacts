@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
 import OptimizedControlPanel from '@/components/OptimizedControlPanel';
+import PatternNavigation from '@/components/PatternNavigation';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { animations } from '@/data/animationData';
@@ -16,8 +17,6 @@ const Index = () => {
     isAutoCycling,
     animationSpeed,
     showAsciiOverlay,
-    handlePrevAnimation,
-    handleNextAnimation,
     performanceMode
   } = useAnimation();
 
@@ -82,31 +81,8 @@ const Index = () => {
       
       <OptimizedAnimationInfo />
       
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex items-center space-x-4"
-      >
-        <button 
-          onClick={handlePrevAnimation}
-          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
-        >
-          ←
-        </button>
-        <button
-          onClick={() => isAutoCycling}
-          className={`px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isAutoCycling ? 'bg-mystic/20' : ''}`}
-        >
-          {isAutoCycling ? 'AUTO' : 'MANUAL'}
-        </button>
-        <button 
-          onClick={handleNextAnimation}
-          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
-        >
-          →
-        </button>
-      </motion.div>
+      {/* Using our new PatternNavigation component */}
+      <PatternNavigation />
       
       <motion.div
         initial={{ opacity: 0 }}

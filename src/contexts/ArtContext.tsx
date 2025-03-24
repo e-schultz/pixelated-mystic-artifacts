@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { navigateToNextPattern, navigateToPreviousPattern, jumpToPattern } from "@/utils/geometry/navigation";
 
 // Pattern data with titles and descriptions
 export const patterns = [
@@ -77,11 +78,11 @@ const ArtContext = createContext<ArtContextType | undefined>(undefined);
 function artReducer(state: ArtState, action: ActionType): ArtState {
   switch (action.type) {
     case 'SET_PATTERN':
-      return { ...state, currentPattern: action.pattern };
+      return { ...state, currentPattern: jumpToPattern(action.pattern, patterns.length) };
     case 'NEXT_PATTERN':
-      return { ...state, currentPattern: (state.currentPattern + 1) % patterns.length };
+      return { ...state, currentPattern: navigateToNextPattern(state.currentPattern, patterns.length) };
     case 'PREV_PATTERN':
-      return { ...state, currentPattern: (state.currentPattern - 1 + patterns.length) % patterns.length };
+      return { ...state, currentPattern: navigateToPreviousPattern(state.currentPattern, patterns.length) };
     case 'SET_SPEED':
       return { ...state, speed: action.speed };
     case 'TOGGLE_TERMINAL_MODE':

@@ -54,6 +54,13 @@
   body {
     @apply bg-black text-mystic overflow-hidden;
   }
+  
+  /* Prevent overscroll on mobile */
+  html, body {
+    @apply overscroll-none;
+    touch-action: none;
+    -webkit-overflow-scrolling: none;
+  }
 
   .pixelated {
     image-rendering: pixelated;
@@ -65,6 +72,7 @@
     top: 0;
     left: 0;
     z-index: -1;
+    touch-action: none;
   }
   
   /* Adds subtle CRT/pixel effect */
@@ -141,6 +149,17 @@
     }
     50% {
       transform: translateY(-10px);
+    }
+  }
+  
+  /* Mobile-specific utilities */
+  @media (max-width: 640px) {
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    
+    .neo-blur {
+      @apply backdrop-blur-md bg-black/50;
     }
   }
 }

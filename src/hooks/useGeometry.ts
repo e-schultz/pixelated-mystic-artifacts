@@ -1,6 +1,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { GeometrySettings, getRandomGeometryFunction } from '@/utils/geometryUtils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export function useGeometry(animationSpeed: number) {
   const [time, setTime] = useState(0);
@@ -14,6 +15,8 @@ export function useGeometry(animationSpeed: number) {
     settings: GeometrySettings;
   }>>([]);
   
+  const isMobile = useIsMobile();
+  
   // Use refs for animation to prevent unnecessary re-renders
   const requestRef = useRef<number>();
   const previousTimeRef = useRef<number>();
@@ -24,9 +27,10 @@ export function useGeometry(animationSpeed: number) {
     speedFactorRef.current = animationSpeed;
   }, [animationSpeed]);
 
-  // Generate random small background shapes
+  // Generate random small background shapes - fewer on mobile
   const generateSmallShapes = useCallback(() => {
-    const numShapes = Math.floor(Math.random() * 10) + 5; // 5-15 shapes
+    // Reduce number of shapes on mobile for better performance
+    const numShapes = Math.floor(Math.random() * (isMobile ? 5 : 10)) + (isMobile ? 3 : 5);
     const newShapes = [];
     
     for (let i = 0; i < numShapes; i++) {
@@ -34,7 +38,7 @@ export function useGeometry(animationSpeed: number) {
       newShapes.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        size: Math.random() * 50 + 20, // 20-70 size
+        size: Math.random() * (isMobile ? 40 : 50) + (isMobile ? 15 : 20), // Smaller on mobile
         rotation: Math.random() * Math.PI * 2,
         speed: Math.random() * 0.002 + 0.001, // 0.001-0.003 speed
         drawFunction,
@@ -42,9 +46,9 @@ export function useGeometry(animationSpeed: number) {
           scale: 0.8,
           rotation: 0,
           opacity: Math.random() * 0.5 + 0.3, // 0.3-0.8 opacity
-          segments: 8,
+          segments: isMobile ? 6 : 8, // Less complex on mobile
           variance: 0.2,
-          pixelSize: Math.floor(Math.random() * 2) + 1, // 1-2 pixel size
+          pixelSize: isMobile ? 1 : Math.floor(Math.random() * 2) + 1, // Smaller pixels on mobile
           color: `rgba(240, 240, 228, ${Math.random() * 0.5 + 0.3})`,
           speed: 0.005
         }
@@ -52,7 +56,7 @@ export function useGeometry(animationSpeed: number) {
     }
     
     setSmallShapes(newShapes);
-  }, []);
+  }, [isMobile]);
 
   // Animation frame loop using requestAnimationFrame
   const animate = useCallback((time: number) => {

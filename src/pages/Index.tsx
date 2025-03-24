@@ -9,24 +9,26 @@ import NavigationControls from '@/components/NavigationControls';
 import UtilityActions from '@/components/UtilityActions';
 import AsciiOverlay from '@/components/AsciiOverlay';
 import { useAnimation } from '@/context/AnimationContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
   const { state } = useAnimation();
   const { isLoading, currentAnimation, animationSpeed, showAsciiOverlay } = state;
+  const isMobile = useIsMobile();
 
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden perspective-1000">
+    <div className="relative w-full h-screen overflow-hidden perspective-1000 touch-none">
       {isLoading && <LoadingScreen />}
 
       <SacredGeometryCanvas 
         currentAnimation={currentAnimation}
         animationSpeed={animationSpeed}
-        showAsciiOverlay={showAsciiOverlay}
+        showAsciiOverlay={showAsciiOverlay && !isMobile}
       />
       
       <Header />
@@ -38,7 +40,7 @@ const Index: React.FC = () => {
         <ControlPanel onClose={toggleControlPanel} />
       )}
       
-      {showAsciiOverlay && <AsciiOverlay />}
+      {showAsciiOverlay && !isMobile && <AsciiOverlay />}
     </div>
   );
 };

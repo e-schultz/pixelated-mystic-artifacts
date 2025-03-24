@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { animations } from '@/data/animationData';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define types for our animation state
 export interface AnimationState {
@@ -78,28 +79,31 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
 // Provider component
 export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(animationReducer, initialState);
+  const isMobile = useIsMobile();
 
   // Set up auto-cycling effect
   useEffect(() => {
     if (state.isAutoCycling) {
-      // Longer cycle time with more consistent timing
-      const cycleTime = 15000 / Math.max(0.8, state.animationSpeed);
+      // Shorter cycle time on mobile for better experience
+      const baseTime = isMobile ? 12000 : 15000;
+      const cycleTime = baseTime / Math.max(0.8, state.animationSpeed);
+      
       const intervalId = setInterval(() => {
         dispatch({ type: 'NEXT_ANIMATION' });
       }, cycleTime);
       
       return () => clearInterval(intervalId);
     }
-  }, [state.isAutoCycling, state.animationSpeed]);
+  }, [state.isAutoCycling, state.animationSpeed, isMobile]);
 
-  // Initial loading effect
+  // Initial loading effect - shorter on mobile
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: 'SET_LOADING', payload: false });
-    }, 2500);
+    }, isMobile ? 1800 : 2500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isMobile]);
 
   return (
     <AnimationContext.Provider value={{ state, dispatch }}>

@@ -1,8 +1,8 @@
-
 import React, { useEffect, useRef } from 'react';
 import p5 from 'p5';
 import { useGeometry } from '@/hooks/useGeometry';
 import { animations } from '@/data/animationData';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   getDefaultSettings,
   drawFlowerOfLife,
@@ -32,18 +32,19 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
   const canvasRef = useRef<p5 | null>(null);
   const prevAnimationRef = useRef<number>(currentAnimation);
   const { time, smallShapes } = useGeometry(animationSpeed);
+  const isMobile = useIsMobile();
   
   // Animation configurations
   const animationFunctions = [
     {
       name: "Metatron's Cube",
       drawFunction: drawMetatronCube,
-      settings: getDefaultSettings({ segments: 12, pixelSize: 2 })
+      settings: getDefaultSettings({ segments: isMobile ? 8 : 12, pixelSize: isMobile ? 1 : 2 })
     },
     {
       name: "Flower of Life",
       drawFunction: drawFlowerOfLife,
-      settings: getDefaultSettings({ segments: 8, pixelSize: 3 })
+      settings: getDefaultSettings({ segments: isMobile ? 6 : 8, pixelSize: isMobile ? 2 : 3 })
     },
     {
       name: "Sri Yantra",
@@ -77,12 +78,13 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
     }
   ];
 
-  // ASCII character mapping for brightness
-  const asciiChars = '@%#*+=-:. ';
+  // ASCII character mapping for brightness - simpler on mobile
+  const asciiChars = isMobile ? '@#*+:. ' : '@%#*+=-:. ';
   
-  // Draw ASCII overlay
+  // Draw ASCII overlay - simpler version for mobile
   const drawAsciiOverlay = (p: any) => {
-    const charSize = 12;
+    // Larger character size on mobile for better readability
+    const charSize = isMobile ? 16 : 12;
     const cols = Math.floor(p.width / charSize);
     const rows = Math.floor(p.height / charSize);
     
@@ -91,29 +93,40 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
     p.textSize(charSize);
     p.textFont('monospace');
     
+    // Use fewer characters on mobile for better performance
+    const sparseRate = isMobile ? 0.5 : 0.7;
+    
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
+        // Skip more characters on mobile
+        if (Math.random() > sparseRate) continue;
+        
         const pixelX = x * charSize;
         const pixelY = y * charSize;
         
-        // Use a repeating pattern for the overlay
+        // Create a simpler ASCII art pattern for mobile
         let char = '';
         
-        // Create an ASCII art pattern
-        if ((x + y) % 7 === 0) char = '.';
-        else if ((x + y) % 5 === 0) char = '*';
-        else if ((x * y) % 11 === 0) char = '/';
-        else if ((x * y) % 13 === 0) char = '|';
-        else if ((x - y) % 6 === 0) char = '\\';
-        else if ((x + y * 2) % 15 === 0) char = '#';
-        else if ((x * y) % 29 === 0) char = '+';
-        else if ((x * y) % 17 === 0) char = ':';
-        else char = ' ';
-        
-        // Only draw the characters with a random chance to create a sparse effect
-        if (Math.random() < 0.7) {
-          p.text(char, pixelX, pixelY + charSize);
+        if (isMobile) {
+          // Simpler pattern for mobile
+          if ((x + y) % 5 === 0) char = '.';
+          else if ((x * y) % 11 === 0) char = '*';
+          else if ((x - y) % 6 === 0) char = '/';
+          else char = ' ';
+        } else {
+          // Full pattern for desktop
+          if ((x + y) % 7 === 0) char = '.';
+          else if ((x + y) % 5 === 0) char = '*';
+          else if ((x * y) % 11 === 0) char = '/';
+          else if ((x * y) % 13 === 0) char = '|';
+          else if ((x - y) % 6 === 0) char = '\\';
+          else if ((x + y * 2) % 15 === 0) char = '#';
+          else if ((x * y) % 29 === 0) char = '+';
+          else if ((x * y) % 17 === 0) char = ':';
+          else char = ' ';
         }
+        
+        p.text(char, pixelX, pixelY + charSize);
       }
     }
     p.pop();
@@ -138,13 +151,13 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
         canvas.parent(containerRef.current!);
         p.background(18, 18, 18);
-        p.frameRate(60); // Higher framerate for smoother animation
+        p.frameRate(isMobile ? 30 : 60); // Lower framerate on mobile
         prevFrame = p.createImage(p.width, p.height);
       };
       
       p.draw = () => {
         // Apply less aggressive fade for reduced flickering
-        p.background(18, 18, 18, 5);
+        p.background(18, 18, 18, isMobile ? 10 : 5); // Stronger fade on mobile
         
         // Check if animation changed
         if (currentAnimation !== prevAnimationRef.current) {
@@ -170,7 +183,8 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         const currentAnim = animationFunctions[currentAnimation % animationFunctions.length];
         const centerX = p.width / 2;
         const centerY = p.height / 2;
-        const size = Math.min(p.width, p.height) * 0.6;
+        // Smaller size on mobile
+        const size = Math.min(p.width, p.height) * (isMobile ? 0.8 : 0.6);
         
         // Update settings for animation effect - smoother rotation
         const animSettings = { 
@@ -187,7 +201,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         currentAnim.drawFunction(p, centerX, centerY, size, animSettings);
         p.pop();
         
-        // Draw small background shapes
+        // Draw small background shapes - fewer on mobile
         p.push();
         p.noStroke();
         smallShapes.forEach(shape => {
@@ -201,15 +215,16 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         });
         p.pop();
         
-        // Draw subtle grid in background - less random to reduce flickering
-        p.stroke(240, 240, 228, 8); // Lower opacity
-        p.strokeWeight(1);
-        const gridSize = 40; // Larger grid size
-        for (let x = 0; x < p.width; x += gridSize) {
-          for (let y = 0; y < p.height; y += gridSize) {
-            // Use deterministic pattern instead of random for grid points
-            if ((x + y) % 5 === 0) {
-              p.point(x, y);
+        // Draw subtle grid in background - simplified for mobile
+        if (!isMobile) {
+          p.stroke(240, 240, 228, 8);
+          p.strokeWeight(1);
+          const gridSize = 40;
+          for (let x = 0; x < p.width; x += gridSize) {
+            for (let y = 0; y < p.height; y += gridSize) {
+              if ((x + y) % 5 === 0) {
+                p.point(x, y);
+              }
             }
           }
         }
@@ -233,7 +248,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         canvasRef.current.remove();
       }
     };
-  }, [currentAnimation, animationSpeed, showAsciiOverlay, smallShapes, time]);
+  }, [currentAnimation, animationSpeed, showAsciiOverlay, smallShapes, time, isMobile]);
 
   return (
     <div ref={containerRef} className={className} />

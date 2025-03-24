@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { GeometrySettings, getRandomGeometryFunction } from '@/utils/geometryUtils';
 
 export function useGeometry(animationSpeed: number) {
@@ -13,6 +13,16 @@ export function useGeometry(animationSpeed: number) {
     drawFunction: Function;
     settings: GeometrySettings;
   }>>([]);
+  
+  // Use refs for animation to prevent unnecessary re-renders
+  const requestRef = useRef<number>();
+  const previousTimeRef = useRef<number>();
+  const speedFactorRef = useRef(animationSpeed);
+  
+  // Update speed factor when animationSpeed changes
+  useEffect(() => {
+    speedFactorRef.current = animationSpeed;
+  }, [animationSpeed]);
 
   // Generate random small background shapes
   const generateSmallShapes = useCallback(() => {
@@ -44,36 +54,53 @@ export function useGeometry(animationSpeed: number) {
     setSmallShapes(newShapes);
   }, []);
 
-  // Update time based on animation speed
-  useEffect(() => {
-    const frameUpdate = () => {
-      setTime(prev => prev + 0.005 * animationSpeed);
-      
-      // Rarely regenerate shapes
-      if (Math.random() < 0.005 * animationSpeed) {
-        generateSmallShapes();
-      }
-    };
-
-    const intervalId = setInterval(frameUpdate, 1000 / 30); // ~30fps
+  // Animation frame loop using requestAnimationFrame
+  const animate = useCallback((time: number) => {
+    if (previousTimeRef.current === undefined) {
+      previousTimeRef.current = time;
+    }
     
-    // Initial generation of shapes
-    if (smallShapes.length === 0) {
+    const deltaTime = time - (previousTimeRef.current || 0);
+    previousTimeRef.current = time;
+    
+    // Smoother time increment based on delta time and current speed
+    const timeIncrement = (deltaTime / 1000) * 0.15 * speedFactorRef.current;
+    
+    setTime(prevTime => prevTime + timeIncrement);
+    
+    // Less frequent shape regeneration to reduce flickering
+    if (Math.random() < 0.001 * speedFactorRef.current) {
       generateSmallShapes();
     }
-
-    return () => clearInterval(intervalId);
-  }, [animationSpeed, smallShapes.length, generateSmallShapes]);
-
-  // Update small shapes based on animation speed
-  useEffect(() => {
+    
+    // Update shape rotations with smoother increments
     setSmallShapes(prev => 
       prev.map(shape => ({
         ...shape,
-        rotation: shape.rotation + shape.speed * animationSpeed
+        rotation: shape.rotation + (shape.speed * deltaTime * 0.01 * speedFactorRef.current)
       }))
     );
-  }, [time, animationSpeed]);
+    
+    requestRef.current = requestAnimationFrame(animate);
+  }, [generateSmallShapes]);
+
+  // Set up and clean up animation frame
+  useEffect(() => {
+    // Initial generation of shapes if none exist
+    if (smallShapes.length === 0) {
+      generateSmallShapes();
+    }
+    
+    // Start the animation loop
+    requestRef.current = requestAnimationFrame(animate);
+    
+    // Clean up animation frame on unmount
+    return () => {
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [animate, generateSmallShapes, smallShapes.length]);
 
   return {
     time,

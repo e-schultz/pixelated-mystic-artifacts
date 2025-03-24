@@ -53,7 +53,9 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
     case 'SET_AUTO_CYCLING':
       return { ...state, isAutoCycling: action.payload };
     case 'SET_ANIMATION_SPEED':
-      return { ...state, animationSpeed: action.payload };
+      // Clamp animation speed between 0.5 and 2.5 to prevent strobing
+      const clampedSpeed = Math.max(0.5, Math.min(2.5, action.payload));
+      return { ...state, animationSpeed: clampedSpeed };
     case 'TOGGLE_ASCII_OVERLAY':
       return { ...state, showAsciiOverlay: !state.showAsciiOverlay };
     case 'SET_ASCII_OVERLAY':
@@ -80,7 +82,8 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Set up auto-cycling effect
   useEffect(() => {
     if (state.isAutoCycling) {
-      const cycleTime = 10000 / state.animationSpeed;
+      // Longer cycle time with more consistent timing
+      const cycleTime = 15000 / Math.max(0.8, state.animationSpeed);
       const intervalId = setInterval(() => {
         dispatch({ type: 'NEXT_ANIMATION' });
       }, cycleTime);

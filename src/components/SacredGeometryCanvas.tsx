@@ -30,6 +30,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<p5 | null>(null);
+  const prevAnimationRef = useRef<number>(currentAnimation);
   const { time, smallShapes } = useGeometry(animationSpeed);
   
   // Animation configurations
@@ -128,15 +129,42 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
     
     // Create new p5 instance
     const sketch = (p: any) => {
+      // Track previous frame for smoother transitions
+      let prevFrame: p5.Image;
+      let transitionProgress = 0;
+      const isTransitioning = currentAnimation !== prevAnimationRef.current;
+      
       p.setup = () => {
         const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
         canvas.parent(containerRef.current!);
         p.background(18, 18, 18);
-        p.frameRate(30);
+        p.frameRate(60); // Higher framerate for smoother animation
+        prevFrame = p.createImage(p.width, p.height);
       };
       
       p.draw = () => {
-        p.background(18, 18, 18, 10); // Slight trail effect
+        // Apply less aggressive fade for reduced flickering
+        p.background(18, 18, 18, 5);
+        
+        // Check if animation changed
+        if (currentAnimation !== prevAnimationRef.current) {
+          // Save current frame for transition
+          prevFrame.copy(p, 0, 0, p.width, p.height, 0, 0, p.width, p.height);
+          prevAnimationRef.current = currentAnimation;
+          transitionProgress = 0;
+        }
+        
+        // Handle transition between animations
+        if (transitionProgress < 1) {
+          transitionProgress += 0.05 * animationSpeed;
+          if (transitionProgress < 1) {
+            // Draw previous frame with decreasing opacity
+            p.push();
+            p.tint(255, 255, 255, (1 - transitionProgress) * 255);
+            p.image(prevFrame, 0, 0);
+            p.pop();
+          }
+        }
         
         // Draw main animation
         const currentAnim = animationFunctions[currentAnimation % animationFunctions.length];
@@ -144,14 +172,20 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         const centerY = p.height / 2;
         const size = Math.min(p.width, p.height) * 0.6;
         
-        // Update settings for animation effect
+        // Update settings for animation effect - smoother rotation
         const animSettings = { 
           ...currentAnim.settings,
-          rotation: time * 0.2,
+          rotation: time * 0.1, // Reduced rotation speed to minimize strobing
         };
         
         // Draw the main geometry
+        p.push();
+        if (transitionProgress < 1) {
+          // Fade in new animation
+          p.tint(255, 255, 255, transitionProgress * 255);
+        }
         currentAnim.drawFunction(p, centerX, centerY, size, animSettings);
+        p.pop();
         
         // Draw small background shapes
         p.push();
@@ -167,13 +201,14 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         });
         p.pop();
         
-        // Draw subtle grid in background
-        p.stroke(240, 240, 228, 10);
+        // Draw subtle grid in background - less random to reduce flickering
+        p.stroke(240, 240, 228, 8); // Lower opacity
         p.strokeWeight(1);
-        const gridSize = 30;
+        const gridSize = 40; // Larger grid size
         for (let x = 0; x < p.width; x += gridSize) {
           for (let y = 0; y < p.height; y += gridSize) {
-            if (Math.random() > 0.92) {
+            // Use deterministic pattern instead of random for grid points
+            if ((x + y) % 5 === 0) {
               p.point(x, y);
             }
           }
@@ -187,6 +222,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
       
       p.windowResized = () => {
         p.resizeCanvas(window.innerWidth, window.innerHeight);
+        prevFrame = p.createImage(p.width, p.height);
       };
     };
     

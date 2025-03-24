@@ -2,6 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/ArtContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PatternInfoProps {
   title: string;
@@ -17,6 +18,7 @@ const PatternInfo: React.FC<PatternInfoProps> = ({
   isAutoCycling 
 }) => {
   const { isAutoPlaying, isTerminalMode } = useArt();
+  const isMobile = useIsMobile();
   
   // Use props if provided, otherwise fall back to context values
   const displayAutoPlaying = isAutoCycling !== undefined ? isAutoCycling : isAutoPlaying;
@@ -27,12 +29,12 @@ const PatternInfo: React.FC<PatternInfoProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 2, duration: 0.5 }}
-      className="fixed bottom-6 left-6 max-w-sm backdrop-blur-sm bg-black/40 border border-white/10 rounded-lg p-4 z-10"
+      className={`${isMobile ? 'fixed bottom-16 left-4 right-4 max-w-full' : 'fixed bottom-6 left-6 max-w-sm'} backdrop-blur-sm bg-black/40 border border-white/10 rounded-lg p-4 z-10`}
     >
       <h2 className="text-white text-xl font-light tracking-wider mb-2">
         {title}
       </h2>
-      <p className="text-white/80 text-sm mb-4">
+      <p className={`text-white/80 ${isMobile ? 'text-xs' : 'text-sm'} mb-4`}>
         {description}
       </p>
       

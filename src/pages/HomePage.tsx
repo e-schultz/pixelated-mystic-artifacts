@@ -6,9 +6,11 @@ import PatternInfo from '@/components/PatternInfo';
 import { useArt } from '@/contexts/ArtContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { patterns } from '@/contexts/ArtContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const isMobile = useIsMobile();
   const { 
     currentPattern, 
     nextPattern, 
@@ -76,9 +78,12 @@ const HomePage = () => {
           {/* Pattern Info and Navigation */}
           <div className="absolute bottom-6 left-0 right-0 px-6 space-y-4">
             {/* System Status Bar */}
-            <div className="mx-auto w-full max-w-md border border-green-400/30 bg-black/60 rounded-lg px-3 py-1">
-              <div className="text-green-400/90 font-mono text-xs tracking-widest">
-                NEOSYS [VER 2.3
+            <div className={`mx-auto w-full ${isMobile ? 'max-w-full' : 'max-w-md'} border border-green-400/30 bg-black/60 rounded-lg px-3 py-1`}>
+              <div className="text-green-400/90 font-mono text-xs tracking-widest flex justify-between items-center">
+                <span>NEOSYS [VER 2.3</span>
+                {isMobile && (
+                  <span>PATTERN: {currentPattern + 1}/{patterns.length}</span>
+                )}
               </div>
             </div>
             
@@ -88,18 +93,18 @@ const HomePage = () => {
               description={patternInfo.description} 
             />
             
-            {/* Navigation Controls */}
-            <div className="flex justify-center items-center space-x-6">
+            {/* Navigation Controls - Mobile Optimized */}
+            <div className={`flex justify-center items-center space-x-6 ${isMobile ? 'absolute bottom-4 left-0 right-0 z-20' : ''}`}>
               <motion.button 
                 onClick={prevPattern}
-                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10"
+                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10`}
                 whileTap={{ scale: 0.9 }}
               >
                 ←
               </motion.button>
               <motion.button 
                 onClick={nextPattern}
-                className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10"
+                className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:bg-white/10`}
                 whileTap={{ scale: 0.9 }}
               >
                 →
@@ -107,7 +112,7 @@ const HomePage = () => {
             </div>
             
             {/* Terminal Mode Indicator */}
-            {isTerminalMode && (
+            {isTerminalMode && !isMobile && (
               <div className="absolute left-6 bottom-0 text-green-400/90 text-xs font-mono tracking-widest flex items-center">
                 <span className="w-2 h-2 bg-green-400/90 mr-2 rounded-full animate-pulse"></span>
                 TERMINAL MODE

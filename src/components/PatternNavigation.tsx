@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/ArtContext';
 
@@ -7,37 +7,80 @@ import { useArt } from '@/contexts/ArtContext';
  * A component for navigating between patterns
  */
 const PatternNavigation: React.FC = () => {
-  const { nextPattern, prevPattern, isAutoPlaying, currentPattern } = useArt();
+  const { nextPattern, prevPattern, isAutoPlaying, currentPattern, setCurrentPattern, selectRandomPattern } = useArt();
   const { patterns } = useArt as any; // Using 'as any' to access patterns from context
+  const [showPatternList, setShowPatternList] = useState(false);
+
+  const handlePatternClick = (index: number) => {
+    setCurrentPattern(index);
+    setShowPatternList(false);
+  };
 
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 2.2, duration: 0.5 }}
-      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex items-center space-x-4"
+      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center"
     >
-      <button 
-        onClick={prevPattern}
-        aria-label="Previous pattern"
-        className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
-      >
-        ←
-      </button>
-      
-      <div className="px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70">
-        <span className={`${isAutoPlaying ? 'text-mystic' : 'text-mystic/70'}`}>
-          {currentPattern + 1}/{patterns.length}
-        </span>
+      <div className="flex items-center space-x-4 mb-2">
+        <button 
+          onClick={prevPattern}
+          aria-label="Previous pattern"
+          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        >
+          ←
+        </button>
+        
+        <button
+          onClick={() => setShowPatternList(!showPatternList)}
+          className="px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        >
+          <span className={`${isAutoPlaying ? 'text-mystic' : 'text-mystic/70'}`}>
+            {currentPattern + 1}/{patterns.length}
+          </span>
+        </button>
+        
+        <button 
+          onClick={nextPattern}
+          aria-label="Next pattern"
+          className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        >
+          →
+        </button>
       </div>
       
-      <button 
-        onClick={nextPattern}
-        aria-label="Next pattern"
-        className="w-10 h-10 rounded-full border border-mystic/30 flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+      {/* Random pattern button */}
+      <button
+        onClick={selectRandomPattern}
+        className="text-xs text-mystic/50 hover:text-mystic/80 transition-colors"
       >
-        →
+        Random Pattern
       </button>
+      
+      {/* Pattern selection dropdown */}
+      {showPatternList && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          className="absolute bottom-16 bg-black/70 backdrop-blur-sm border border-mystic/20 rounded-lg p-2 w-48"
+        >
+          {patterns.map((pattern: any, index: number) => (
+            <button
+              key={pattern.id}
+              onClick={() => handlePatternClick(index)}
+              className={`w-full text-left px-3 py-2 text-xs rounded ${
+                currentPattern === index 
+                  ? 'bg-mystic/20 text-mystic' 
+                  : 'text-mystic/70 hover:bg-mystic/10 hover:text-mystic'
+              } transition-colors`}
+            >
+              {pattern.title}
+            </button>
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 };

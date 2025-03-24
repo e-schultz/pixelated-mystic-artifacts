@@ -1,7 +1,12 @@
-
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { navigateToNextPattern, navigateToPreviousPattern, jumpToPattern } from "@/utils/geometry/navigation";
+import { 
+  navigateToNextPattern, 
+  navigateToPreviousPattern, 
+  jumpToPattern,
+  selectPatternById,
+  getRandomPattern
+} from "@/utils/geometry/navigation";
 
 // Pattern data with titles and descriptions
 export const patterns = [
@@ -46,7 +51,8 @@ type ActionType =
   | { type: 'TOGGLE_TERMINAL_MODE' }
   | { type: 'TOGGLE_PIXELATED' }
   | { type: 'TOGGLE_AUTO_PLAY' }
-  | { type: 'TOGGLE_CONTROLS' };
+  | { type: 'TOGGLE_CONTROLS' }
+  | { type: 'SELECT_RANDOM_PATTERN' };
 
 // Define state interface
 interface ArtState {
@@ -69,6 +75,8 @@ interface ArtContextType extends ArtState {
   togglePixelated: () => void;
   toggleAutoPlay: () => void;
   toggleControls: () => void;
+  selectPatternById: (id: number) => void;
+  selectRandomPattern: () => void;
 }
 
 // Create context
@@ -83,6 +91,8 @@ function artReducer(state: ArtState, action: ActionType): ArtState {
       return { ...state, currentPattern: navigateToNextPattern(state.currentPattern, patterns.length) };
     case 'PREV_PATTERN':
       return { ...state, currentPattern: navigateToPreviousPattern(state.currentPattern, patterns.length) };
+    case 'SELECT_RANDOM_PATTERN':
+      return { ...state, currentPattern: getRandomPattern(state.currentPattern, patterns.length) };
     case 'SET_SPEED':
       return { ...state, speed: action.speed };
     case 'TOGGLE_TERMINAL_MODE':
@@ -129,6 +139,16 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
   
   const prevPattern = useCallback(() => {
     dispatch({ type: 'PREV_PATTERN' });
+  }, []);
+  
+  const selectPatternById = useCallback((id: number) => {
+    console.log(`Selecting pattern with ID ${id}`);
+    dispatch({ type: 'SET_PATTERN', pattern: id });
+  }, []);
+  
+  const selectRandomPattern = useCallback(() => {
+    console.log('Selecting a random pattern');
+    dispatch({ type: 'SELECT_RANDOM_PATTERN' });
   }, []);
   
   const setSpeed = useCallback((speed: number) => {
@@ -179,7 +199,9 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
         toggleTerminalMode,
         togglePixelated,
         toggleAutoPlay,
-        toggleControls
+        toggleControls,
+        selectPatternById,
+        selectRandomPattern
       }}
     >
       {children}

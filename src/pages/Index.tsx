@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
 import AnimationInfo from '@/components/AnimationInfo';
@@ -15,7 +14,6 @@ const Index = () => {
   const [showAsciiOverlay, setShowAsciiOverlay] = useState(false);
 
   useEffect(() => {
-    // Simulate loading delay
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);
@@ -24,7 +22,6 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    // Auto-cycle through animations if enabled
     if (isAutoCycling) {
       const cycleTime = 10000 / animationSpeed;
       const intervalId = setInterval(() => {
@@ -47,7 +44,6 @@ const Index = () => {
     setShowControlPanel(prev => !prev);
   };
 
-  // Easter egg ASCII message that appears in console when ASCII mode is toggled
   useEffect(() => {
     if (showAsciiOverlay) {
       console.log(`
@@ -70,7 +66,6 @@ const Index = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
-      {/* Loading screen */}
       {isLoading && (
         <div className="fixed inset-0 bg-mystic-dark flex flex-col items-center justify-center z-50">
           <motion.div
@@ -92,29 +87,23 @@ const Index = () => {
             LOADING MYSTIC ARTIFACTS
           </motion.p>
           
-          {/* ASCII-style loading indicator */}
           <motion.pre
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
             className="text-green-400/70 text-xs font-mono mt-8 tracking-widest"
           >
-{`[...............]
- INITIALIZING SACRED GEOMETRY
- LOADING VISUAL MATRIX
- CALIBRATING MYSTIC FREQUENCIES`}
+{`[...............]\n INITIALIZING SACRED GEOMETRY\n LOADING VISUAL MATRIX\n CALIBRATING MYSTIC FREQUENCIES`}
           </motion.pre>
         </div>
       )}
 
-      {/* Main content */}
       <SacredGeometryCanvas 
         currentAnimation={currentAnimation}
         animationSpeed={animationSpeed}
         showAsciiOverlay={showAsciiOverlay}
       />
       
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 p-6 z-10">
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
@@ -126,7 +115,6 @@ const Index = () => {
         </motion.h1>
       </header>
       
-      {/* Animation info */}
       <AnimationInfo
         title={animations[currentAnimation].title}
         description={animations[currentAnimation].description}
@@ -134,7 +122,6 @@ const Index = () => {
         showAsciiOverlay={showAsciiOverlay}
       />
       
-      {/* Navigation controls */}
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -161,7 +148,6 @@ const Index = () => {
         </button>
       </motion.div>
       
-      {/* ASCII mode toggle button */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -189,7 +175,6 @@ const Index = () => {
         </p>
       </motion.div>
       
-      {/* Settings button */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -200,7 +185,6 @@ const Index = () => {
         ⚙️
       </motion.button>
       
-      {/* Control panel */}
       {showControlPanel && (
         <ControlPanel 
           animationSpeed={animationSpeed}
@@ -213,10 +197,8 @@ const Index = () => {
         />
       )}
       
-      {/* Retro terminal UI elements that appear in ASCII mode */}
       {showAsciiOverlay && (
         <>
-          {/* Top terminal bar */}
           <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
             <div className="flex justify-between items-center">
               <div className="text-green-400/80 font-mono text-xs tracking-widest">
@@ -228,13 +210,12 @@ const Index = () => {
             </div>
           </div>
           
-          {/* ASCII-inspired text in bottom-left */}
           <pre className="fixed left-6 bottom-32 z-9 text-green-400/60 text-xs font-mono">
 {`,--.    ,--.   ,--. ,---.,---.  ,--.  ,---.  
-|   \\ ,-'  '-. `.' |/ .--' ,-. \\ |  | /  .-'  
-|  . \'-.  .-'  /  || \\--. | | | |`-'' \`--.   
+|   \\ ,-'  '-. \`.' |/ .--' ,-. \\ |  | /  .-'  
+|  . \\'-.  .-'  /  || \\--. | | | |\`-'' \`--.   
 |  |\\  \\|  |   /|  |\\.-. \\' | | |,--.  .-'   
-\`--' '--'   '--' '--'\`----' -----'/`--' \`----'`}
+\`--' '--'   '--' '--'\`----' -----'/\`--' \`----'`}
           </pre>
         </>
       )}

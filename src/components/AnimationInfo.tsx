@@ -1,38 +1,66 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useAnimation } from '@/context/AnimationContext';
-import { animations } from '@/data/animationData';
-import { useIsMobile } from '@/hooks/use-mobile';
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { cn } from '@/lib/utils';
 
-const AnimationInfo: React.FC = () => {
-  const { state } = useAnimation();
-  const { currentAnimation, isLoading } = state;
-  const isMobile = useIsMobile();
+interface AnimationInfoProps {
+  title: string;
+  description: string;
+  isAutoCycling?: boolean;
+  showAsciiOverlay?: boolean;
+  className?: string;
+}
+
+const AnimationInfo: React.FC<AnimationInfoProps> = ({ 
+  title, 
+  description, 
+  isAutoCycling = true,
+  showAsciiOverlay = false,
+  className 
+}) => {
+  const [visible, setVisible] = useState(false);
   
-  // Get current animation data
-  const animationData = animations[currentAnimation];
-  
-  if (isLoading || !animationData) return null;
+  useEffect(() => {
+    // Show animation info with a delay for a nice entrance effect
+    const timer = setTimeout(() => {
+      setVisible(true);
+    }, 800);
+    
+    return () => clearTimeout(timer);
+  }, [title]);
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 1.8, duration: 0.5 }}
-      className={`fixed left-0 right-0 bottom-16 mx-auto text-center z-10 px-4 pointer-events-none`}
+    <div 
+      className={cn(
+        "fixed bottom-6 left-6 max-w-sm backdrop-blur-sm bg-black/40 border border-mystic/10 rounded-lg p-4 transition-all duration-500 z-10",
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+        className
+      )}
     >
-      <div className="inline-block backdrop-blur-sm bg-black/30 border border-white/10 rounded-lg px-3 py-2">
-        <h2 className="text-cyan-300 text-sm font-light tracking-wider mb-1">
-          {animationData.title}
-        </h2>
-        {!isMobile && (
-          <p className="text-white/60 text-xs max-w-xs mx-auto">
-            {animationData.description}
-          </p>
+      <h2 className="text-mystic text-xl font-light tracking-wider mb-2">
+        {title}
+      </h2>
+      <p className="text-mystic/80 text-sm mb-4">
+        {description}
+      </p>
+      <div className="flex flex-col space-y-2">
+        {isAutoCycling && (
+          <div className="flex items-center space-x-2">
+            <div className="h-1 flex-grow bg-mystic/20 rounded-full">
+              <div className="h-1 bg-mystic/50 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+            </div>
+            <span className="text-mystic/60 text-xs">Auto-cycling</span>
+          </div>
+        )}
+        
+        {showAsciiOverlay && (
+          <div className="flex items-center space-x-2 mt-1">
+            <div className="h-1 w-4 bg-green-400/50 rounded-full animate-pulse"></div>
+            <span className="text-green-400/90 text-xs font-mono">ASCII MODE</span>
+          </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 

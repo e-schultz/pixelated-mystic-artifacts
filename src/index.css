@@ -34,6 +34,15 @@
     --ring: 60 15% 90%;
 
     --radius: 0.25rem;
+
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 60 15% 90%;
+    --sidebar-primary: 60 15% 90%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 60 15% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 60 15% 90%;
   }
 }
 
@@ -43,14 +52,7 @@
   }
 
   body {
-    @apply bg-black text-mystic overflow-hidden;
-  }
-  
-  /* Prevent overscroll on mobile */
-  html, body {
-    @apply overscroll-none;
-    touch-action: none;
-    -webkit-overflow-scrolling: none;
+    @apply bg-mystic-dark text-mystic overflow-hidden;
   }
 
   .pixelated {
@@ -63,10 +65,9 @@
     top: 0;
     left: 0;
     z-index: -1;
-    touch-action: none;
   }
   
-  /* Adds subtle pixel effect */
+  /* Adds subtle CRT/pixel effect */
   .crt-overlay::before {
     content: '';
     display: block;
@@ -79,72 +80,15 @@
       linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
         rgba(0, 0, 0, 0.1) 50%
+      ),
+      linear-gradient(
+        90deg, 
+        rgba(255, 0, 0, 0.02), 
+        rgba(0, 255, 0, 0.02), 
+        rgba(0, 0, 255, 0.02)
       );
-    background-size: 100% 2px;
+    background-size: 100% 2px, 3px 100%;
     pointer-events: none;
     z-index: 10;
-  }
-
-  /* 3D perspective effect for depth */
-  .perspective-1000 {
-    perspective: 1000px;
-  }
-
-  /* Glass morphism utilities */
-  .neo-blur {
-    @apply backdrop-blur-md bg-black/40 border border-white/10 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)];
-  }
-}
-
-/* Animation utilities */
-@layer utilities {
-  .animate-spin-slow {
-    animation: spin 10s linear infinite;
-  }
-
-  .animate-pulse-subtle {
-    animation: pulse 3s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 0.8;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-5px);
-    }
-  }
-}
-
-/* Mobile-specific styles */
-@media (max-width: 640px) {
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-  
-  .neo-blur {
-    @apply backdrop-blur-sm bg-black/50;
   }
 }

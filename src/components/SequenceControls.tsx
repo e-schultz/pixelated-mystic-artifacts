@@ -63,10 +63,13 @@ const SequenceControls: React.FC = () => {
     setPlaybackSpeed(newSpeed);
   };
 
-  // Safely get pattern title
+  // Safely get pattern title with null checks
   const getCurrentPatternTitle = () => {
+    if (!patterns || !sequence) return 'None';
+    
     if (currentItemIndex >= 0 && 
         currentItemIndex < sequence.length && 
+        sequence[currentItemIndex].patternId >= 0 &&
         sequence[currentItemIndex].patternId < patterns.length) {
       return patterns[sequence[currentItemIndex].patternId]?.title || 'Unknown Pattern';
     }

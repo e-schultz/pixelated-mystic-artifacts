@@ -42,9 +42,14 @@ const HomePage = () => {
     setShowControlPanel(prev => !prev);
   };
 
+  // Fix the toggleAsciiOverlay function to actually call setShowAsciiOverlay
   const toggleAsciiOverlay = () => {
     setShowAsciiOverlay(!showAsciiOverlay);
   };
+
+  // Add safety check for animations length
+  const animationsLength = animations?.length || 0;
+  const currentAnimationIndex = currentAnimation >= 0 && currentAnimation < animationsLength ? currentAnimation : 0;
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
@@ -106,7 +111,7 @@ const HomePage = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={toggleAsciiOverlay}
+          onClick={toggleAsciiOverlay} // Fixed: proper function call
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
@@ -150,7 +155,7 @@ const HomePage = () => {
                 MYSTIC.SYS [VERSION 8.15.23]
               </div>
               <div className="text-green-400/60 font-mono text-xs tracking-widest">
-                {`${currentAnimation + 1}/${animations.length} | ${animationSpeed.toFixed(1)}X`}
+                {`${currentAnimationIndex + 1}/${animationsLength} | ${animationSpeed.toFixed(1)}X`}
               </div>
             </div>
           </div>

@@ -14,6 +14,10 @@ const PatternNavigation: React.FC = () => {
   const [showPatternList, setShowPatternList] = useState(false);
   const isMobile = useIsMobile();
 
+  // Add safety check for patterns
+  const patternsLength = patterns?.length || 0;
+  const currentPatternIndex = currentPattern >= 0 && currentPattern < patternsLength ? currentPattern : 0;
+
   const handlePatternClick = (index: number) => {
     setCurrentPattern(index);
     setShowPatternList(false);
@@ -40,7 +44,7 @@ const PatternNavigation: React.FC = () => {
           className={`px-4 py-1.5 border border-mystic/30 rounded-full flex items-center ${isMobile ? 'text-sm' : 'text-xs'} text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all`}
         >
           <span className={`${isAutoPlaying ? 'text-mystic' : 'text-mystic/70'} mr-1`}>
-            {currentPattern + 1}/{patterns.length}
+            {currentPatternIndex + 1}/{patternsLength}
           </span>
           <ChevronDown className="h-3 w-3" />
         </button>
@@ -63,7 +67,7 @@ const PatternNavigation: React.FC = () => {
       </button>
       
       {/* Pattern selection dropdown */}
-      {showPatternList && (
+      {showPatternList && patterns && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -75,7 +79,7 @@ const PatternNavigation: React.FC = () => {
               key={pattern.id}
               onClick={() => handlePatternClick(index)}
               className={`w-full text-left px-3 py-2 ${isMobile ? 'text-sm' : 'text-xs'} rounded ${
-                currentPattern === index 
+                currentPatternIndex === index 
                   ? 'bg-mystic/20 text-mystic' 
                   : 'text-mystic/70 hover:bg-mystic/10 hover:text-mystic'
               } transition-colors`}

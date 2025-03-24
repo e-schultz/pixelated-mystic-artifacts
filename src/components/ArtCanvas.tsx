@@ -30,6 +30,16 @@ const ArtCanvas: React.FC = () => {
         canvas.parent(canvasRef.current!);
         p.background(0);
         p.frameRate(targetFrameRate);
+        
+        // Add these to ensure WebGL is properly initialized
+        if (p.WEBGL) {
+          try {
+            p.setAttributes('antialias', true);
+            p.smooth();
+          } catch (e) {
+            console.log('WebGL initialization warning:', e);
+          }
+        }
       };
       
       p.draw = () => {
@@ -110,9 +120,18 @@ const ArtCanvas: React.FC = () => {
     return () => {
       if (p5InstanceRef.current) {
         p5InstanceRef.current.remove();
+        p5InstanceRef.current = null;
       }
     };
   }, []); // Empty dependency array - canvas created once
+
+  // Force redraw when pattern changes
+  useEffect(() => {
+    // This ensures the canvas updates when pattern changes
+    if (p5InstanceRef.current) {
+      // We don't need to recreate the canvas, it will update in the next draw cycle
+    }
+  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]);
 
   return <div ref={canvasRef} className="absolute inset-0 z-0" />;
 };

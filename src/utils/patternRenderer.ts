@@ -17,8 +17,11 @@ export function drawPatterns(
 ) {
   const { time, isPixelated, isLowPerformanceMode } = options;
   
+  // Validate pattern index to ensure it's within bounds
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 5));
+  
   // Determine which pattern to draw
-  switch (patternIndex) {
+  switch (validPatternIndex) {
     case 0:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);
       break;

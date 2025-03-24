@@ -5,6 +5,7 @@ import ArtCanvas from '@/components/ArtCanvas';
 import PatternInfo from '@/components/PatternInfo';
 import Controls from '@/components/Controls';
 import { useArt, patterns } from '@/contexts/ArtContext';
+import { useToast } from "@/components/ui/use-toast";
 
 const HomePage = () => {
   const {
@@ -17,15 +18,41 @@ const HomePage = () => {
   } = useArt();
   
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
   
   // Handle initial loading animation
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
+      
+      // Display toast when app is ready
+      toast({
+        title: "Neo Artifacts Ready",
+        description: "Navigate through patterns using arrows below",
+      });
     }, 2000);
     
     return () => clearTimeout(timer);
-  }, []);
+  }, [toast]);
+  
+  // Log pattern changes
+  useEffect(() => {
+    console.log(`HomePage: Current pattern is ${currentPattern}`);
+  }, [currentPattern]);
+  
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        prevPattern();
+      } else if (e.key === 'ArrowRight') {
+        nextPattern();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [nextPattern, prevPattern]);
   
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black text-white font-mono">
@@ -87,8 +114,8 @@ const HomePage = () => {
       
       {/* Pattern Info */}
       <PatternInfo 
-        title={patterns[currentPattern].title}
-        description={patterns[currentPattern].description}
+        title={patterns[currentPattern]?.title || "Loading..."}
+        description={patterns[currentPattern]?.description || "Please wait..."}
       />
       
       {/* Controls Panel */}

@@ -88,13 +88,21 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
   // UI state
   const [isControlsVisible, setIsControlsVisible] = useState(false);
   
-  // Navigation functions
+  // Navigation functions - ensure they are memoized and work correctly
   const nextPattern = useCallback(() => {
-    setCurrentPattern((prev) => (prev + 1) % patterns.length);
+    setCurrentPattern((prev) => {
+      const nextIndex = (prev + 1) % patterns.length;
+      console.log(`Switching from pattern ${prev} to ${nextIndex}`);
+      return nextIndex;
+    });
   }, []);
   
   const prevPattern = useCallback(() => {
-    setCurrentPattern((prev) => (prev - 1 + patterns.length) % patterns.length);
+    setCurrentPattern((prev) => {
+      const prevIndex = (prev - 1 + patterns.length) % patterns.length;
+      console.log(`Switching from pattern ${prev} to ${prevIndex}`);
+      return prevIndex;
+    });
   }, []);
   
   // Toggle functions
@@ -118,12 +126,18 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isAutoPlaying) return;
     
+    console.log(`Auto-cycling enabled with speed ${speed}`);
     const interval = setInterval(() => {
       nextPattern();
     }, isLowPerformanceMode ? 15000 / speed : 12000 / speed);
     
     return () => clearInterval(interval);
   }, [isAutoPlaying, speed, nextPattern, isLowPerformanceMode]);
+  
+  // Log when pattern changes for debugging
+  useEffect(() => {
+    console.log(`Current pattern set to: ${currentPattern}`);
+  }, [currentPattern]);
   
   return (
     <ArtContext.Provider

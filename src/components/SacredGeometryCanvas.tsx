@@ -1,8 +1,8 @@
-
 import React, { useEffect, useRef } from 'react';
 import p5 from 'p5';
 import { useGeometry } from '@/hooks/useGeometry';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAnimation } from '@/context/AnimationContext';
 import { 
   GeometrySettings, 
   getDefaultSettings,
@@ -26,8 +26,11 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<p5 | null>(null);
   const prevAnimationRef = useRef<number>(currentAnimation);
-  const { time, smallShapes } = useGeometry(animationSpeed);
+  const { state } = useAnimation();
   const isMobile = useIsMobile();
+  
+  // Use performance mode from animation context
+  const { time, smallShapes } = useGeometry(animationSpeed, state.performanceMode || isMobile);
   
   // Animation configurations - mobile-first
   const animationFunctions = [
@@ -35,40 +38,39 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
       name: "Metatron's Cube",
       drawFunction: drawMetatronCube,
       settings: getDefaultSettings({ 
-        segments: isMobile ? 6 : 12, 
-        pixelSize: isMobile ? 1 : 2 
+        segments: (state.performanceMode || isMobile) ? 4 : 12, 
+        pixelSize: (state.performanceMode || isMobile) ? 1 : 2 
       })
     },
     {
       name: "Flower of Life",
       drawFunction: drawFlowerOfLife,
       settings: getDefaultSettings({ 
-        segments: isMobile ? 4 : 8, 
-        pixelSize: isMobile ? 1 : 2 
+        segments: (state.performanceMode || isMobile) ? 3 : 8, 
+        pixelSize: (state.performanceMode || isMobile) ? 1 : 2 
       })
     },
     {
       name: "Sri Yantra",
       drawFunction: drawSriYantra,
       settings: getDefaultSettings({ 
-        segments: isMobile ? 6 : 9, 
-        pixelSize: isMobile ? 1 : 2 
+        segments: (state.performanceMode || isMobile) ? 4 : 9, 
+        pixelSize: (state.performanceMode || isMobile) ? 1 : 2 
       })
     },
     {
       name: "Geometric Grid",
       drawFunction: drawGeometricGrid,
       settings: getDefaultSettings({ 
-        segments: isMobile ? 4 : 6, 
-        pixelSize: isMobile ? 1 : 2 
+        segments: (state.performanceMode || isMobile) ? 3 : 6, 
+        pixelSize: (state.performanceMode || isMobile) ? 1 : 2 
       })
     }
   ];
 
-  // Simple ASCII effect
+  // Simple ASCII effect - disabled in performance mode
   const drawAsciiOverlay = (p: any) => {
-    if (isMobile) return; // Skip ASCII on mobile
-    
+    if (isMobile || state.performanceMode) return; // Skip ASCII on mobile or in performance mode
     const charSize = 12;
     const cols = Math.floor(p.width / charSize);
     const rows = Math.floor(p.height / charSize);
@@ -109,17 +111,26 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
       let prevFrame: p5.Image;
       let transitionProgress = 0;
       let lastFrameTime = 0;
+      let frameCount = 0;
       
       p.setup = () => {
         const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
         canvas.parent(containerRef.current!);
         p.background(18, 18, 18);
-        p.frameRate(isMobile ? 30 : 60); // Lower framerate on mobile
+        // Lower framerate on mobile or in performance mode
+        p.frameRate((state.performanceMode || isMobile) ? 24 : 60);
         prevFrame = p.createImage(p.width, p.height);
         lastFrameTime = p.millis();
       };
       
       p.draw = () => {
+        frameCount++;
+        
+        // Skip frames in performance mode to improve performance
+        if ((state.performanceMode || isMobile) && frameCount % 2 !== 0) {
+          return;
+        }
+        
         // Calculate delta time for smoother transitions
         const currentTime = p.millis();
         const deltaTime = (currentTime - lastFrameTime) / 1000; // convert to seconds
@@ -127,7 +138,9 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         
         // Less frequent background refresh - helps reduce flickering
         // Only fade background slowly instead of redrawing it completely
-        p.background(18, 18, 18, isMobile ? 15 : 8);
+        // More aggressive in performance mode
+        const fadeAlpha = (state.performanceMode || isMobile) ? 20 : 8;
+        p.background(18, 18, 18, fadeAlpha);
         
         // Handle transition if animation changed
         if (currentAnimation !== prevAnimationRef.current) {
@@ -139,8 +152,10 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         
         // Process transition more smoothly using delta time
         if (transitionProgress < 1) {
-          // Scale transition speed by delta time for consistency across devices
-          transitionProgress += 0.04 * animationSpeed * Math.min(deltaTime * 60, 2);
+          // Scale transition speed by delta time for consistency 
+          // Faster transitions in performance mode
+          const transitionSpeed = (state.performanceMode || isMobile) ? 0.08 : 0.04;
+          transitionProgress += transitionSpeed * animationSpeed * Math.min(deltaTime * 60, 2);
           if (transitionProgress < 1) {
             p.push();
             // Apply previous frame with fading opacity
@@ -155,7 +170,8 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         const centerX = p.width / 2;
         const centerY = p.height / 2;
         // Mobile-first: smaller size on mobile
-        const size = Math.min(p.width, p.height) * (isMobile ? 0.7 : 0.6);
+        const sizeMultiplier = (state.performanceMode || isMobile) ? 0.6 : 0.6;
+        const size = Math.min(p.width, p.height) * sizeMultiplier;
         
         // Animation settings - smoother rotation based on delta time
         const animSettings = { 
@@ -173,37 +189,50 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         p.pop();
         
         // Draw small background shapes - fewer on mobile and with smoother rendering
-        p.push();
-        p.noStroke();
-        smallShapes.forEach(shape => {
-          // Only draw shapes that are within the screen bounds with some padding
-          // This helps reduce unnecessary rendering that could cause flickering
-          if (
-            shape.x > -shape.size && 
-            shape.x < p.width + shape.size && 
-            shape.y > -shape.size && 
-            shape.y < p.height + shape.size
-          ) {
-            const shapeSettings = {
-              ...shape.settings,
-              rotation: shape.rotation,
-              color: `rgba(240, 240, 228, ${shape.settings.opacity})`
-            };
-            
-            shape.drawFunction(p, shape.x, shape.y, shape.size, shapeSettings);
-          }
-        });
-        p.pop();
+        // Skip drawing background shapes in extreme performance cases
+        if (!(state.performanceMode && isMobile)) {
+          p.push();
+          p.noStroke();
+          // Only process every nth shape in performance mode to improve performance
+          const shapesToProcess = (state.performanceMode || isMobile) ? 
+                                 smallShapes.filter((_, i) => i % 2 === 0) : 
+                                 smallShapes;
+          
+          shapesToProcess.forEach(shape => {
+            // Only draw shapes that are within the screen bounds with some padding
+            // This helps reduce unnecessary rendering that could cause flickering
+            if (
+              shape.x > -shape.size && 
+              shape.x < p.width + shape.size && 
+              shape.y > -shape.size && 
+              shape.y < p.height + shape.size
+            ) {
+              const shapeSettings = {
+                ...shape.settings,
+                rotation: shape.rotation,
+                color: `rgba(240, 240, 228, ${shape.settings.opacity})`
+              };
+              
+              shape.drawFunction(p, shape.x, shape.y, shape.size, shapeSettings);
+            }
+          });
+          p.pop();
+        }
         
-        // Draw ASCII overlay if enabled (desktop only)
-        if (showAsciiOverlay && !isMobile) {
+        // Draw ASCII overlay if enabled (desktop only and not in performance mode)
+        if (showAsciiOverlay && !isMobile && !state.performanceMode) {
           drawAsciiOverlay(p);
         }
       };
       
       p.windowResized = () => {
         p.resizeCanvas(window.innerWidth, window.innerHeight);
-        prevFrame = p.createImage(p.width, p.height);
+        // Create smaller image in performance mode to save memory
+        if (state.performanceMode || isMobile) {
+          prevFrame = p.createImage(p.width, p.height);
+        } else {
+          prevFrame = p.createImage(p.width, p.height);
+        }
       };
     };
     
@@ -214,7 +243,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         canvasRef.current.remove();
       }
     };
-  }, [currentAnimation, animationSpeed, showAsciiOverlay, smallShapes, time, isMobile]);
+  }, [currentAnimation, animationSpeed, showAsciiOverlay, smallShapes, time, isMobile, state.performanceMode]);
 
   return <div ref={containerRef} />;
 };

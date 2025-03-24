@@ -14,7 +14,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const Index: React.FC = () => {
   const [showControlPanel, setShowControlPanel] = useState(false);
   const { state } = useAnimation();
-  const { isLoading, currentAnimation, animationSpeed, showAsciiOverlay } = state;
+  const { isLoading, currentAnimation, animationSpeed, showAsciiOverlay, performanceMode } = state;
   const isMobile = useIsMobile();
 
   const toggleControlPanel = () => {
@@ -28,7 +28,7 @@ const Index: React.FC = () => {
       <SacredGeometryCanvas 
         currentAnimation={currentAnimation}
         animationSpeed={animationSpeed}
-        showAsciiOverlay={showAsciiOverlay && !isMobile}
+        showAsciiOverlay={showAsciiOverlay && !isMobile && !performanceMode}
       />
       
       <Header />
@@ -40,7 +40,7 @@ const Index: React.FC = () => {
         <ControlPanel onClose={toggleControlPanel} />
       )}
       
-      {showAsciiOverlay && !isMobile && <AsciiOverlay />}
+      {showAsciiOverlay && !isMobile && !performanceMode && <AsciiOverlay />}
     </div>
   );
 };

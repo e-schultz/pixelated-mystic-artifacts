@@ -10,6 +10,7 @@ export interface AnimationState {
   isAutoCycling: boolean;
   animationSpeed: number;
   showAsciiOverlay: boolean;
+  performanceMode: boolean; // New performance mode state
 }
 
 // Actions that can be dispatched
@@ -21,6 +22,8 @@ type AnimationAction =
   | { type: 'SET_ANIMATION_SPEED'; payload: number }
   | { type: 'TOGGLE_ASCII_OVERLAY' }
   | { type: 'SET_ASCII_OVERLAY'; payload: boolean }
+  | { type: 'TOGGLE_PERFORMANCE_MODE' }
+  | { type: 'SET_PERFORMANCE_MODE'; payload: boolean }
   | { type: 'NEXT_ANIMATION' }
   | { type: 'PREV_ANIMATION' };
 
@@ -37,6 +40,7 @@ const initialState: AnimationState = {
   isAutoCycling: true,
   animationSpeed: 1,
   showAsciiOverlay: false,
+  performanceMode: false, // Default to standard mode
 };
 
 // Create context
@@ -61,6 +65,10 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
       return { ...state, showAsciiOverlay: !state.showAsciiOverlay };
     case 'SET_ASCII_OVERLAY':
       return { ...state, showAsciiOverlay: action.payload };
+    case 'TOGGLE_PERFORMANCE_MODE':
+      return { ...state, performanceMode: !state.performanceMode };
+    case 'SET_PERFORMANCE_MODE':
+      return { ...state, performanceMode: action.payload };
     case 'NEXT_ANIMATION':
       return { 
         ...state, 
@@ -82,6 +90,13 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const isMobile = useIsMobile();
   const autoCycleTimerRef = useRef<number | null>(null);
 
+  // Auto-enable performance mode on mobile
+  useEffect(() => {
+    if (isMobile) {
+      dispatch({ type: 'SET_PERFORMANCE_MODE', payload: true });
+    }
+  }, [isMobile]);
+
   // Set up auto-cycling effect with debounce to avoid rapid transitions
   useEffect(() => {
     // Clear any existing timer
@@ -91,8 +106,8 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
     
     if (state.isAutoCycling) {
-      // Longer cycle time on mobile to reduce visual fatigue
-      const cycleTime = isMobile ? 12000 : 15000;
+      // Longer cycle time on mobile to reduce visual fatigue and improve performance
+      const cycleTime = isMobile ? 15000 : 15000;
       // Adjust time based on animation speed, but with limits to prevent extremes
       const adjustedTime = cycleTime / Math.max(0.6, Math.min(state.animationSpeed, 1.5));
       
@@ -112,7 +127,7 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: 'SET_LOADING', payload: false });
-    }, isMobile ? 1200 : 2000);
+    }, isMobile ? 800 : 1500);
 
     return () => clearTimeout(timer);
   }, [isMobile]);

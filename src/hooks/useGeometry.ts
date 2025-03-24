@@ -1,6 +1,13 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { GeometrySettings, getRandomGeometryFunction } from '@/utils/geometryUtils';
+import { 
+  GeometrySettings, 
+  getDefaultSettings, 
+  drawMetatronCube, 
+  drawFlowerOfLife, 
+  drawSriYantra, 
+  drawGeometricGrid 
+} from '@/utils/geometryUtils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export function useGeometry(animationSpeed: number) {
@@ -29,27 +36,34 @@ export function useGeometry(animationSpeed: number) {
 
   // Generate random small background shapes - fewer on mobile
   const generateSmallShapes = useCallback(() => {
-    // Reduce number of shapes on mobile for better performance
-    const numShapes = Math.floor(Math.random() * (isMobile ? 5 : 10)) + (isMobile ? 3 : 5);
+    // Fewer shapes on mobile for better performance
+    const numShapes = isMobile ? 3 : 8;
     const newShapes = [];
     
+    const drawFunctions = [
+      drawMetatronCube,
+      drawFlowerOfLife,
+      drawSriYantra,
+      drawGeometricGrid
+    ];
+    
     for (let i = 0; i < numShapes; i++) {
-      const drawFunction = getRandomGeometryFunction();
+      const drawFunction = drawFunctions[Math.floor(Math.random() * drawFunctions.length)];
       newShapes.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        size: Math.random() * (isMobile ? 40 : 50) + (isMobile ? 15 : 20), // Smaller on mobile
+        size: Math.random() * (isMobile ? 30 : 50) + (isMobile ? 10 : 20),
         rotation: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.002 + 0.001, // 0.001-0.003 speed
+        speed: Math.random() * 0.001 + 0.0005, // Slower on mobile
         drawFunction,
         settings: {
           scale: 0.8,
           rotation: 0,
-          opacity: Math.random() * 0.5 + 0.3, // 0.3-0.8 opacity
-          segments: isMobile ? 6 : 8, // Less complex on mobile
+          opacity: Math.random() * 0.3 + 0.1, // Lower opacity on mobile
+          segments: isMobile ? 4 : 8,
           variance: 0.2,
-          pixelSize: isMobile ? 1 : Math.floor(Math.random() * 2) + 1, // Smaller pixels on mobile
-          color: `rgba(240, 240, 228, ${Math.random() * 0.5 + 0.3})`,
+          pixelSize: isMobile ? 1 : 2,
+          color: `rgba(240, 240, 228, ${Math.random() * 0.3 + 0.1})`,
           speed: 0.005
         }
       });
@@ -67,21 +81,20 @@ export function useGeometry(animationSpeed: number) {
     const deltaTime = time - (previousTimeRef.current || 0);
     previousTimeRef.current = time;
     
-    // Smoother time increment based on delta time and current speed
-    const timeIncrement = (deltaTime / 1000) * 0.15 * speedFactorRef.current;
-    
+    // Use delta time for smoother animation
+    const timeIncrement = (deltaTime / 1000) * 0.1 * speedFactorRef.current;
     setTime(prevTime => prevTime + timeIncrement);
     
-    // Less frequent shape regeneration to reduce flickering
-    if (Math.random() < 0.001 * speedFactorRef.current) {
+    // Less frequent shape regeneration
+    if (Math.random() < 0.0005) {
       generateSmallShapes();
     }
     
-    // Update shape rotations with smoother increments
+    // Update shape rotations
     setSmallShapes(prev => 
       prev.map(shape => ({
         ...shape,
-        rotation: shape.rotation + (shape.speed * deltaTime * 0.01 * speedFactorRef.current)
+        rotation: shape.rotation + (shape.speed * deltaTime * 0.01)
       }))
     );
     
@@ -90,25 +103,18 @@ export function useGeometry(animationSpeed: number) {
 
   // Set up and clean up animation frame
   useEffect(() => {
-    // Initial generation of shapes if none exist
-    if (smallShapes.length === 0) {
-      generateSmallShapes();
-    }
-    
-    // Start the animation loop
+    generateSmallShapes();
     requestRef.current = requestAnimationFrame(animate);
     
-    // Clean up animation frame on unmount
     return () => {
       if (requestRef.current) {
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [animate, generateSmallShapes, smallShapes.length]);
+  }, [animate, generateSmallShapes]);
 
   return {
     time,
-    smallShapes,
-    generateSmallShapes
+    smallShapes
   };
 }

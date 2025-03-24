@@ -30,7 +30,7 @@ interface AnimationContextType {
   dispatch: React.Dispatch<AnimationAction>;
 }
 
-// Initial state
+// Initial state - mobile-first approach
 const initialState: AnimationState = {
   currentAnimation: 0,
   isLoading: true,
@@ -54,8 +54,8 @@ function animationReducer(state: AnimationState, action: AnimationAction): Anima
     case 'SET_AUTO_CYCLING':
       return { ...state, isAutoCycling: action.payload };
     case 'SET_ANIMATION_SPEED':
-      // Clamp animation speed between 0.5 and 2.5 to prevent strobing
-      const clampedSpeed = Math.max(0.5, Math.min(2.5, action.payload));
+      // Clamp animation speed between 0.5 and 2
+      const clampedSpeed = Math.max(0.5, Math.min(2, action.payload));
       return { ...state, animationSpeed: clampedSpeed };
     case 'TOGGLE_ASCII_OVERLAY':
       return { ...state, showAsciiOverlay: !state.showAsciiOverlay };
@@ -84,13 +84,13 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // Set up auto-cycling effect
   useEffect(() => {
     if (state.isAutoCycling) {
-      // Shorter cycle time on mobile for better experience
-      const baseTime = isMobile ? 12000 : 15000;
-      const cycleTime = baseTime / Math.max(0.8, state.animationSpeed);
+      // Shorter cycle time on mobile
+      const cycleTime = isMobile ? 10000 : 15000;
+      const adjustedTime = cycleTime / Math.max(0.8, state.animationSpeed);
       
       const intervalId = setInterval(() => {
         dispatch({ type: 'NEXT_ANIMATION' });
-      }, cycleTime);
+      }, adjustedTime);
       
       return () => clearInterval(intervalId);
     }
@@ -100,7 +100,7 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch({ type: 'SET_LOADING', payload: false });
-    }, isMobile ? 1800 : 2500);
+    }, isMobile ? 1200 : 2000);
 
     return () => clearTimeout(timer);
   }, [isMobile]);

@@ -1,49 +1,63 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LOADING_ASCII } from '@/constants/asciiArt';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const LoadingScreen: React.FC = () => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-black to-blue-950 flex flex-col items-center justify-center z-50">
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: 0 }}
+      transition={{ delay: 1, duration: 0.5 }}
+      className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center"
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.8, rotateY: 180 }}
-        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-        transition={{ duration: 0.8, type: "spring" }}
-        className="w-20 h-20 mb-6 relative"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative w-20 h-20 mb-6"
       >
-        <div className="absolute inset-0 w-20 h-20 border-2 border-t-blue-400 border-r-indigo-500 border-b-purple-600 border-l-cyan-400 rounded-full flex items-center justify-center animate-spin-slow opacity-75"></div>
-        <div className="absolute inset-0 w-20 h-20 border-2 border-cyan-400 rounded-full flex items-center justify-center animate-pulse-subtle"></div>
-        <div className="absolute inset-2 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-xl rounded-full flex items-center justify-center">
-          <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-lg shadow-cyan-500/50"></div>
-        </div>
+        <motion.span
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+          className="absolute inset-0 border-2 border-cyan-500/30 rounded-full"
+        />
+        <motion.span
+          animate={{ rotate: -360 }}
+          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+          className="absolute inset-2 border-2 border-purple-500/30 rounded-full"
+        />
+        <motion.span
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+          className="absolute inset-0 flex items-center justify-center text-cyan-300 text-xs"
+        >
+          INIT
+        </motion.span>
       </motion.div>
       
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="text-cyan-300 text-sm tracking-[0.25em] font-light"
+      <motion.h2
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="text-lg text-white/80 font-light tracking-wider mb-2"
       >
-        INITIALIZING NEURAL MATRIX
-      </motion.p>
+        SACRED GEOMETRY
+      </motion.h2>
       
-      <motion.div 
-        initial={{ width: 0, opacity: 0 }}
-        animate={{ width: "220px", opacity: 1 }}
-        transition={{ delay: 0.7, duration: 1.5 }}
-        className="h-[2px] bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 mt-6 rounded-full"
-      />
-      
-      <motion.pre
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-        className="text-cyan-400/70 text-xs font-mono mt-8 tracking-widest"
-      >
-        {LOADING_ASCII}
-      </motion.pre>
-    </div>
+      {!isMobile && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-sm text-white/60 max-w-xs text-center"
+        >
+          Loading visualization matrix...
+        </motion.p>
+      )}
+    </motion.div>
   );
 };
 

@@ -23,27 +23,7 @@ export const animations: AnimationData[] = [
   },
   {
     id: 3,
-    title: "Sacred Grid",
-    description: "A geometric pattern that represents the interconnectedness of consciousness and the mathematical foundations of reality."
-  },
-  {
-    id: 4,
     title: "Geometric Grid",
     description: "A pixelated grid pattern showing the underlying structure of digital reality, inspired by ancient wisdom in modern form."
-  },
-  {
-    id: 5,
-    title: "Perspective Corridor",
-    description: "A geometric tunneling effect that creates the illusion of infinite depth, representing the journey into the deeper realms of consciousness."
-  },
-  {
-    id: 6,
-    title: "Light Prism",
-    description: "A pattern that simulates how light diffracts through crystal structures, revealing the spectrum of energy hidden within unified light."
-  },
-  {
-    id: 7,
-    title: "Retro Computer",
-    description: "An homage to early digital visualizations - where ancient wisdom meets the dawn of the computer age, rendered in glowing vector lines."
   }
 ];

@@ -29,35 +29,31 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: isMobile ? 20 : 0, x: isMobile ? 0 : 20 }}
-      animate={{ opacity: 1, y: 0, x: 0 }}
-      exit={{ opacity: 0, y: isMobile ? 20 : 0, x: isMobile ? 0 : 20 }}
-      className={`fixed z-20 ${
-        isMobile 
-          ? 'inset-x-4 bottom-20 top-auto' 
-          : 'top-20 right-6 w-72'
-      } bg-black/70 backdrop-blur-md border border-mystic/20 rounded-lg p-5`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      className={`fixed z-20 inset-x-4 bottom-20 bg-black/70 backdrop-blur-md border border-mystic/20 rounded-lg p-4`}
     >
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-mystic text-lg font-light tracking-wider">Settings</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-mystic text-base font-light tracking-wider">Settings</h3>
         <button 
           onClick={onClose}
           className="text-mystic/60 hover:text-mystic transition-colors p-1"
           aria-label="Close settings"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
       </div>
       
-      <div className="space-y-6">
-        <div className="space-y-3">
+      <div className="space-y-4">
+        <div className="space-y-2">
           <p className="text-mystic/80 text-sm">Animation Speed</p>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <span className="text-mystic/60 text-xs">Slow</span>
             <Slider
               value={[animationSpeed]}
               min={0.5}
-              max={3}
+              max={2}
               step={0.1}
               onValueChange={handleSpeedChange}
               className="flex-1"
@@ -69,7 +65,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
           </div>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-2">
           <p className="text-mystic/80 text-sm">Auto-Cycling</p>
           <button
             onClick={toggleAutoCycling}
@@ -80,8 +76,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
         </div>
         
         {!isMobile && (
-          <div className="space-y-3">
-            <p className="text-mystic/80 text-sm">ASCII Terminal Overlay</p>
+          <div className="space-y-2">
+            <p className="text-mystic/80 text-sm">ASCII Overlay</p>
             <button
               onClick={toggleAsciiOverlay}
               className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${showAsciiOverlay ? 'bg-green-800/30 text-green-400/90 border-green-400/30' : ''}`}
@@ -93,12 +89,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
             </div>
           </div>
         )}
-        
-        <div className="pt-3 border-t border-mystic/10">
-          <p className="text-mystic/60 text-xs">
-            Use arrow buttons {isMobile ? 'above' : 'below'} to manually navigate between patterns.
-          </p>
-        </div>
       </div>
     </motion.div>
   );

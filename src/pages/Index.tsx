@@ -1,68 +1,38 @@
+
 import React, { useState, useEffect } from 'react';
 import SacredGeometryCanvas from '@/components/SacredGeometryCanvas';
-import AnimationInfo from '@/components/AnimationInfo';
-import ControlPanel from '@/components/ControlPanel';
+import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
+import OptimizedControlPanel from '@/components/OptimizedControlPanel';
+import { useAnimation } from '@/contexts/AnimationContext';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 
 const Index = () => {
-  const [currentAnimation, setCurrentAnimation] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAutoCycling, setIsAutoCycling] = useState(true);
-  const [animationSpeed, setAnimationSpeed] = useState(1);
   const [showControlPanel, setShowControlPanel] = useState(false);
-  const [showAsciiOverlay, setShowAsciiOverlay] = useState(false);
+  
+  const {
+    currentAnimation,
+    isAutoCycling,
+    animationSpeed,
+    showAsciiOverlay,
+    handlePrevAnimation,
+    handleNextAnimation,
+    performanceMode
+  } = useAnimation();
 
+  // Loading screen effect
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
+    }, performanceMode ? 1000 : 1500); // Shorter loading time on mobile
 
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (isAutoCycling) {
-      const cycleTime = 10000 / animationSpeed;
-      const intervalId = setInterval(() => {
-        setCurrentAnimation((prev) => (prev + 1) % animations.length);
-      }, cycleTime);
-      
-      return () => clearInterval(intervalId);
-    }
-  }, [isAutoCycling, animationSpeed, animations.length]);
-
-  const handlePrevAnimation = () => {
-    setCurrentAnimation((prev) => (prev - 1 + animations.length) % animations.length);
-  };
-
-  const handleNextAnimation = () => {
-    setCurrentAnimation((prev) => (prev + 1) % animations.length);
-  };
+  }, [performanceMode]);
 
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
   };
-
-  useEffect(() => {
-    if (showAsciiOverlay) {
-      console.log(`
-,---.   .--.   .---. ,--. ,-. 
-|    \\  |  |   | .-' | .--' | 
-|  ,  \\ |  |   | \`-. | |    | 
-|  |\\  \\|  |   | .-' | |    | 
-|  | \\  '  '--.|  \`--' \`--. | 
-\`--'  \`--\`-----'\`------\`---' ' 
-.---.   ,---.  ,--.  ,---.   
-| .-.\\ /  .-. ) |  | /  .-'  
-| |-' )| ('-. \\ |  || \`--.   
-| |--' |  --. ) |  ||.--.    
-| |    /  '--'  |  ||  --'   
-)('    \`------' \`--' \`----'  
-                               
-      `);
-    }
-  }, [showAsciiOverlay]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
@@ -98,11 +68,7 @@ const Index = () => {
         </div>
       )}
 
-      <SacredGeometryCanvas 
-        currentAnimation={currentAnimation}
-        animationSpeed={animationSpeed}
-        showAsciiOverlay={showAsciiOverlay}
-      />
+      <SacredGeometryCanvas />
       
       <header className="fixed top-0 left-0 right-0 p-6 z-10">
         <motion.h1 
@@ -115,12 +81,7 @@ const Index = () => {
         </motion.h1>
       </header>
       
-      <AnimationInfo
-        title={animations[currentAnimation].title}
-        description={animations[currentAnimation].description}
-        isAutoCycling={isAutoCycling}
-        showAsciiOverlay={showAsciiOverlay}
-      />
+      <OptimizedAnimationInfo />
       
       <motion.div 
         initial={{ opacity: 0 }}
@@ -135,7 +96,7 @@ const Index = () => {
           ←
         </button>
         <button
-          onClick={() => setIsAutoCycling(!isAutoCycling)}
+          onClick={() => isAutoCycling}
           className={`px-4 py-1 border border-mystic/30 rounded-full text-xs text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isAutoCycling ? 'bg-mystic/20' : ''}`}
         >
           {isAutoCycling ? 'AUTO' : 'MANUAL'}
@@ -155,7 +116,7 @@ const Index = () => {
         className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
       >
         <button
-          onClick={() => setShowAsciiOverlay(!showAsciiOverlay)}
+          onClick={() => showAsciiOverlay}
           className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
             showAsciiOverlay 
               ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
@@ -186,15 +147,7 @@ const Index = () => {
       </motion.button>
       
       {showControlPanel && (
-        <ControlPanel 
-          animationSpeed={animationSpeed}
-          setAnimationSpeed={setAnimationSpeed}
-          isAutoCycling={isAutoCycling}
-          setIsAutoCycling={setIsAutoCycling}
-          showAsciiOverlay={showAsciiOverlay}
-          setShowAsciiOverlay={setShowAsciiOverlay}
-          onClose={toggleControlPanel}
-        />
+        <OptimizedControlPanel onClose={toggleControlPanel} />
       )}
       
       {showAsciiOverlay && (
@@ -218,6 +171,12 @@ const Index = () => {
 \`--' '--'   '--' '--'\`----' -----'/\`--' \`----'`}
           </pre>
         </>
+      )}
+      
+      {performanceMode && (
+        <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
+          Performance Mode
+        </div>
       )}
     </div>
   );

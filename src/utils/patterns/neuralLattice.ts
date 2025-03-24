@@ -1,7 +1,7 @@
 
 // Neural Lattice pattern implementation
 import { RenderOptions } from "../patternTypes";
-import { drawPixelatedLine, drawPixelatedCircle } from './helpers';
+import { drawPixelatedLine, drawCustomCircle } from './commonGeometry';
 
 // Pattern 1: Neural Lattice
 export function drawNeuralLattice(
@@ -53,11 +53,16 @@ export function drawNeuralLattice(
   p.noStroke();
   
   nodes.forEach(node => {
-    if (isPixelated) {
-      drawPixelatedCircle(p, node.x, node.y, node.pulseSize, pixelSize);
-    } else {
-      p.circle(node.x, node.y, node.pulseSize * 2);
-    }
+    drawCustomCircle(
+      p, 
+      node.x, 
+      node.y, 
+      node.pulseSize / 2, 
+      isPixelated, 
+      pixelSize, 
+      [255, 255], 
+      [255, 255]
+    );
   });
   
   p.pop();

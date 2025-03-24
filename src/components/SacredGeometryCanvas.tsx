@@ -9,18 +9,23 @@ import {
   drawMetatronCube,
   drawSriYantra,
   drawMeditationCube,
-  drawGeometricGrid
+  drawGeometricGrid,
+  drawPerspectiveCorridor,
+  drawLightPrism,
+  drawRetroComputer
 } from '../utils/geometryUtils';
 
 interface SacredGeometryCanvasProps {
   currentAnimation?: number;
   animationSpeed?: number;
+  showAsciiOverlay?: boolean;
   className?: string;
 }
 
 const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ 
   currentAnimation = 0,
   animationSpeed = 1,
+  showAsciiOverlay = false,
   className 
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -52,6 +57,21 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
       name: "Geometric Grid",
       drawFunction: drawGeometricGrid,
       settings: getDefaultSettings({ segments: 6, pixelSize: 3 })
+    },
+    {
+      name: "Perspective Corridor",
+      drawFunction: drawPerspectiveCorridor,
+      settings: getDefaultSettings({ segments: 10, pixelSize: 2 })
+    },
+    {
+      name: "Light Prism",
+      drawFunction: drawLightPrism,
+      settings: getDefaultSettings({ segments: 12, pixelSize: 2 })
+    },
+    {
+      name: "Retro Computer",
+      drawFunction: drawRetroComputer,
+      settings: getDefaultSettings({ segments: 8, pixelSize: 2 })
     }
   ];
 
@@ -75,6 +95,9 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         drawFunction: Function;
         settings: GeometrySettings;
       }> = [];
+      
+      // ASCII character mapping for brightness
+      const asciiChars = '@%#*+=-:. ';
       
       const generateSmallShapes = () => {
         smallShapes = [];
@@ -113,7 +136,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         time += 0.005 * animationSpeed;
         
         // Draw main animation
-        const currentAnim = animations[currentAnimation];
+        const currentAnim = animations[currentAnimation % animations.length];
         const centerX = p.width / 2;
         const centerY = p.height / 2;
         const size = Math.min(p.width, p.height) * 0.6;
@@ -154,10 +177,54 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
           }
         }
         
+        // Draw ASCII overlay if enabled
+        if (showAsciiOverlay) {
+          drawAsciiOverlay(p);
+        }
+        
         // Rarely regenerate small shapes
         if (p.random() < 0.005 * animationSpeed) {
           generateSmallShapes();
         }
+      };
+      
+      // ASCII art overlay effect
+      const drawAsciiOverlay = (p: any) => {
+        const charSize = 12;
+        const cols = Math.floor(p.width / charSize);
+        const rows = Math.floor(p.height / charSize);
+        
+        p.push();
+        p.fill(240, 240, 228, 160);
+        p.textSize(charSize);
+        p.textFont('monospace');
+        
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            const pixelX = x * charSize;
+            const pixelY = y * charSize;
+            
+            // Use a repeating pattern for the overlay
+            let char = '';
+            
+            // Create an ASCII art pattern
+            if ((x + y) % 7 === 0) char = '.';
+            else if ((x + y) % 5 === 0) char = '*';
+            else if ((x * y) % 11 === 0) char = '/';
+            else if ((x * y) % 13 === 0) char = '|';
+            else if ((x - y) % 6 === 0) char = '\\';
+            else if ((x + y * 2) % 15 === 0) char = '#';
+            else if ((x * y) % 29 === 0) char = '+';
+            else if ((x * y) % 17 === 0) char = ':';
+            else char = ' ';
+            
+            // Only draw the characters with a random chance to create a sparse effect
+            if (Math.random() < 0.7) {
+              p.text(char, pixelX, pixelY + charSize);
+            }
+          }
+        }
+        p.pop();
       };
       
       p.windowResized = () => {
@@ -172,7 +239,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
         canvasRef.current.remove();
       }
     };
-  }, [currentAnimation, animationSpeed]);
+  }, [currentAnimation, animationSpeed, showAsciiOverlay]);
 
   return (
     <div ref={containerRef} className={className} />

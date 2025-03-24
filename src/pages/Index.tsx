@@ -12,6 +12,7 @@ const Index = () => {
   const [isAutoCycling, setIsAutoCycling] = useState(true);
   const [animationSpeed, setAnimationSpeed] = useState(1);
   const [showControlPanel, setShowControlPanel] = useState(false);
+  const [showAsciiOverlay, setShowAsciiOverlay] = useState(false);
 
   useEffect(() => {
     // Simulate loading delay
@@ -32,7 +33,7 @@ const Index = () => {
       
       return () => clearInterval(intervalId);
     }
-  }, [isAutoCycling, animationSpeed]);
+  }, [isAutoCycling, animationSpeed, animations.length]);
 
   const handlePrevAnimation = () => {
     setCurrentAnimation((prev) => (prev - 1 + animations.length) % animations.length);
@@ -45,6 +46,27 @@ const Index = () => {
   const toggleControlPanel = () => {
     setShowControlPanel(prev => !prev);
   };
+
+  // Easter egg ASCII message that appears in console when ASCII mode is toggled
+  useEffect(() => {
+    if (showAsciiOverlay) {
+      console.log(`
+,---.   .--.   .---. ,--. ,-. 
+|    \\  |  |   | .-' | .--' | 
+|  ,  \\ |  |   | \`-. | |    | 
+|  |\\  \\|  |   | .-' | |    | 
+|  | \\  '  '--.|  \`--' \`--. | 
+\`--'  \`--\`-----'\`------\`---' ' 
+.---.   ,---.  ,--.  ,---.   
+| .-.\\ /  .-. ) |  | /  .-'  
+| |-' )| ('-. \\ |  || \`--.   
+| |--' |  --. ) |  ||.--.    
+| |    /  '--'  |  ||  --'   
+)('    \`------' \`--' \`----'  
+                               
+      `);
+    }
+  }, [showAsciiOverlay]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
@@ -69,6 +91,19 @@ const Index = () => {
           >
             LOADING MYSTIC ARTIFACTS
           </motion.p>
+          
+          {/* ASCII-style loading indicator */}
+          <motion.pre
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-green-400/70 text-xs font-mono mt-8 tracking-widest"
+          >
+{`[...............]
+ INITIALIZING SACRED GEOMETRY
+ LOADING VISUAL MATRIX
+ CALIBRATING MYSTIC FREQUENCIES`}
+          </motion.pre>
         </div>
       )}
 
@@ -76,6 +111,7 @@ const Index = () => {
       <SacredGeometryCanvas 
         currentAnimation={currentAnimation}
         animationSpeed={animationSpeed}
+        showAsciiOverlay={showAsciiOverlay}
       />
       
       {/* Header */}
@@ -95,6 +131,7 @@ const Index = () => {
         title={animations[currentAnimation].title}
         description={animations[currentAnimation].description}
         isAutoCycling={isAutoCycling}
+        showAsciiOverlay={showAsciiOverlay}
       />
       
       {/* Navigation controls */}
@@ -124,6 +161,34 @@ const Index = () => {
         </button>
       </motion.div>
       
+      {/* ASCII mode toggle button */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.5 }}
+        className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
+      >
+        <button
+          onClick={() => setShowAsciiOverlay(!showAsciiOverlay)}
+          className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
+            showAsciiOverlay 
+              ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
+              : 'border-mystic/30 text-mystic/60 hover:bg-mystic/10 hover:text-mystic'
+          }`}
+        >
+          <span className="font-mono tracking-wide">
+            {showAsciiOverlay ? 'ASCII ON' : 'ASCII'}
+          </span>
+          {showAsciiOverlay && (
+            <span className="ml-2 h-2 w-2 rounded-full bg-green-400/90 animate-pulse"></span>
+          )}
+        </button>
+        
+        <p className="text-mystic/50 text-xs">
+          sacred geometry {new Date().getFullYear()}
+        </p>
+      </motion.div>
+      
       {/* Settings button */}
       <motion.button
         initial={{ opacity: 0 }}
@@ -142,21 +207,37 @@ const Index = () => {
           setAnimationSpeed={setAnimationSpeed}
           isAutoCycling={isAutoCycling}
           setIsAutoCycling={setIsAutoCycling}
+          showAsciiOverlay={showAsciiOverlay}
+          setShowAsciiOverlay={setShowAsciiOverlay}
           onClose={toggleControlPanel}
         />
       )}
       
-      {/* Footer */}
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 0.5 }}
-        className="fixed bottom-6 right-6 z-10"
-      >
-        <p className="text-mystic/50 text-xs">
-          sacred geometry patterns • {new Date().getFullYear()}
-        </p>
-      </motion.footer>
+      {/* Retro terminal UI elements that appear in ASCII mode */}
+      {showAsciiOverlay && (
+        <>
+          {/* Top terminal bar */}
+          <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
+            <div className="flex justify-between items-center">
+              <div className="text-green-400/80 font-mono text-xs tracking-widest">
+                MYSTIC.SYS [VERSION 8.15.23]
+              </div>
+              <div className="text-green-400/60 font-mono text-xs tracking-widest">
+                {`${currentAnimation + 1}/${animations.length} | ${animationSpeed.toFixed(1)}X`}
+              </div>
+            </div>
+          </div>
+          
+          {/* ASCII-inspired text in bottom-left */}
+          <pre className="fixed left-6 bottom-32 z-9 text-green-400/60 text-xs font-mono">
+{`,--.    ,--.   ,--. ,---.,---.  ,--.  ,---.  
+|   \\ ,-'  '-. `.' |/ .--' ,-. \\ |  | /  .-'  
+|  . \'-.  .-'  /  || \\--. | | | |`-'' \`--.   
+|  |\\  \\|  |   /|  |\\.-. \\' | | |,--.  .-'   
+\`--' '--'   '--' '--'\`----' -----'/`--' \`----'`}
+          </pre>
+        </>
+      )}
     </div>
   );
 };

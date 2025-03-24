@@ -8,6 +8,8 @@ interface ControlPanelProps {
   setAnimationSpeed: (speed: number) => void;
   isAutoCycling: boolean;
   setIsAutoCycling: (isAuto: boolean) => void;
+  showAsciiOverlay: boolean;
+  setShowAsciiOverlay: (showAscii: boolean) => void;
   onClose: () => void;
 }
 
@@ -16,6 +18,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   setAnimationSpeed,
   isAutoCycling,
   setIsAutoCycling,
+  showAsciiOverlay,
+  setShowAsciiOverlay,
   onClose
 }) => {
   return (
@@ -63,6 +67,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           >
             {isAutoCycling ? 'Enabled' : 'Disabled'}
           </button>
+        </div>
+        
+        <div className="space-y-3">
+          <p className="text-mystic/80 text-sm">ASCII Terminal Overlay</p>
+          <button
+            onClick={() => setShowAsciiOverlay(!showAsciiOverlay)}
+            className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${showAsciiOverlay ? 'bg-green-800/30 text-green-400/90 border-green-400/30' : ''}`}
+          >
+            {showAsciiOverlay ? 'Enabled' : 'Disabled'}
+          </button>
+          <div className="text-xs text-mystic/50 mt-1">
+            Adds a retro computer terminal effect
+          </div>
         </div>
         
         <div className="pt-3 border-t border-mystic/10">

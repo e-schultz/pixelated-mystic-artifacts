@@ -9,7 +9,6 @@ import PerformanceMonitor from '@/components/PerformanceMonitor';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
 import { patterns } from '@/contexts/ArtContext';
-import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
 import { Settings, Terminal } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -29,10 +28,6 @@ const HomePage = () => {
   } = useAnimation();
 
   const { currentPattern } = useArt();
-  
-  // Safety checks for animations length
-  const animationsLength = animations?.length || 0;
-  const currentAnimationIndex = currentAnimation >= 0 && currentAnimation < animationsLength ? currentAnimation : 0;
   
   // Safety checks for patterns
   const patternsArray = patterns || [];
@@ -55,27 +50,27 @@ const HomePage = () => {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden crt-overlay">
+    <div className="relative w-full h-screen overflow-hidden crt-overlay bg-black">
       {/* Loading Screen */}
       {isLoading && (
-        <div className="fixed inset-0 bg-mystic-dark flex flex-col items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
             className="w-16 h-16 mb-4"
           >
-            <div className="w-16 h-16 border-2 border-mystic rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-mystic rounded-full animate-pulse"></div>
+            <div className="w-16 h-16 border-2 border-white rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
             </div>
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="text-mystic/70 text-sm tracking-widest"
+            className="text-white/70 text-sm font-mono tracking-widest"
           >
-            LOADING MYSTIC ARTIFACTS
+            LOADING NEO ARTIFACTS
           </motion.p>
           
           <motion.pre
@@ -84,7 +79,7 @@ const HomePage = () => {
             transition={{ delay: 0.6 }}
             className="text-green-400/70 text-xs font-mono mt-8 tracking-widest px-4 text-center max-w-full overflow-x-hidden"
           >
-{`[...............]\n INITIALIZING SACRED GEOMETRY\n LOADING VISUAL MATRIX\n CALIBRATING MYSTIC FREQUENCIES`}
+{`[...............]\n INITIALIZING SYSTEMS\n LOADING VISUAL MATRIX\n CALIBRATING FREQUENCIES`}
           </motion.pre>
         </div>
       )}
@@ -92,7 +87,7 @@ const HomePage = () => {
       {/* Main Canvas */}
       <SacredGeometryCanvas />
       
-      {/* Header - Responsive adjustments */}
+      {/* NEO ARTIFACTS Header */}
       <header className="fixed top-0 left-0 right-0 p-4 sm:p-6 z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -100,64 +95,63 @@ const HomePage = () => {
           transition={{ delay: 1.8, duration: 0.5 }}
           className="flex flex-col items-center"
         >
-          <h1 className="text-mystic text-xl sm:text-2xl font-light tracking-[0.2em] text-center">
-            PIXELATED MYSTIC ARTIFACTS
+          <h1 className="text-white text-2xl font-mono tracking-[0.2em] text-center">
+            NEO ARTIFACTS
           </h1>
-          {!isLoading && (
-            <p className="text-mystic/50 text-xs mt-2">
-              {currentPatternData.title}
-            </p>
-          )}
         </motion.div>
       </header>
       
-      {/* Animation Info Display - Responsive sizing */}
-      <OptimizedAnimationInfo className={isMobile ? "mx-4 max-w-[calc(100%-2rem)]" : ""} />
-      
-      {/* Pattern Navigation and Sequencer */}
-      <PatternNavigation />
-      <PatternSequencer />
-      
-      {/* Bottom Information - Responsive adjustments */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-10 flex items-center space-x-3"
-      >
-        <button
-          onClick={toggleAsciiOverlay}
-          className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
-            showAsciiOverlay 
-              ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
-              : 'border-mystic/30 text-mystic/60 hover:bg-mystic/10 hover:text-mystic'
-          }`}
-          aria-pressed={showAsciiOverlay}
+      {/* NEOSYS Terminal Header - Only visible when ASCII overlay is on */}
+      {showAsciiOverlay && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="fixed top-16 left-4 right-4 sm:left-6 sm:right-6 z-8 border border-green-400/40 bg-black/40 rounded px-3 py-1"
         >
-          <Terminal className="h-3 w-3 mr-1" />
-          <span className="font-mono tracking-wide">
-            {showAsciiOverlay ? 'ASCII ON' : 'ASCII'}
-          </span>
-          {showAsciiOverlay && (
-            <span className="ml-2 h-2 w-2 rounded-full bg-green-400/90 animate-pulse"></span>
-          )}
-        </button>
-        
-        <p className="text-mystic/50 text-xs hidden sm:block">
-          sacred geometry {new Date().getFullYear()}
-        </p>
-      </motion.div>
+          <p className="text-green-400/90 font-mono text-xs tracking-widest">
+            NEOSYS [VER 2.3]
+          </p>
+        </motion.div>
+      )}
       
-      {/* Settings Button - Responsive position */}
+      {/* Animation Info Display */}
+      <OptimizedAnimationInfo />
+      
+      {/* Pattern Navigation - only show if control panel isn't open */}
+      {!showControlPanel && <PatternNavigation />}
+      
+      {/* Settings Button */}
       <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 0.5 }}
         onClick={toggleControlPanel}
-        className="fixed top-4 sm:top-6 right-4 sm:right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+        className="fixed top-4 sm:top-6 right-4 sm:right-6 z-10 w-10 h-10 border border-white/30 rounded-full flex items-center justify-center text-white/70 hover:bg-white/10 hover:text-white transition-all"
         aria-label="Toggle settings panel"
       >
         <Settings className="h-5 w-5" />
+      </motion.button>
+      
+      {/* ASCII Toggle Button */}
+      <motion.button
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 0.5 }}
+        onClick={toggleAsciiOverlay}
+        className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-10 px-3 py-1.5 border rounded-full transition-all flex items-center ${
+          showAsciiOverlay 
+            ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
+            : 'border-white/30 text-white/60 hover:bg-white/10 hover:text-white'
+        }`}
+      >
+        <Terminal className="h-3.5 w-3.5 mr-1.5" />
+        <span className="font-mono text-xs tracking-wide">
+          TERMINAL {showAsciiOverlay ? 'ON' : 'OFF'}
+        </span>
+        {showAsciiOverlay && (
+          <span className="ml-2 h-2 w-2 rounded-full bg-green-400/90 animate-pulse"></span>
+        )}
       </motion.button>
       
       {/* Performance Monitor */}
@@ -168,44 +162,16 @@ const HomePage = () => {
         <OptimizedControlPanel onClose={toggleControlPanel} />
       )}
       
-      {/* ASCII Overlay Elements - Mobile responsive */}
+      {/* ASCII Art Elements - Only shown when ASCII mode is on */}
       {showAsciiOverlay && (
-        <>
-          <div className="fixed top-16 left-4 right-4 sm:left-6 sm:right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
-            <div className="flex justify-between items-center">
-              <div className="text-green-400/80 font-mono text-[10px] sm:text-xs tracking-widest truncate">
-                MYSTIC.SYS [VERSION 8.15.23]
-              </div>
-              <div className="text-green-400/60 font-mono text-[10px] sm:text-xs tracking-widest truncate ml-2">
-                {`${currentPatternData.title} | ${animationSpeed.toFixed(1)}X`}
-              </div>
-            </div>
-          </div>
-          
-          <pre className="fixed left-4 sm:left-6 bottom-24 sm:bottom-32 z-9 text-green-400/60 text-[8px] sm:text-xs font-mono hidden sm:block">
-{`,--.    ,--.   ,--. ,---.,---.  ,--.  ,---.  
-|   \\ ,-'  '-. \`.' |/ .--' ,-. \\ |  | /  .-'  
-|  . \\'-.  .-'  /  || \\--. | | | |\`-'' \`--.   
-|  |\\  \\|  |   /|  |\\.-. \\' | | |,--.  .-'   
-\`--' '--'   '--' '--'\`----' -----'/\`--' \`----'`}
-          </pre>
-          
-          {/* Mobile version of ASCII art */}
-          <pre className="fixed left-4 bottom-24 z-9 text-green-400/60 text-[8px] font-mono sm:hidden">
-{`,--.    ,--.   ,--.,---. 
+        <pre className="fixed left-4 bottom-20 z-9 text-green-400/60 text-[8px] sm:text-xs font-mono">
+{`
+,--.    ,--.   ,--. ,---. 
 |   \\ ,-'  '-. \`.' / .--'
 |  . \\'-.  .-'  / | \\--. 
 |  |\\  \\|  |   /| \\.-. \\
 \`--' '--'   '--' '--'\`----'`}
-          </pre>
-        </>
-      )}
-      
-      {/* Performance Mode Indicator - Responsive position */}
-      {performanceMode && (
-        <div className="fixed top-16 right-4 sm:right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-[10px] sm:text-xs">
-          Performance Mode
-        </div>
+        </pre>
       )}
     </div>
   );

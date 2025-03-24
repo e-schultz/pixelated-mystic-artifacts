@@ -1,11 +1,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { useAnimation } from '@/contexts/AnimationContext';
 import { useArt } from '@/contexts/ArtContext';
-import { X, Info, Zap, EyeOff, Eye, Gauge, SkipForward } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { patterns } from '@/contexts/ArtContext';
 
 interface ControlPanelProps {
   onClose: () => void;
@@ -23,6 +25,8 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
   } = useAnimation();
 
   const {
+    currentPattern,
+    setCurrentPattern,
     isPixelated,
     togglePixelated
   } = useArt();
@@ -42,120 +46,102 @@ const OptimizedControlPanel: React.FC<ControlPanelProps> = ({ onClose }) => {
     setShowAsciiOverlay(!showAsciiOverlay);
   }, [setShowAsciiOverlay, showAsciiOverlay]);
 
+  const handlePatternSelect = React.useCallback((index: number) => {
+    setCurrentPattern(index);
+  }, [setCurrentPattern]);
+
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
       className={cn(
-        "fixed z-20 bg-black/60 backdrop-blur-md border border-mystic/20 rounded-lg overflow-hidden",
+        "fixed z-20 bg-black/90 border border-white/20 rounded-lg overflow-hidden shadow-lg",
         isMobile 
-          ? "top-16 right-4 left-4 max-h-[calc(100vh-8rem)]" 
-          : "top-20 right-6 w-72"
+          ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[350px]" 
+          : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px]"
       )}
     >
-      <div className="flex justify-between items-center p-4 border-b border-mystic/10">
-        <h3 className="text-mystic text-lg font-light tracking-wider">Settings</h3>
+      <div className="flex justify-between items-center p-4 border-b border-white/10">
+        <h3 className="text-white text-lg font-mono">Controls</h3>
         <button 
           onClick={onClose}
-          className="text-mystic/60 hover:text-mystic transition-colors"
+          className="text-white/60 hover:text-white transition-colors"
           aria-label="Close settings"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
       
-      <div className={cn(
-        "space-y-5 p-4",
-        isMobile && "overflow-y-auto max-h-[calc(100vh-16rem)]"
-      )}>
-        <div className="space-y-3">
-          <div className="flex items-center mb-1">
-            <Gauge className="h-4 w-4 text-mystic/70 mr-2" />
-            <p className="text-mystic/80 text-sm">Animation Speed</p>
+      <div className="p-5 space-y-6">
+        <div>
+          <p className="text-white/90 font-mono mb-3">Pattern</p>
+          <div className="grid grid-cols-3 gap-2">
+            {patterns.map((pattern, index) => (
+              <button
+                key={pattern.id}
+                onClick={() => handlePatternSelect(index)}
+                className={`aspect-square border flex items-center justify-center text-lg font-mono
+                  ${currentPattern === index 
+                    ? 'border-white text-white bg-white/10' 
+                    : 'border-white/30 text-white/50 hover:border-white/50 hover:text-white/70'
+                  }`}
+              >
+                {index + 1}
+              </button>
+            ))}
           </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-mystic/60 text-xs">Slow</span>
-            <Slider
-              value={[animationSpeed]}
-              min={0.5}
-              max={performanceMode ? 2 : 3} // Limit max speed on mobile
-              step={0.1}
-              onValueChange={handleSpeedChange}
-              className="flex-1"
-              aria-label="Animation speed"
+        </div>
+        
+        <div className="space-y-2">
+          <p className="text-white/90 font-mono">
+            Speed: {animationSpeed.toFixed(1)}x
+          </p>
+          <Slider
+            value={[animationSpeed]}
+            min={0.5}
+            max={performanceMode ? 2 : 3}
+            step={0.1}
+            onValueChange={handleSpeedChange}
+            className="w-full"
+            aria-label="Animation speed"
+          />
+        </div>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-white/90 font-mono">Auto Play</span>
+            <Switch 
+              checked={isAutoCycling} 
+              onCheckedChange={toggleAutoCycle}
+              className="data-[state=checked]:bg-white/70 data-[state=unchecked]:bg-white/20"
             />
-            <span className="text-mystic/60 text-xs">Fast</span>
           </div>
-          <div className="text-center text-mystic/70 text-xs mt-1">
-            {animationSpeed.toFixed(1)}x
+          
+          <div className="flex items-center justify-between">
+            <span className="text-white/90 font-mono">Pixelated</span>
+            <Switch 
+              checked={isPixelated} 
+              onCheckedChange={togglePixelated}
+              className="data-[state=checked]:bg-white/70 data-[state=unchecked]:bg-white/20"
+            />
           </div>
-        </div>
-        
-        <div className="space-y-3">
-          <div className="flex items-center mb-1">
-            <SkipForward className="h-4 w-4 text-mystic/70 mr-2" />
-            <p className="text-mystic/80 text-sm">Pattern Auto-Cycling</p>
-          </div>
-          <button
-            onClick={toggleAutoCycle}
-            className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isAutoCycling ? 'bg-mystic/20' : ''}`}
-            aria-pressed={isAutoCycling}
-          >
-            {isAutoCycling ? 'Enabled' : 'Disabled'}
-          </button>
-          <div className="text-xs text-mystic/50 mt-1">
-            {isAutoCycling 
-              ? 'Patterns will automatically change over time' 
-              : 'Use navigation buttons to change patterns'}
+          
+          <div className="flex items-center justify-between">
+            <span className="text-white/90 font-mono">Terminal</span>
+            <Switch 
+              checked={showAsciiOverlay} 
+              onCheckedChange={toggleAsciiOverlay}
+              className="data-[state=checked]:bg-green-400/70 data-[state=unchecked]:bg-white/20"
+            />
           </div>
         </div>
         
-        <div className="space-y-3">
-          <div className="flex items-center mb-1">
-            {showAsciiOverlay ? (
-              <Eye className="h-4 w-4 text-green-400/70 mr-2" />
-            ) : (
-              <EyeOff className="h-4 w-4 text-mystic/70 mr-2" />
-            )}
-            <p className="text-mystic/80 text-sm">ASCII Terminal Overlay</p>
-          </div>
-          <button
-            onClick={toggleAsciiOverlay}
-            className={`w-full py-2 border rounded text-sm transition-all ${showAsciiOverlay ? 'bg-green-800/30 text-green-400/90 border-green-400/30' : 'text-mystic/70 border-mystic/30 hover:bg-mystic/10 hover:text-mystic'}`}
-            aria-pressed={showAsciiOverlay}
-          >
-            {showAsciiOverlay ? 'Enabled' : 'Disabled'}
-          </button>
-          <div className="text-xs text-mystic/50 mt-1">
-            Adds a retro computer terminal effect
-          </div>
+        <div className="pt-4 border-t border-white/10">
+          <p className="text-white/50 text-center font-mono text-sm">
+            Neo Artifacts v1.0.0
+          </p>
         </div>
-        
-        <div className="space-y-3">
-          <div className="flex items-center mb-1">
-            <Zap className="h-4 w-4 text-mystic/70 mr-2" />
-            <p className="text-mystic/80 text-sm">Pixelated Effect</p>
-          </div>
-          <button
-            onClick={togglePixelated}
-            className={`w-full py-2 border border-mystic/30 rounded text-sm text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all ${isPixelated ? 'bg-mystic/20' : ''}`}
-            aria-pressed={isPixelated}
-          >
-            {isPixelated ? 'Enabled' : 'Disabled'}
-          </button>
-        </div>
-
-        {performanceMode && (
-          <div className="pt-3 border-t border-mystic/10">
-            <div className="flex items-center">
-              <Info className="h-4 w-4 text-amber-400/70 mr-2" />
-              <p className="text-amber-400/70 text-xs">
-                Performance mode active for mobile devices
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </motion.div>
   );

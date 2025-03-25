@@ -59,8 +59,8 @@ function drawShrineCore(p: any, size: number, time: number, pixelSize: number, i
     // Draw level polygon
     if (useColor) {
       // Magenta to cyan gradient based on level
-      const hue = p.map(i, 0, levels, 320, 180);
-      p.stroke(hue, 100, 70, 180);
+      const levelHue = p.map(i, 0, levels, 320, 180);
+      p.stroke(levelHue, 100, 70, 180);
     } else {
       p.stroke(255, 140 + i * 20);
     }
@@ -91,7 +91,7 @@ function drawShrineCore(p: any, size: number, time: number, pixelSize: number, i
     // Add inner details
     const innerSize = levelSize * 0.7;
     if (useColor) {
-      p.stroke(hue, 100, 50, 150);
+      p.stroke(levelHue, 100, 50, 150);
     } else {
       p.stroke(255, 100);
     }
@@ -306,8 +306,8 @@ function drawCentralGlow(p: any, size: number, time: number, pixelSize: number, 
       const opacity = 150 * (1 - (i / rings));
       
       // Shift hue over time
-      const hue = (300 + time * 20) % 360;
-      p.stroke(hue, 100, 70, opacity);
+      const glowHue = (300 + time * 20) % 360;
+      p.stroke(glowHue, 100, 70, opacity);
       p.strokeWeight(pixelSize);
       p.noFill();
       

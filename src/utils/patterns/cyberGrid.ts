@@ -17,31 +17,42 @@ export function drawCyberGrid(
   
   const pixelSize = isPixelated ? 2 : 1;
   
+  // Get isTerminalMode from options if available
+  const options = arguments[5] as RenderOptions;
+  const isTerminalMode = options?.isTerminalMode || false;
+  
+  // Use color only if pixelated or terminal mode is enabled
+  const useColor = isPixelated || isTerminalMode;
+  
   // Draw perspective grid
-  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated);
+  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated, useColor);
   
   // Draw sacred geometry pattern
-  drawSacredPattern(p, size, time, pixelSize, isPixelated);
+  drawSacredPattern(p, size, time, pixelSize, isPixelated, useColor);
   
   // Draw floating elements
-  drawFloatingElements(p, size, time, pixelSize, isPixelated);
+  drawFloatingElements(p, size, time, pixelSize, isPixelated, useColor);
   
   // Draw center focal point
-  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated);
+  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated, useColor);
   
   p.pop();
 }
 
 // Draw a perspective grid with vanishing point
-function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
+function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
   const gridLines = 16;
   const maxDistance = size * 0.8;
   
   // Color palette inspired by the neon images
-  const colors = [
+  const colors = useColor ? [
     [0, 255, 255, 150],   // Cyan
     [255, 0, 255, 150],   // Magenta
     [255, 255, 0, 150],   // Yellow
+  ] : [
+    [255, 255, 255, 150], // White
+    [200, 200, 200, 150], // Light gray
+    [150, 150, 150, 150], // Medium gray
   ];
   
   p.noFill();
@@ -119,7 +130,7 @@ function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: numb
 }
 
 // Draw a sacred geometry inspired pattern (flower of life or metatron's cube style)
-function drawSacredPattern(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
+function drawSacredPattern(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
   const patternSize = size * 0.4;
   const elements = 8;
   
@@ -134,12 +145,18 @@ function drawSacredPattern(p: any, size: number, time: number, pixelSize: number
     const x = p.cos(angle) * dist;
     const y = p.sin(angle) * dist;
     
-    // Cycle through color pattern
-    let hue = (i * 30 + time * 20) % 360;
-    // Convert HSB to RGB for our vibrant colors
-    p.colorMode(p.HSB, 360, 100, 100, 100);
-    const color = p.color(hue, 80, 100, 70);
-    p.colorMode(p.RGB, 255, 255, 255, 255);
+    let color;
+    if (useColor) {
+      // Vibrant colors for pixelated or terminal mode
+      p.colorMode(p.HSB, 360, 100, 100, 100);
+      let hue = (i * 30 + time * 20) % 360;
+      color = p.color(hue, 80, 100, 70);
+      p.colorMode(p.RGB, 255, 255, 255, 255);
+    } else {
+      // Black and white for standard mode
+      const brightness = 180 + Math.sin(time + i) * 75;
+      color = p.color(brightness, brightness, brightness, 70);
+    }
     
     p.stroke(color);
     p.strokeWeight(pixelSize);
@@ -190,7 +207,7 @@ function drawSacredPattern(p: any, size: number, time: number, pixelSize: number
 }
 
 // Draw floating geometric elements
-function drawFloatingElements(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
+function drawFloatingElements(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
   const elementCount = 12;
   
   for (let i = 0; i < elementCount; i++) {
@@ -207,11 +224,18 @@ function drawFloatingElements(p: any, size: number, time: number, pixelSize: num
     p.translate(x, y);
     p.rotate(time * 0.3 + i);
     
-    // Use vibrant cyberpunk colors
-    let hue = (i * 60 + time * 10) % 360;
-    p.colorMode(p.HSB, 360, 100, 100, 100);
-    const color = p.color(hue, 80, 100, 70);
-    p.colorMode(p.RGB, 255, 255, 255, 255);
+    let color;
+    if (useColor) {
+      // Vibrant cyberpunk colors
+      p.colorMode(p.HSB, 360, 100, 100, 100);
+      let hue = (i * 60 + time * 10) % 360;
+      color = p.color(hue, 80, 100, 70);
+      p.colorMode(p.RGB, 255, 255, 255, 255);
+    } else {
+      // Black and white for standard mode
+      const brightness = 200 + Math.sin(time * 0.5 + i * 0.2) * 55;
+      color = p.color(brightness, brightness, brightness, 70);
+    }
     
     p.stroke(color);
     p.strokeWeight(pixelSize);
@@ -254,18 +278,26 @@ function drawFloatingElements(p: any, size: number, time: number, pixelSize: num
 }
 
 // Draw center focal point
-function drawCenterFocalPoint(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
+function drawCenterFocalPoint(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
   // Central pulsing elements
   const pulseSize = size * 0.08 * (p.sin(time * 2) * 0.2 + 0.8);
   
   p.push();
   p.rotate(time * 0.2);
   
-  // Alternate between magenta and cyan for the Star of David effect from the 3rd image
-  p.colorMode(p.HSB, 360, 100, 100, 100);
-  const color1 = p.color(180, 100, 100, 80); // Cyan
-  const color2 = p.color(300, 100, 100, 80); // Magenta
-  p.colorMode(p.RGB, 255, 255, 255, 255);
+  let color1, color2;
+  
+  if (useColor) {
+    // Alternate between magenta and cyan for the Star of David effect
+    p.colorMode(p.HSB, 360, 100, 100, 100);
+    color1 = p.color(180, 100, 100, 80); // Cyan
+    color2 = p.color(300, 100, 100, 80); // Magenta
+    p.colorMode(p.RGB, 255, 255, 255, 255);
+  } else {
+    // Black and white version
+    color1 = p.color(255, 255, 255, 80); // White
+    color2 = p.color(180, 180, 180, 80); // Gray
+  }
   
   // Outer hexagon - like in the sacred geometry images
   p.noFill();

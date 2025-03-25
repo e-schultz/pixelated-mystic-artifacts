@@ -1,6 +1,6 @@
 
 import { ArtState } from './types';
-import { ActionType } from './actions';
+import { Action, ActionType } from './actions';
 import { 
   navigateToNextPattern, 
   navigateToPreviousPattern, 
@@ -10,25 +10,27 @@ import {
 import { patterns } from './types';
 
 // Reducer function
-export function artReducer(state: ArtState, action: ActionType): ArtState {
+export function artReducer(state: ArtState, action: Action): ArtState {
   switch (action.type) {
-    case 'SET_PATTERN':
+    case ActionType.SET_PATTERN:
       return { ...state, currentPattern: jumpToPattern(action.pattern, patterns.length) };
-    case 'NEXT_PATTERN':
+    case ActionType.NEXT_PATTERN:
       return { ...state, currentPattern: navigateToNextPattern(state.currentPattern, patterns.length) };
-    case 'PREV_PATTERN':
+    case ActionType.PREV_PATTERN:
       return { ...state, currentPattern: navigateToPreviousPattern(state.currentPattern, patterns.length) };
-    case 'SELECT_RANDOM_PATTERN':
+    case ActionType.SELECT_RANDOM_PATTERN:
       return { ...state, currentPattern: getRandomPattern(state.currentPattern, patterns.length) };
-    case 'SET_SPEED':
+    case ActionType.SET_SPEED:
       return { ...state, speed: action.speed };
-    case 'TOGGLE_TERMINAL_MODE':
+    case ActionType.TOGGLE_TERMINAL_MODE:
       return { ...state, isTerminalMode: !state.isTerminalMode };
-    case 'TOGGLE_PIXELATED':
+    case ActionType.TOGGLE_PIXELATED:
       return { ...state, isPixelated: !state.isPixelated };
-    case 'TOGGLE_AUTO_PLAY':
+    case ActionType.TOGGLE_LOW_PERFORMANCE_MODE:
+      return { ...state, isLowPerformanceMode: !state.isLowPerformanceMode };
+    case ActionType.TOGGLE_AUTO_PLAY:
       return { ...state, isAutoPlaying: !state.isAutoPlaying };
-    case 'TOGGLE_CONTROLS':
+    case ActionType.TOGGLE_CONTROLS:
       return { ...state, isControlsVisible: !state.isControlsVisible };
     default:
       return state;

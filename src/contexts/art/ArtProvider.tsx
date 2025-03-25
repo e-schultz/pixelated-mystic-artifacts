@@ -2,7 +2,7 @@
 import React, { createContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { ArtState, ArtContextType, patterns } from './types';
-import { ActionType } from './actions';
+import { ActionType, Action } from './actions';
 import { artReducer } from './reducer';
 import { selectPatternById } from "@/utils/geometry/navigation";
 
@@ -31,15 +31,15 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
   // Action creators
   const setCurrentPattern = useCallback((index: number) => {
     console.log(`Switching to pattern ${index}`);
-    dispatch({ type: 'SET_PATTERN', pattern: index });
+    dispatch({ type: ActionType.SET_PATTERN, pattern: index });
   }, []);
   
   const nextPattern = useCallback(() => {
-    dispatch({ type: 'NEXT_PATTERN' });
+    dispatch({ type: ActionType.NEXT_PATTERN });
   }, []);
   
   const previousPattern = useCallback(() => {
-    dispatch({ type: 'PREV_PATTERN' });
+    dispatch({ type: ActionType.PREV_PATTERN });
   }, []);
   
   // Alias for previousPattern
@@ -47,37 +47,37 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
   
   const selectPatternById = useCallback((id: number) => {
     console.log(`Selecting pattern with ID ${id}`);
-    dispatch({ type: 'SET_PATTERN', pattern: id });
+    dispatch({ type: ActionType.SET_PATTERN, pattern: id });
   }, []);
   
   const selectRandomPattern = useCallback(() => {
     console.log('Selecting a random pattern');
-    dispatch({ type: 'SELECT_RANDOM_PATTERN' });
+    dispatch({ type: ActionType.SELECT_RANDOM_PATTERN });
   }, []);
   
   const setSpeed = useCallback((speed: number) => {
-    dispatch({ type: 'SET_SPEED', speed });
+    dispatch({ type: ActionType.SET_SPEED, speed });
   }, []);
   
   const toggleTerminalMode = useCallback(() => {
-    dispatch({ type: 'TOGGLE_TERMINAL_MODE' });
+    dispatch({ type: ActionType.TOGGLE_TERMINAL_MODE });
   }, []);
   
   const togglePixelated = useCallback(() => {
-    dispatch({ type: 'TOGGLE_PIXELATED' });
+    dispatch({ type: ActionType.TOGGLE_PIXELATED });
   }, []);
   
   const toggleAutoPlay = useCallback(() => {
-    dispatch({ type: 'TOGGLE_AUTO_PLAY' });
+    dispatch({ type: ActionType.TOGGLE_AUTO_PLAY });
   }, []);
   
   const toggleControls = useCallback(() => {
-    dispatch({ type: 'TOGGLE_CONTROLS' });
+    dispatch({ type: ActionType.TOGGLE_CONTROLS });
   }, []);
   
   // New function to toggle low performance mode
   const toggleLowPerformanceMode = useCallback(() => {
-    dispatch({ type: 'TOGGLE_LOW_PERFORMANCE_MODE' });
+    dispatch({ type: ActionType.TOGGLE_LOW_PERFORMANCE_MODE });
   }, []);
   
   // Handle auto play

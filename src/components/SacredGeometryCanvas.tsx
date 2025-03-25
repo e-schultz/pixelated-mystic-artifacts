@@ -6,14 +6,16 @@ interface SacredGeometryCanvasProps {
   currentAnimation?: number;
   animationSpeed?: number;
   showAsciiOverlay?: boolean;
+  performanceMode?: boolean;
   className?: string;
 }
 
-// This component now properly passes all props to the CanvasManager
+// This component properly passes all props to the CanvasManager
 const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({ 
   currentAnimation,
   animationSpeed,
   showAsciiOverlay,
+  performanceMode,
   className
 }) => {
   return (
@@ -21,6 +23,7 @@ const SacredGeometryCanvas: React.FC<SacredGeometryCanvasProps> = ({
       currentAnimation={currentAnimation}
       animationSpeed={animationSpeed}
       showAsciiOverlay={showAsciiOverlay}
+      performanceMode={performanceMode}
       className={className} 
     />
   );
@@ -32,6 +35,7 @@ export default memo(SacredGeometryCanvas, (prevProps, nextProps) => {
     prevProps.currentAnimation === nextProps.currentAnimation &&
     prevProps.animationSpeed === nextProps.animationSpeed &&
     prevProps.showAsciiOverlay === nextProps.showAsciiOverlay &&
+    prevProps.performanceMode === nextProps.performanceMode &&
     prevProps.className === nextProps.className
   );
 });

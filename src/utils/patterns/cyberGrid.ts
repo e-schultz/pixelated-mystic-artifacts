@@ -22,25 +22,36 @@ export function drawCyberGrid(
   p.push();
   p.translate(centerX, centerY);
   
-  const pixelSize = isPixelated ? 2 : 1;
+  // Apply parameters if available
+  const parameters = options?.parameters || {
+    complexity: 0.5,
+    rotationSpeed: 1.0,
+    colorIntensity: 0.7,
+    lineThickness: 0.5,
+    trailPersistence: 0.5
+  };
+  
+  // Apply line thickness parameter
+  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
   
   // Get isTerminalMode from options if available
   const isTerminalMode = options?.isTerminalMode || false;
   
-  // Use color only if pixelated or terminal mode is enabled
+  // Apply color intensity parameter
   const useColor = isPixelated || isTerminalMode;
+  const colorMultiplier = parameters.colorIntensity;
   
-  // Draw perspective grid
-  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated, useColor);
+  // Draw perspective grid with complexity parameter
+  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
   
   // Draw sacred geometry pattern
-  drawSacredPattern(p, size, time, pixelSize, isPixelated, useColor);
+  drawSacredPattern(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
   
   // Draw floating elements
-  drawFloatingElements(p, size, time, pixelSize, isPixelated, useColor);
+  drawFloatingElements(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
   
   // Draw center focal point
-  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated, useColor);
+  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier);
   
   p.pop();
 }

@@ -6,7 +6,7 @@ export interface RenderOptions {
   isPixelated: boolean;
   isLowPerformanceMode: boolean;
   isTerminalMode?: boolean;
-  parameters?: {
+  parameters: {
     complexity: number;
     rotationSpeed: number;
     colorIntensity: number;

@@ -11,7 +11,8 @@ export function useArtCanvasSketch() {
     speed, 
     isTerminalMode, 
     isPixelated,
-    isLowPerformanceMode 
+    isLowPerformanceMode,
+    parameters 
   } = useArt();
 
   // Create the sketch function
@@ -30,6 +31,7 @@ export function useArtCanvasSketch() {
       
       p.setup = () => {
         console.log('Setting up p5 canvas with pattern:', currentPattern);
+        console.log('Current parameters:', parameters);
         const canvas = p.createCanvas(window.innerWidth, window.innerHeight);
         if (canvas.parent) {
           canvas.parent(p.canvas.parentElement);
@@ -56,11 +58,13 @@ export function useArtCanvasSketch() {
         lastFrameTime = currentTime;
         
         // Clear with trail effect - optimize based on device
-        const alphaValue = isLowPerformanceMode ? 30 : 12; // Higher alpha = less trail for performance
+        // Apply trail persistence parameter here
+        const baseAlpha = isLowPerformanceMode ? 30 : 12;
+        const alphaValue = baseAlpha * (1 - (parameters.trailPersistence * 0.9)); // Lower alpha = more trail
         p.background(0, alphaValue);
         
-        // Update time based on animation speed
-        time += 0.01 * speed * deltaTime * 60;
+        // Update time based on animation speed and rotationSpeed parameter
+        time += 0.01 * speed * deltaTime * 60 * parameters.rotationSpeed;
         
         // Draw current pattern
         drawPatterns(
@@ -73,7 +77,8 @@ export function useArtCanvasSketch() {
             time,
             isPixelated,
             isLowPerformanceMode,
-            isTerminalMode
+            isTerminalMode,
+            parameters
           }
         );
         
@@ -125,13 +130,13 @@ export function useArtCanvasSketch() {
         }, 200); // Increased debounce time for better performance
       };
     };
-  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]);
+  }, [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode, parameters]);
 
   // Memoize the sketch creation and dependencies for improved rendering performance
   const sketch = useMemo(() => createSketch(), [createSketch]);
 
   return {
     createSketch: () => sketch,
-    dependencies: [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode]
+    dependencies: [currentPattern, speed, isTerminalMode, isPixelated, isLowPerformanceMode, parameters]
   };
 }

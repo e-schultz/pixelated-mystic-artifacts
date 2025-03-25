@@ -26,7 +26,7 @@ export function drawPatterns(
   size: number,
   options: RenderOptions
 ) {
-  const { time, isPixelated, isLowPerformanceMode } = options;
+  const { time, isPixelated, isLowPerformanceMode, parameters } = options;
   
   // Validate pattern index to ensure it's within bounds
   const validPatternIndex = Math.max(0, Math.min(patternIndex, 12));
@@ -34,25 +34,25 @@ export function drawPatterns(
   // Determine which pattern to draw
   switch (validPatternIndex) {
     case 0:
-      drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);
+      drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 1:
-      drawNeuralLattice(p, centerX, centerY, size, time, isPixelated);
+      drawNeuralLattice(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 2:
-      drawTesseractMatrix(p, centerX, centerY, size, time, isPixelated);
+      drawTesseractMatrix(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 3:
-      drawSacredGeometry(p, centerX, centerY, size, time, isPixelated);
+      drawSacredGeometry(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 4:
-      drawQuantumField(p, centerX, centerY, size, time, isPixelated);
+      drawQuantumField(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 5:
-      drawPulseGrid(p, centerX, centerY, size, time, isPixelated);
+      drawPulseGrid(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 6:
-      drawSineWaveGrid(p, centerX, centerY, size, time, isPixelated);
+      drawSineWaveGrid(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 7:
       drawCyberGrid(p, centerX, centerY, size, time, isPixelated, options);
@@ -73,7 +73,7 @@ export function drawPatterns(
       drawFractalHarmonicShrine(p, centerX, centerY, size, time, isPixelated, options);
       break;
     default:
-      drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);
+      drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated, options);
   }
   
   // Draw subtle background grid

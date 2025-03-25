@@ -51,7 +51,7 @@ const Controls: React.FC<ControlsProps> = ({ onClose }) => {
           <div className="grid grid-cols-3 gap-2">
             {patterns.map((pattern, index) => (
               <button
-                key={pattern.id}
+                key={index}
                 onClick={() => handlePatternSelect(index)}
                 className={`
                   w-full aspect-square border

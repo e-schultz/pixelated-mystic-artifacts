@@ -13,6 +13,7 @@ const PatternNavigation: React.FC = () => {
   let artContext = {
     nextPattern: () => console.log('Next pattern clicked'),
     prevPattern: () => console.log('Previous pattern clicked'),
+    previousPattern: () => console.log('Previous pattern clicked'), // Alias
     isAutoPlaying: false,
     currentPattern: 0,
     setCurrentPattern: (_index: number) => {}, // Fix: Add parameter to match signature
@@ -25,6 +26,7 @@ const PatternNavigation: React.FC = () => {
       artContext = {
         nextPattern: context.nextPattern,
         prevPattern: context.prevPattern,
+        previousPattern: context.previousPattern,
         isAutoPlaying: context.isAutoPlaying,
         currentPattern: context.currentPattern,
         setCurrentPattern: context.setCurrentPattern,
@@ -107,7 +109,7 @@ const PatternNavigation: React.FC = () => {
         >
           {patterns.map((pattern, index) => (
             <button
-              key={pattern.id}
+              key={index}
               onClick={() => handlePatternClick(index)}
               className={`w-full text-left px-3 py-2 text-xs rounded ${
                 currentPattern === index 

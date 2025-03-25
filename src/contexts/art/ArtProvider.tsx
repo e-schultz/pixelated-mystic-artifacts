@@ -38,9 +38,12 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'NEXT_PATTERN' });
   }, []);
   
-  const prevPattern = useCallback(() => {
+  const previousPattern = useCallback(() => {
     dispatch({ type: 'PREV_PATTERN' });
   }, []);
+  
+  // Alias for previousPattern
+  const prevPattern = previousPattern;
   
   const selectPatternById = useCallback((id: number) => {
     console.log(`Selecting pattern with ID ${id}`);
@@ -72,6 +75,11 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'TOGGLE_CONTROLS' });
   }, []);
   
+  // New function to toggle low performance mode
+  const toggleLowPerformanceMode = useCallback(() => {
+    dispatch({ type: 'TOGGLE_LOW_PERFORMANCE_MODE' });
+  }, []);
+  
   // Handle auto play
   useEffect(() => {
     if (!state.isAutoPlaying) return;
@@ -95,10 +103,12 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
         ...state,
         setCurrentPattern,
         nextPattern,
+        previousPattern,
         prevPattern,
         setSpeed,
         toggleTerminalMode,
         togglePixelated,
+        toggleLowPerformanceMode,
         toggleAutoPlay,
         toggleControls,
         selectPatternById,

@@ -15,7 +15,6 @@ export function drawPulseGrid(
 ) {
   p.push();
   p.translate(centerX, centerY);
-  p.rotate(time * 0.05);
   
   // Apply parameters if available
   const parameters = options?.parameters || {
@@ -26,9 +25,15 @@ export function drawPulseGrid(
     trailPersistence: 0.5
   };
   
+  // Apply rotation based on rotationSpeed parameter
+  p.rotate(time * 0.05 * parameters.rotationSpeed);
+  
+  // Apply line thickness parameter
   const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
-  const gridSize = size * 0.7;
-  const cellCount = 8;
+  
+  // Apply complexity to grid
+  const gridSize = size * 0.7 * (0.8 + parameters.complexity * 0.4); // Scale by complexity
+  const cellCount = Math.max(6, Math.floor(6 + parameters.complexity * 6)); // 6-12 cells based on complexity
   
   // Draw the pulsing grid cells
   drawGridCells(p, gridSize, cellCount, time, pixelSize, isPixelated);

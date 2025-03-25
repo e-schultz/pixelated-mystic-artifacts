@@ -26,16 +26,24 @@ export function drawSacredGeometry(
     trailPersistence: 0.5
   };
   
+  // Apply rotation based on rotationSpeed parameter
   p.rotate(time * 0.1 * parameters.rotationSpeed);
   
+  // Apply line thickness parameter
   const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
-  const radius = size * 0.4;
   
-  // Draw flower of life pattern
-  drawFlowerOfLifePattern(p, 0, 0, radius, 7, isPixelated, pixelSize, [255, 200]);
+  // Apply complexity to radius
+  const complexity = 0.5 + (parameters.complexity * 0.5); // Scale 0.5-1.0
+  const radius = size * 0.4 * complexity;
   
-  // Draw hexagon
-  drawGeometricPolygon(p, 0, 0, radius * 0.8, 6, isPixelated, pixelSize, 0, [255, 200]);
+  // Apply color intensity to opacity
+  const opacity = 180 + (parameters.colorIntensity * 75); // Scale 180-255
+  
+  // Draw flower of life pattern with adjusted parameters
+  drawFlowerOfLifePattern(p, 0, 0, radius, 7, isPixelated, pixelSize, [255, opacity]);
+  
+  // Draw hexagon with adjusted parameters
+  drawGeometricPolygon(p, 0, 0, radius * 0.8, 6, isPixelated, pixelSize, 0, [255, opacity]);
   
   p.pop();
 }

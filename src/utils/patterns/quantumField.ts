@@ -26,11 +26,17 @@ export function drawQuantumField(
     trailPersistence: 0.5
   };
   
-  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
-  const fieldSize = size * 0.8;
-  const particleCount = 100;
+  // Apply rotation based on rotationSpeed parameter
+  p.rotate(time * 0.03 * parameters.rotationSpeed);
   
-  // Draw particles and get their positions
+  // Apply line thickness parameter
+  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
+  
+  // Apply complexity to field size and particle count
+  const fieldSize = size * 0.8 * (0.7 + parameters.complexity * 0.6); // Scale by complexity
+  const particleCount = Math.floor(50 + parameters.complexity * 100); // 50-150 particles based on complexity
+  
+  // Draw particles and get their positions with adjusted color intensity
   const particles = drawQuantumParticles(p, particleCount, fieldSize, time, pixelSize, isPixelated);
   
   // Draw connections between particles

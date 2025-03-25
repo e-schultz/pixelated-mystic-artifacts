@@ -43,7 +43,7 @@ export function drawPatterns(
       drawTesseractMatrix(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 3:
-      drawSacredGeometry(p, centerX, centerY, size, time, isPixelated, options);
+      drawSacredGeometry(p, centerX, centerY, size, time, isPixelated);
       break;
     case 4:
       drawQuantumField(p, centerX, centerY, size, time, isPixelated, options);

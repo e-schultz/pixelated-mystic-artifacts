@@ -6,4 +6,11 @@ export interface RenderOptions {
   isPixelated: boolean;
   isLowPerformanceMode: boolean;
   isTerminalMode?: boolean;
+  parameters?: {
+    complexity: number;
+    rotationSpeed: number;
+    colorIntensity: number;
+    lineThickness: number;
+    trailPersistence: number;
+  };
 }

@@ -1,7 +1,7 @@
 
 import React, { createContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { ArtState, ArtContextType, patterns } from './types';
+import { ArtState, ArtContextType, patterns, defaultParameters, PatternParameters } from './types';
 import { ActionType, Action } from './actions';
 import { artReducer } from './reducer';
 import { selectPatternById } from "@/utils/geometry/navigation";
@@ -22,7 +22,8 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
     isPixelated: true,
     isAutoPlaying: true,
     isLowPerformanceMode,
-    isControlsVisible: false
+    isControlsVisible: false,
+    parameters: { ...defaultParameters }
   };
   
   // Use reducer for state management
@@ -80,6 +81,17 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: ActionType.TOGGLE_LOW_PERFORMANCE_MODE });
   }, []);
   
+  // New functions to manage pattern parameters
+  const setPatternParameters = useCallback((parameters: Partial<PatternParameters>) => {
+    console.log('Updating pattern parameters:', parameters);
+    dispatch({ type: ActionType.SET_PATTERN_PARAMETERS, parameters });
+  }, []);
+  
+  const resetPatternParameters = useCallback(() => {
+    console.log('Resetting pattern parameters to defaults');
+    dispatch({ type: ActionType.RESET_PATTERN_PARAMETERS });
+  }, []);
+  
   // Handle auto play
   useEffect(() => {
     if (!state.isAutoPlaying) return;
@@ -112,7 +124,9 @@ export function ArtProvider({ children }: { children: React.ReactNode }) {
         toggleAutoPlay,
         toggleControls,
         selectPatternById,
-        selectRandomPattern
+        selectRandomPattern,
+        setPatternParameters,
+        resetPatternParameters
       }}
     >
       {children}

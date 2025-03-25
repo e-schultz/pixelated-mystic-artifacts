@@ -10,8 +10,12 @@ export enum ActionType {
   TOGGLE_LOW_PERFORMANCE_MODE = 'TOGGLE_LOW_PERFORMANCE_MODE',
   TOGGLE_AUTO_PLAY = 'TOGGLE_AUTO_PLAY',
   TOGGLE_CONTROLS = 'TOGGLE_CONTROLS',
-  SELECT_RANDOM_PATTERN = 'SELECT_RANDOM_PATTERN'
+  SELECT_RANDOM_PATTERN = 'SELECT_RANDOM_PATTERN',
+  SET_PATTERN_PARAMETERS = 'SET_PATTERN_PARAMETERS',
+  RESET_PATTERN_PARAMETERS = 'RESET_PATTERN_PARAMETERS'
 }
+
+import { PatternParameters } from './types';
 
 // Define action interfaces
 export type Action =
@@ -24,4 +28,6 @@ export type Action =
   | { type: ActionType.TOGGLE_LOW_PERFORMANCE_MODE }
   | { type: ActionType.TOGGLE_AUTO_PLAY }
   | { type: ActionType.TOGGLE_CONTROLS }
-  | { type: ActionType.SELECT_RANDOM_PATTERN };
+  | { type: ActionType.SELECT_RANDOM_PATTERN }
+  | { type: ActionType.SET_PATTERN_PARAMETERS; parameters: Partial<PatternParameters> }
+  | { type: ActionType.RESET_PATTERN_PARAMETERS };

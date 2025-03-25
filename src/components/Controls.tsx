@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useArt } from '@/contexts/art';
 import { patterns } from '@/contexts/art';
+import PatternParameters from './PatternParameters';
 
 interface ControlsProps {
   onClose: () => void;
@@ -123,6 +124,9 @@ const Controls: React.FC<ControlsProps> = ({ onClose }) => {
             </button>
           </div>
         </div>
+        
+        {/* Pattern Parameters */}
+        <PatternParameters />
         
         <div className="pt-2 border-t border-white/10">
           <p className="text-white/50 text-xs text-center">

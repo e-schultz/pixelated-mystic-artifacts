@@ -1,96 +1,96 @@
 
-// Pattern data with titles and descriptions
+import { GeometrySettings } from "@/utils/geometry/types";
+
+// Define available pattern types
 export const patterns = [
   {
-    id: 1,
+    id: 0,
     title: "Digital Corridor",
-    description: "A digital corridor with perspective lines and dynamic central element."
+    description: "A digital tunnel of geometric grids that creates an immersive perspective experience."
+  },
+  {
+    id: 1,
+    title: "Tesseract Matrix",
+    description: "A four-dimensional cube projection that transforms through hyperspace."
   },
   {
     id: 2,
-    title: "Neural Lattice",
-    description: "Connected nodes forming a neural network with pulse waves."
+    title: "Fractal Harmonic Shrine",
+    description: "An evolving fractal structure that represents harmonic resonance patterns."
   },
   {
     id: 3,
-    title: "Tesseract Matrix",
-    description: "A four-dimensional cube projection with matrix-like elements."
+    title: "Sacred Geometry",
+    description: "Classic sacred geometry patterns including the Flower of Life and Metatron's Cube."
   },
   {
     id: 4,
-    title: "Sacred Geometry",
-    description: "Ancient geometric patterns with cosmic significance."
+    title: "Quantum Field",
+    description: "A visualization of quantum probability fields with entangled particles."
   },
   {
     id: 5,
-    title: "Quantum Field",
-    description: "Particles in a quantum probability field with wave function."
+    title: "Pulse Grid",
+    description: "A pulsating grid structure that expands and contracts with energy waves."
   },
   {
     id: 6,
-    title: "Pulse Grid",
-    description: "Grid cells pulsing with energy in a synchronized pattern."
+    title: "Resonance Contour",
+    description: "Topographic-like visualization of energy resonance patterns."
   },
   {
     id: 7,
-    title: "Sine Wave Grid",
-    description: "Modulated sine waves creating an undulating grid structure."
-  },
-  {
-    id: 8,
-    title: "Cyber Grid",
-    description: "Digital matrix with perspective and floating elements."
-  },
-  {
-    id: 9,
-    title: "Diffusion Oracle",
-    description: "Reaction-diffusion pattern resembling a mystical oracle."
-  },
-  {
-    id: 10,
-    title: "Resonance Contour",
-    description: "Standing wave patterns with resonance points and vector field."
-  },
-  {
-    id: 11,
-    title: "Recursive Collapse Shrine",
-    description: "A spiraling, multi-layered structure with recursive elements."
-  },
-  {
-    id: 12,
-    title: "Hybrid Constellation",
-    description: "Celestial patterns forming hybrid geometric constellations."
-  },
-  {
-    id: 13,
-    title: "Fractal Harmonic Shrine",
-    description: "Sacred geometry shrine floating on a grid of harmonic waves with recursive fractal elements."
+    title: "CyberGrid",
+    description: "A cyberpunk-inspired grid with sacred geometry elements."
   }
 ];
 
-// Define state interface
+// Define pattern parameters that users can adjust
+export interface PatternParameters {
+  complexity: number;    // Controls the number of elements/segments (0-1)
+  rotationSpeed: number; // Controls animation speed multiplier (0-2)
+  colorIntensity: number; // Controls the intensity of colors (0-1)
+  lineThickness: number; // Controls the thickness of lines (0-1)
+  trailPersistence: number; // Controls how long visuals persist (0-1)
+}
+
+// Define default pattern parameters
+export const defaultParameters: PatternParameters = {
+  complexity: 0.5,
+  rotationSpeed: 1.0,
+  colorIntensity: 0.7,
+  lineThickness: 0.5,
+  trailPersistence: 0.5
+};
+
+// Define application state
 export interface ArtState {
   currentPattern: number;
   speed: number;
   isTerminalMode: boolean;
   isPixelated: boolean;
   isLowPerformanceMode: boolean;
-  isControlsVisible: boolean;
   isAutoPlaying: boolean;
+  isControlsVisible: boolean;
+  parameters: PatternParameters;
 }
 
-// Define context interface
+// Define context type
 export interface ArtContextType extends ArtState {
+  setCurrentPattern: (index: number) => void;
+  nextPattern: () => void;
+  previousPattern: () => void;
+  prevPattern: () => void; // Alias for previousPattern
+  setSpeed: (speed: number) => void;
   toggleTerminalMode: () => void;
   togglePixelated: () => void;
   toggleLowPerformanceMode: () => void;
-  toggleControls: () => void;
   toggleAutoPlay: () => void;
-  setCurrentPattern: (pattern: number) => void;
-  nextPattern: () => void;
-  previousPattern: () => void;
-  prevPattern: () => void; // Add this alias for previousPattern
-  setSpeed: (speed: number) => void;
+  toggleControls: () => void;
   selectPatternById: (id: number) => void;
   selectRandomPattern: () => void;
+  
+  // New parameter adjustment methods
+  setPatternParameters: (parameters: Partial<PatternParameters>) => void;
+  resetPatternParameters: () => void;
 }

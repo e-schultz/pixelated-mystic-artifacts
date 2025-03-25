@@ -1,5 +1,5 @@
 
-import { ArtState } from './types';
+import { ArtState, defaultParameters } from './types';
 import { Action, ActionType } from './actions';
 import { 
   navigateToNextPattern, 
@@ -32,6 +32,19 @@ export function artReducer(state: ArtState, action: Action): ArtState {
       return { ...state, isAutoPlaying: !state.isAutoPlaying };
     case ActionType.TOGGLE_CONTROLS:
       return { ...state, isControlsVisible: !state.isControlsVisible };
+    case ActionType.SET_PATTERN_PARAMETERS:
+      return { 
+        ...state, 
+        parameters: { 
+          ...state.parameters, 
+          ...action.parameters 
+        }
+      };
+    case ActionType.RESET_PATTERN_PARAMETERS:
+      return { 
+        ...state, 
+        parameters: { ...defaultParameters }
+      };
     default:
       return state;
   }

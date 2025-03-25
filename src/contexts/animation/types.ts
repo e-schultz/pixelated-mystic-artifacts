@@ -11,6 +11,7 @@ export interface AnimationState {
   isAutoCycling: boolean;
   showAsciiOverlay: boolean;
   performanceMode: boolean;
+  randomOffset: number;
 }
 
 // Define context interface

@@ -10,11 +10,12 @@ export const createAnimationSketch = (
   currentAnimation: number, 
   animationSpeed: number, 
   showAsciiOverlay: boolean, 
-  performanceMode: boolean
+  performanceMode: boolean,
+  randomOffset: number = 0 // Add randomOffset parameter with default
 ) => {
   return (p: any) => {
     // Animation state
-    let time = 0;
+    let time = randomOffset; // Initialize time with the random offset
     let smallShapes: Array<{
       x: number;
       y: number;
@@ -44,7 +45,7 @@ export const createAnimationSketch = (
       p.background(18, 18, 18);
       p.frameRate(targetFrameRate);
       
-      smallShapes = generateSmallShapes(p, currentAnimation, performanceMode, smallShapes);
+      smallShapes = generateSmallShapes(p, currentAnimation, performanceMode, smallShapes, randomOffset);
     };
     
     // Draw function with delta time for consistent animation speed
@@ -75,6 +76,7 @@ export const createAnimationSketch = (
       const animSettings = { 
         ...animation.settings,
         rotation: time * 0.2,
+        randomOffset // Pass through the random offset
       };
       
       // Draw main geometry
@@ -101,7 +103,7 @@ export const createAnimationSketch = (
       // Regenerate small shapes occasionally - much less frequently on mobile
       const regenerateThreshold = performanceMode ? 0.0005 : 0.002;
       if (p.random() < regenerateThreshold * animationSpeed) {
-        smallShapes = generateSmallShapes(p, currentAnimation, performanceMode, []);
+        smallShapes = generateSmallShapes(p, currentAnimation, performanceMode, [], randomOffset);
       }
       
       // Record performance metrics

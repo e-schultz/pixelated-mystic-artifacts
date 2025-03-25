@@ -9,7 +9,8 @@ export const initialAnimationState: AnimationState = {
   animationSpeed: 1,
   isAutoCycling: true,
   showAsciiOverlay: false,
-  performanceMode: false
+  performanceMode: false,
+  randomOffset: Math.random() * 1000 // Initialize with a random value
 };
 
 // Reducer function for managing animation state
@@ -49,6 +50,11 @@ export function animationReducer(state: AnimationState, action: AnimationActionT
       return {
         ...state,
         performanceMode: action.isPerformanceMode
+      };
+    case 'SET_RANDOM_OFFSET':
+      return {
+        ...state,
+        randomOffset: action.offset
       };
     default:
       return state;

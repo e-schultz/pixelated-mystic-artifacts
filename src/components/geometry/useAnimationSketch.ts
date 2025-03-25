@@ -9,7 +9,8 @@ export function useAnimationSketch() {
     currentAnimation, 
     animationSpeed, 
     showAsciiOverlay, 
-    performanceMode 
+    performanceMode,
+    randomOffset
   } = useAnimation();
 
   // Create the sketch function with optimizations
@@ -18,15 +19,16 @@ export function useAnimationSketch() {
       currentAnimation,
       animationSpeed,
       showAsciiOverlay,
-      performanceMode
+      performanceMode,
+      randomOffset
     );
-  }, [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode]);
+  }, [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode, randomOffset]);
 
   // Memoize the sketch creation for better performance
   const sketch = useMemo(() => createSketch(), [createSketch]);
 
   return {
     createSketch: () => sketch,
-    dependencies: [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode]
+    dependencies: [currentAnimation, animationSpeed, showAsciiOverlay, performanceMode, randomOffset]
   };
 }

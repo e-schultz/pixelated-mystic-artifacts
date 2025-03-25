@@ -54,6 +54,13 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (intervalId) clearInterval(intervalId);
     };
   }, [state.isAutoCycling, state.animationSpeed]);
+
+  // Effect to randomize animation settings when animation changes
+  useEffect(() => {
+    // Generate random offset for the animation to create variety
+    const randomOffset = Math.random() * 1000;
+    dispatch({ type: 'SET_RANDOM_OFFSET', offset: randomOffset });
+  }, [state.currentAnimation]);
   
   const contextValue: AnimationContextType = {
     ...state,
@@ -63,9 +70,7 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setAnimationSpeed,
     setIsAutoCycling,
     setShowAsciiOverlay,
-    setPerformanceMode: (isPerformanceMode) => {
-      setPerformanceMode(isPerformanceMode);
-    }
+    setPerformanceMode
   };
   
   return (

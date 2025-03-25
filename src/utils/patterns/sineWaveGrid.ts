@@ -3,6 +3,7 @@
 import { RenderOptions } from "../patternTypes";
 import { drawHorizontalWaves } from './sineComponents/horizontalWaves';
 import { drawVerticalWaves } from './sineComponents/verticalWaves';
+import { drawCenterVisualization } from './sineWaveGridComponents/centerVisualization';
 
 // Pattern 6: Sine Wave Grid with Frequency Modulation
 export function drawSineWaveGrid(
@@ -59,11 +60,8 @@ export function drawSineWaveGrid(
     isPixelated
   );
   
-  // Draw a subtle pulsating circle to represent the frequency modulation
-  const pulseSize = (Math.sin(time * 0.5) * 0.2 + 0.8) * gridSize * 0.4;
-  p.stroke(255, 40);
-  p.strokeWeight(pixelSize);
-  p.ellipse(0, 0, pulseSize, pulseSize);
+  // Draw center visualization
+  drawCenterVisualization(p, time, gridSize, pixelSize);
   
   p.pop();
 }

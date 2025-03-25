@@ -10,15 +10,15 @@ export function drawResonanceContour(
   centerY: number, 
   size: number, 
   time: number,
-  isPixelated: boolean
+  isPixelated: boolean,
+  options?: RenderOptions
 ) {
   p.push();
   p.translate(centerX, centerY);
   
   const pixelSize = isPixelated ? 2 : 1;
   
-  // Get options
-  const options = arguments[5] as RenderOptions;
+  // Get terminal mode option
   const isTerminalMode = options?.isTerminalMode || false;
   
   // Use color only if pixelated or terminal mode is enabled

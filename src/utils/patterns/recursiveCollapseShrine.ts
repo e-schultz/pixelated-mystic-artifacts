@@ -1,371 +1,227 @@
 // Recursive Collapse Shrine pattern implementation
 import { RenderOptions } from "../patternTypes";
-import { drawPixelatedLine, drawPixelatedCircle } from './helpers';
+import { drawPixelatedLine, drawPixelatedCircle } from './coreUtils';
 
-// Pattern: Recursive Collapse Shrine - A spiraling, layered structure with recursive elements
-export function drawRecursiveCollapseShrine(
-  p: any, 
-  centerX: number, 
-  centerY: number, 
-  size: number, 
-  time: number,
-  isPixelated: boolean,
-  options?: RenderOptions
-) {
-  p.push();
-  p.translate(centerX, centerY);
+export const drawRecursiveCollapseShrine = (p: any, options: RenderOptions) => {
+  const { width, height, time, color, density } = options;
+  const centerX = width / 2;
+  const centerY = height / 2;
   
-  const pixelSize = isPixelated ? 2 : 1;
-  
-  // Get terminal mode option
-  const isTerminalMode = options?.isTerminalMode || false;
-  
-  // Use color only if pixelated or terminal mode is enabled
-  const useColor = isPixelated || isTerminalMode;
-  
-  // Draw main shrine structure
-  drawShrineCore(p, size, time, pixelSize, isPixelated, useColor);
-  
-  // Draw outer spiral elements
-  drawSpiralStaircase(p, size, time, pixelSize, isPixelated, useColor);
+  // Draw the main shrine structure
+  drawShrineCore(p, centerX, centerY, Math.min(width, height) * 0.4, time, color, 5);
   
   // Draw floating elements around the shrine
-  drawFloatingCubes(p, size, time, pixelSize, isPixelated, useColor);
+  drawFloatingCubes(p, centerX, centerY, width, height, time, color);
   
-  // Draw vertical beams
-  drawVerticalBeams(p, size, time, pixelSize, isPixelated, useColor);
+  // Draw the grid floor
+  drawGridFloor(p, width, height, time, color);
+};
+
+// Draw the central shrine structure with recursive collapsing elements
+const drawShrineCore = (p: any, x: number, y: number, size: number, time: number, baseColor: string, levels: number) => {
+  // Base case for recursion
+  if (levels <= 0 || size < 5) return;
   
-  // Draw central glow
-  drawCentralGlow(p, size, time, pixelSize, isPixelated, useColor);
+  // Determine if we're using color or monochrome
+  const useColor = baseColor !== 'monochrome';
+  
+  // Calculate rotation based on time and level
+  const rotation = time * (0.2 - levels * 0.03) + levels * Math.PI / 4;
+  
+  // Determine the hue for this level
+  const levelHue = useColor 
+    ? (p.frameCount * 0.5 + levels * 30) % 360 
+    : 0;
+  
+  // Size reduction for next level
+  const nextSize = size * 0.75;
+  
+  p.push();
+  p.translate(x, y);
+  p.rotate(rotation);
+  
+  // Draw the outer octagon
+  p.noFill();
+  if (useColor) {
+    p.stroke(levelHue, 100, 100, 200);
+    p.strokeWeight(2);
+  } else {
+    p.stroke(200, 200);
+    p.strokeWeight(1.5);
+  }
+  
+  // Draw an octagon
+  const sides = 8;
+  p.beginShape();
+  for (let i = 0; i < sides; i++) {
+    const angle = i * p.TWO_PI / sides;
+    const px = size * p.cos(angle);
+    const py = size * p.sin(angle);
+    p.vertex(px, py);
+  }
+  p.endShape(p.CLOSE);
+  
+  // Draw connecting lines to create a complex structure
+  if (useColor) {
+    p.stroke(levelHue, 100, 70, 150);
+    p.strokeWeight(1);
+  } else {
+    p.stroke(170, 150);
+    p.strokeWeight(0.5);
+  }
+  
+  // Draw internal connections
+  for (let i = 0; i < sides; i += 2) {
+    const angle1 = i * p.TWO_PI / sides;
+    const px1 = size * 0.9 * p.cos(angle1);
+    const py1 = size * 0.9 * p.sin(angle1);
+    
+    for (let j = i + 1; j < sides; j += 2) {
+      const angle2 = j * p.TWO_PI / sides;
+      const px2 = size * 0.9 * p.cos(angle2);
+      const py2 = size * 0.9 * p.sin(angle2);
+      
+      p.line(px1, py1, px2, py2);
+    }
+  }
+  
+  // Add inner details
+  const innerSize = size * 0.7;
+  if (useColor) {
+    // Use the same levelHue variable that's in scope
+    p.stroke(levelHue, 100, 50, 150);
+  } else {
+    p.stroke(255, 100);
+  }
+  
+  // Glowing center
+  const glowHue = (levelHue + 180) % 360; // Complementary color
+  if (useColor) {
+    p.fill(glowHue, 100, 80, 50);
+  } else {
+    p.fill(255, 40);
+  }
+  
+  // Draw a central circle
+  p.ellipse(0, 0, innerSize, innerSize);
+  
+  // Add some pixelated details
+  if (size > 20) {
+    drawPixelatedDetails(p, 0, 0, innerSize, time, levelHue, useColor);
+  }
+  
+  // Recursive call for inner structures
+  drawShrineCore(p, 0, 0, nextSize, time, baseColor, levels - 1);
   
   p.pop();
-}
+};
 
-// Draw the core structure of the shrine
-function drawShrineCore(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
-  const levels = 5; // Number of vertical levels
-  const baseSize = size * 0.4;
+// Draw pixelated details for the shrine
+const drawPixelatedDetails = (p: any, x: number, y: number, size: number, time: number, hue: number, useColor: boolean) => {
+  const pixelSize = 2;
   
-  for (let i = 0; i < levels; i++) {
-    const levelY = (i * size * 0.08) - (size * 0.2); // Stack vertically
-    const levelSize = baseSize * (1 - (i * 0.15)); // Decrease size with each level
-    const rotation = time * (0.2 + i * 0.1) + (i * p.PI / 6); // Different rotation for each level
+  // Draw some pixelated circles
+  for (let i = 0; i < 3; i++) {
+    const angle = time * 0.5 + i * p.TWO_PI / 3;
+    const distance = size * 0.4;
+    const px = x + p.cos(angle) * distance;
+    const py = y + p.sin(angle) * distance;
     
-    p.push();
-    p.translate(0, levelY);
-    p.rotate(rotation);
-    
-    // Draw level polygon
     if (useColor) {
-      // Magenta to cyan gradient based on level
-      const levelHue = p.map(i, 0, levels, 320, 180);
-      p.stroke(levelHue, 100, 70, 180);
+      const detailHue = (hue + i * 30) % 360;
+      drawPixelatedCircle(p, px, py, size * 0.15, pixelSize, p.color(detailHue, 100, 80, 200));
     } else {
-      p.stroke(255, 140 + i * 20);
+      drawPixelatedCircle(p, px, py, size * 0.15, pixelSize, p.color(255, 150));
     }
-    p.strokeWeight(pixelSize);
-    p.noFill();
-    
-    // Draw octagonal structure for each level
-    const sides = 8;
-    const points = [];
-    
-    for (let j = 0; j < sides; j++) {
-      const angle = j * p.TWO_PI / sides;
-      const x = p.cos(angle) * levelSize;
-      const y = p.sin(angle) * levelSize;
-      points.push({ x, y });
-    }
-    
-    // Connect points
-    for (let j = 0; j < points.length; j++) {
-      const next = (j + 1) % points.length;
-      if (isPixelated) {
-        drawPixelatedLine(p, points[j].x, points[j].y, points[next].x, points[next].y, pixelSize);
-      } else {
-        p.line(points[j].x, points[j].y, points[next].x, points[next].y);
-      }
-    }
-    
-    // Add inner details
-    const innerSize = levelSize * 0.7;
-    if (useColor) {
-      // Fixed: Use the same levelHue variable that's in scope
-      p.stroke(levelHue, 100, 50, 150);
-    } else {
-      p.stroke(255, 100);
-    }
-    
-    if (isPixelated) {
-      drawPixelatedCircle(p, 0, 0, innerSize, pixelSize);
-    } else {
-      p.circle(0, 0, innerSize * 2);
-    }
-    
-    p.pop();
   }
-}
-
-// Draw spiral staircases around the core
-function drawSpiralStaircase(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
-  const steps = 32; // Number of steps
-  const baseRadius = size * 0.45;
-  const spiralRadius = size * 0.15;
   
-  p.noFill();
+  // Connect the circles with pixelated lines
+  if (useColor) {
+    p.stroke(hue, 80, 60, 150);
+  } else {
+    p.stroke(200, 100);
+  }
+  
   p.strokeWeight(pixelSize);
-  
-  for (let spiral = 0; spiral < 3; spiral++) { // Draw 3 intertwined spirals
-    const spiralOffset = spiral * (p.TWO_PI / 3) + time * 0.1;
-    
-    for (let i = 0; i < steps; i++) {
-      const ratio = i / steps;
-      const angle = ratio * p.TWO_PI * 2 + spiralOffset;
-      const height = (ratio - 0.5) * size * 0.4;
-      
-      const radius = baseRadius - (ratio * spiralRadius);
-      const x = p.cos(angle) * radius;
-      const y = p.sin(angle) * radius;
-      
-      // Determine size of step based on position
-      const stepSize = size * 0.02 * (1 - ratio * 0.5);
-      
-      // Draw step
-      p.push();
-      p.translate(x, y + height);
-      p.rotate(angle + p.HALF_PI);
-      
-      if (useColor) {
-        // Magenta to cyan colors
-        if (spiral === 0) {
-          p.stroke(320, 100, 70, 180); // Magenta
-        } else if (spiral === 1) {
-          p.stroke(180, 100, 70, 180); // Cyan
-        } else {
-          p.stroke(260, 100, 70, 180); // Purple
-        }
-      } else {
-        p.stroke(255, 70 + ratio * 80);
-      }
-      
-      if (isPixelated) {
-        drawPixelatedRect(p, 0, 0, stepSize * 3, stepSize, pixelSize);
-      } else {
-        p.rect(-stepSize * 1.5, -stepSize/2, stepSize * 3, stepSize);
-      }
-      
-      p.pop();
-    }
+  p.noFill();
+  p.beginShape();
+  for (let i = 0; i < 3; i++) {
+    const angle = time * 0.5 + i * p.TWO_PI / 3;
+    const distance = size * 0.4;
+    const px = x + p.cos(angle) * distance;
+    const py = y + p.sin(angle) * distance;
+    p.vertex(px, py);
   }
-}
+  p.endShape(p.CLOSE);
+};
 
 // Draw floating cubes around the shrine
-function drawFloatingCubes(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
-  const cubeCount = 12;
+const drawFloatingCubes = (p: any, centerX: number, centerY: number, width: number, height: number, time: number, baseColor: string) => {
+  // Determine if we're using color or monochrome
+  const useColor = baseColor !== 'monochrome';
   
-  for (let i = 0; i < cubeCount; i++) {
-    // Position cubes in a circle around the shrine
-    const angle = i * p.TWO_PI / cubeCount + time * 0.1;
-    const distance = size * (0.5 + 0.1 * p.sin(time + i));
-    const x = p.cos(angle) * distance;
-    const y = p.sin(angle) * distance;
+  const numCubes = 12;
+  
+  for (let i = 0; i < numCubes; i++) {
+    const angle = i * p.TWO_PI / numCubes + time * 0.2;
+    const distance = Math.min(width, height) * 0.3 + Math.sin(time + i) * 20;
+    const x = centerX + p.cos(angle) * distance;
+    const y = centerY + p.sin(angle) * distance;
     
-    // Vertically float based on time
-    const z = p.sin(time * 0.5 + i * 0.7) * size * 0.1;
+    // Vertical oscillation
+    const z = p.sin(time * 0.5 + i * 0.5) * 20;
     
-    // Cube size
-    const cubeSize = size * 0.04 * (0.8 + 0.2 * p.sin(time + i * 2));
+    // Size pulsation
+    const size = 10 + p.sin(time + i * 0.7) * 5;
     
-    // Determine color
+    p.push();
+    p.translate(x, y);
+    p.rotateX(time * 0.2 + i);
+    p.rotateY(time * 0.3 + i);
+    
     if (useColor) {
-      // Alternate between magenta and cyan
-      if (i % 3 === 0) {
-        p.stroke(320, 100, 70, 200); // Magenta
-      } else if (i % 3 === 1) {
-        p.stroke(180, 100, 70, 200); // Cyan
-      } else {
-        p.stroke(260, 100, 70, 200); // Purple
-      }
+      const cubeHue = (time * 20 + i * 30) % 360;
+      p.stroke(cubeHue, 100, 70);
+      p.fill(cubeHue, 100, 50, 150);
     } else {
-      p.stroke(255, 150);
+      p.stroke(200);
+      p.fill(50, 150);
     }
     
-    p.noFill();
-    p.strokeWeight(pixelSize);
-    
-    // Draw cube at position
-    p.push();
-    p.translate(x, y + z);
-    p.rotateX(time * 0.2 + i);
-    p.rotateY(time * 0.3 + i * 0.5);
-    
-    drawCube(p, cubeSize, isPixelated, pixelSize);
+    // Draw a simple cube
+    p.box(size);
     
     p.pop();
   }
-}
+};
 
-// Helper function to draw a 3D cube in 2D
-function drawCube(p: any, size: number, isPixelated: boolean, pixelSize: number) {
-  const s = size / 2;
+// Draw a grid floor
+const drawGridFloor = (p: any, width: number, height: number, time: number, baseColor: string) => {
+  // Determine if we're using color or monochrome
+  const useColor = baseColor !== 'monochrome';
   
-  // Define cube vertices
-  const vertices = [
-    {x: -s, y: -s, z: -s},
-    {x: s, y: -s, z: -s},
-    {x: s, y: s, z: -s},
-    {x: -s, y: s, z: -s},
-    {x: -s, y: -s, z: s},
-    {x: s, y: -s, z: s},
-    {x: s, y: s, z: s},
-    {x: -s, y: s, z: s}
-  ];
+  const gridSize = 20;
+  const gridExtent = Math.max(width, height) * 0.7;
   
-  // Define cube edges
-  const edges = [
-    [0, 1], [1, 2], [2, 3], [3, 0], // Bottom face
-    [4, 5], [5, 6], [6, 7], [7, 4], // Top face
-    [0, 4], [1, 5], [2, 6], [3, 7]  // Connecting edges
-  ];
+  p.push();
+  p.translate(width / 2, height / 2);
   
-  // Draw each edge
-  for (const [a, b] of edges) {
-    if (isPixelated) {
-      drawPixelatedLine(
-        p, 
-        vertices[a].x, vertices[a].y, 
-        vertices[b].x, vertices[b].y, 
-        pixelSize
-      );
-    } else {
-      p.line(
-        vertices[a].x, vertices[a].y, 
-        vertices[b].x, vertices[b].y
-      );
-    }
-  }
-}
-
-// Draw vertical beams/lines
-function drawVerticalBeams(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
-  const beamCount = 16;
+  // Rotate the grid for a perspective effect
+  p.rotateX(p.PI / 3);
+  p.rotateZ(time * 0.05);
   
-  p.strokeWeight(pixelSize);
+  p.stroke(useColor ? p.color(180, 100, 50, 150) : p.color(150, 100));
+  p.strokeWeight(1);
+  p.noFill();
   
-  for (let i = 0; i < beamCount; i++) {
-    const angle = i * p.TWO_PI / beamCount;
-    const x = p.cos(angle) * size * 0.7;
-    const y = p.sin(angle) * size * 0.7;
-    
-    // Beam height varies with time
-    const height = size * (0.5 + 0.2 * p.sin(time * 0.3 + i * 0.4));
-    
-    // Beam opacity varies with time
-    const opacity = 60 + 40 * p.sin(time + i);
-    
-    if (useColor) {
-      // Color based on position
-      const hue = (i * 20 + time * 10) % 360;
-      p.stroke(hue, 80, 70, opacity);
-    } else {
-      p.stroke(255, opacity * 0.6);
-    }
-    
-    // Draw vertical beam
-    if (isPixelated) {
-      drawPixelatedLine(p, x, y, x, y - height, pixelSize);
-    } else {
-      p.line(x, y, x, y - height);
-    }
-    
-    // Add small details along the beam
-    const detailCount = 3;
-    for (let j = 0; j < detailCount; j++) {
-      const detailY = y - (height * (j + 1) / (detailCount + 1));
-      const detailSize = size * 0.01;
-      
-      if (isPixelated) {
-        p.rect(x - detailSize/2, detailY - detailSize/2, pixelSize * 2, pixelSize * 2);
-      } else {
-        p.point(x, detailY);
-      }
-    }
-  }
-}
-
-// Draw central glow effect
-function drawCentralGlow(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean, useColor: boolean) {
-  // Draw pulsing central circle
-  const pulseSize = size * 0.15 * (0.8 + 0.2 * p.sin(time * 2));
-  
-  if (useColor) {
-    // Create gradient-like effect with concentric circles
-    const rings = 5;
-    for (let i = rings; i > 0; i--) {
-      const ringSize = pulseSize * (i / rings);
-      const opacity = 150 * (1 - (i / rings));
-      
-      // Shift hue over time
-      const glowHue = (300 + time * 20) % 360;
-      p.stroke(glowHue, 100, 70, opacity);
-      p.strokeWeight(pixelSize);
-      p.noFill();
-      
-      if (isPixelated) {
-        drawPixelatedCircle(p, 0, 0, ringSize, pixelSize);
-      } else {
-        p.circle(0, 0, ringSize * 2);
-      }
-    }
-  } else {
-    // Monochrome version
-    const rings = 3;
-    for (let i = rings; i > 0; i--) {
-      const ringSize = pulseSize * (i / rings);
-      const opacity = 100 * (1 - (i / rings));
-      
-      p.stroke(255, opacity);
-      p.strokeWeight(pixelSize);
-      p.noFill();
-      
-      if (isPixelated) {
-        drawPixelatedCircle(p, 0, 0, ringSize, pixelSize);
-      } else {
-        p.circle(0, 0, ringSize * 2);
-      }
-    }
+  // Draw grid lines
+  for (let x = -gridExtent; x <= gridExtent; x += gridSize) {
+    p.line(x, -gridExtent, x, gridExtent);
   }
   
-  // Central point
-  p.fill(255);
-  p.noStroke();
-  const centerSize = pixelSize * 2 * (1 + 0.3 * p.sin(time * 3));
-  p.rect(-centerSize/2, -centerSize/2, centerSize, centerSize);
-}
-
-// Helper function to draw a pixelated rectangle outline
-function drawPixelatedRect(p: any, x: number, y: number, width: number, height: number, pixelSize: number) {
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
-  
-  // Draw individual pixels for each side of the rectangle
-  // Top
-  for (let px = x - halfWidth; px <= x + halfWidth; px += pixelSize) {
-    p.rect(px, y - halfHeight, pixelSize, pixelSize);
+  for (let y = -gridExtent; y <= gridExtent; y += gridSize) {
+    p.line(-gridExtent, y, gridExtent, y);
   }
   
-  // Bottom
-  for (let px = x - halfWidth; px <= x + halfWidth; px += pixelSize) {
-    p.rect(px, y + halfHeight - pixelSize, pixelSize, pixelSize);
-  }
-  
-  // Left
-  for (let py = y - halfHeight + pixelSize; py < y + halfHeight - pixelSize; py += pixelSize) {
-    p.rect(x - halfWidth, py, pixelSize, pixelSize);
-  }
-  
-  // Right
-  for (let py = y - halfHeight + pixelSize; py < y + halfHeight - pixelSize; py += pixelSize) {
-    p.rect(x + halfWidth - pixelSize, py, pixelSize, pixelSize);
-  }
-}
+  p.pop();
+};

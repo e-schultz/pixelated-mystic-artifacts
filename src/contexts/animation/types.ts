@@ -21,4 +21,5 @@ export interface AnimationContextType extends AnimationState {
   setAnimationSpeed: (speed: number) => void;
   setIsAutoCycling: (isAuto: boolean) => void;
   setShowAsciiOverlay: (show: boolean) => void;
+  setPerformanceMode: (isPerformanceMode: boolean) => void;
 }

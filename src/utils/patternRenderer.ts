@@ -54,7 +54,7 @@ export function drawPatterns(
       drawSineWaveGrid(p, centerX, centerY, size, time, isPixelated);
       break;
     case 7:
-      drawCyberGrid(p, centerX, centerY, size, time, isPixelated);
+      drawCyberGrid(p, centerX, centerY, size, time, isPixelated, options);
       break;
     case 8:
       drawDiffusionOracle(p, centerX, centerY, size, time, isPixelated, options);

@@ -10,13 +10,13 @@ export const patterns = [
   },
   {
     id: 1,
-    title: "Tesseract Matrix",
-    description: "A four-dimensional cube projection that transforms through hyperspace."
+    title: "Neural Lattice",
+    description: "A network of interconnected nodes that simulate neural pathways with dynamic connections."
   },
   {
     id: 2,
-    title: "Fractal Harmonic Shrine",
-    description: "An evolving fractal structure that represents harmonic resonance patterns."
+    title: "Tesseract Matrix",
+    description: "A four-dimensional cube projection that transforms through hyperspace."
   },
   {
     id: 3,
@@ -35,13 +35,38 @@ export const patterns = [
   },
   {
     id: 6,
+    title: "Sine Wave Grid",
+    description: "Intersecting sine waves creating harmonic interference patterns and nodal points."
+  },
+  {
+    id: 7,
+    title: "Cyber Grid",
+    description: "A cyberpunk-inspired grid with sacred geometry elements."
+  },
+  {
+    id: 8,
+    title: "Diffusion Oracle",
+    description: "Particle diffusion patterns that form emergent structures resembling ancient divination systems."
+  },
+  {
+    id: 9,
     title: "Resonance Contour",
     description: "Topographic-like visualization of energy resonance patterns."
   },
   {
-    id: 7,
-    title: "CyberGrid",
-    description: "A cyberpunk-inspired grid with sacred geometry elements."
+    id: 10,
+    title: "Recursive Collapse Shrine",
+    description: "A spiraling, layered structure with recursive elements that fold in on themselves."
+  },
+  {
+    id: 11,
+    title: "Hybrid Constellation",
+    description: "A star map-like pattern that combines digital and organic elements in cosmic arrangement."
+  },
+  {
+    id: 12,
+    title: "Fractal Harmonic Shrine",
+    description: "An evolving fractal structure that represents harmonic resonance patterns."
   }
 ];
 

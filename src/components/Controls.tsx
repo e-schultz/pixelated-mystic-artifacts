@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useArt } from '@/contexts/ArtContext';
-import { patterns } from '@/contexts/ArtContext';
+import { useArt } from '@/contexts/art';
+import { patterns } from '@/contexts/art';
 
 interface ControlsProps {
   onClose: () => void;

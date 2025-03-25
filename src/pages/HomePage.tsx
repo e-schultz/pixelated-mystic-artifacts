@@ -50,9 +50,10 @@ const HomePage = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Screen Saver Manager */}
+      {/* Screen Saver Manager - Always render */}
       <ScreenSaverManager />
       
+      {/* Loading screen */}
       {isLoading ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black z-50">
           <div className="w-16 h-16 mb-8 border-2 border-white/50 border-t-white/90 rounded-full animate-spin"></div>
@@ -65,9 +66,10 @@ const HomePage = () => {
         </div>
       ) : (
         <>
-          {/* Main Canvas */}
+          {/* Main Canvas - Always render */}
           <ArtCanvas />
           
+          {/* UI Elements - Only render when NOT in screen saver mode */}
           {!isScreenSaverMode && (
             <>
               {/* Header */}
@@ -109,7 +111,7 @@ const HomePage = () => {
                 </div>
               </div>
               
-              {/* Pattern Info - Adjusted for mobile */}
+              {/* Pattern Info */}
               <PatternInfo 
                 title={patternInfo.title} 
                 description={patternInfo.description}
@@ -117,10 +119,10 @@ const HomePage = () => {
                 isAutoCycling={isAutoPlaying}
               />
               
-              {/* Navigation Controls - Now using the improved PatternNavigation component */}
+              {/* Navigation Controls */}
               <PatternNavigation />
               
-              {/* Terminal Mode Indicator - Only on desktop */}
+              {/* Terminal Mode Indicator */}
               {isTerminalMode && !isMobile && (
                 <div className="absolute left-6 bottom-0 text-green-400/90 text-xs font-mono tracking-widest flex items-center">
                   <span className="w-2 h-2 bg-green-400/90 mr-2 rounded-full animate-pulse"></span>

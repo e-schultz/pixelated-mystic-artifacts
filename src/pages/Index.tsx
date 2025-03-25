@@ -39,7 +39,7 @@ const Index = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
-      {/* Screen Saver Manager */}
+      {/* Screen Saver Manager - Always render this component */}
       <ScreenSaverManager />
       
       {isLoading && (
@@ -74,9 +74,11 @@ const Index = () => {
         </div>
       )}
 
+      {/* Always render the canvas regardless of screen saver mode */}
       <SacredGeometryCanvas />
       
-      {!isScreenSaverMode && (
+      {/* Only render UI elements when NOT in screen saver mode */}
+      {!isScreenSaverMode && !isLoading && (
         <>
           <header className="fixed top-0 left-0 right-0 p-6 z-10">
             <motion.h1 

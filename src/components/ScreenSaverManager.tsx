@@ -15,10 +15,26 @@ const ScreenSaverManager: React.FC = () => {
   const [startTime] = useState<number>(Date.now());
   const speedCycleRef = useRef<NodeJS.Timeout | null>(null);
   const featureToggleRef = useRef<NodeJS.Timeout | null>(null);
+  const patternCycleRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Handle key press to exit screen saver
+  // Handle key press or mouse click to exit screen saver
   useEffect(() => {
-    if (!isScreenSaverMode) return;
+    if (!isScreenSaverMode) {
+      // Clear all timeouts when exiting screen saver mode
+      if (speedCycleRef.current) {
+        clearInterval(speedCycleRef.current);
+        speedCycleRef.current = null;
+      }
+      if (featureToggleRef.current) {
+        clearInterval(featureToggleRef.current);
+        featureToggleRef.current = null;
+      }
+      if (patternCycleRef.current) {
+        clearInterval(patternCycleRef.current);
+        patternCycleRef.current = null;
+      }
+      return;
+    }
     
     const handleKeyPress = () => {
       toggleScreenSaverMode();
@@ -37,13 +53,21 @@ const ScreenSaverManager: React.FC = () => {
   useEffect(() => {
     if (!isScreenSaverMode) return;
     
-    const randomPatternInterval = setInterval(() => {
+    const randomPatternChange = () => {
       const randomIndex = Math.floor(Math.random() * animations.length);
       setCurrentAnimation(randomIndex);
-    }, 8000); // Change pattern every 8 seconds
+    };
+    
+    // Initial pattern change when entering screen saver mode
+    randomPatternChange();
+    
+    patternCycleRef.current = setInterval(randomPatternChange, 8000); // Change pattern every 8 seconds
     
     return () => {
-      clearInterval(randomPatternInterval);
+      if (patternCycleRef.current) {
+        clearInterval(patternCycleRef.current);
+        patternCycleRef.current = null;
+      }
     };
   }, [isScreenSaverMode, setCurrentAnimation]);
   

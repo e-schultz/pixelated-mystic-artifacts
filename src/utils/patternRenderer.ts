@@ -13,6 +13,7 @@ import { drawSineWaveGrid } from "./patterns/sineWaveGrid";
 import { drawCyberGrid } from "./patterns/cyberGrid";
 import { drawDiffusionOracle } from "./patterns/diffusionOracle";
 import { drawResonanceContour } from "./patterns/resonanceContour";
+import { drawRecursiveCollapseShrine } from "./patterns/recursiveCollapseShrine";
 
 // Draw different patterns based on the currentPattern index
 export function drawPatterns(
@@ -26,7 +27,7 @@ export function drawPatterns(
   const { time, isPixelated, isLowPerformanceMode } = options;
   
   // Validate pattern index to ensure it's within bounds
-  const validPatternIndex = Math.max(0, Math.min(patternIndex, 9));
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 10));
   
   // Determine which pattern to draw
   switch (validPatternIndex) {
@@ -59,6 +60,9 @@ export function drawPatterns(
       break;
     case 9:
       drawResonanceContour(p, centerX, centerY, size, time, isPixelated, options);
+      break;
+    case 10:
+      drawRecursiveCollapseShrine(p, centerX, centerY, size, time, isPixelated, options);
       break;
     default:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);

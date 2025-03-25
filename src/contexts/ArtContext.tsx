@@ -60,6 +60,11 @@ export const patterns = [
     id: 9,
     title: "Resonance Contour",
     description: "Minimalist topographical contour lines representing energy fields and resonant nodes."
+  },
+  {
+    id: 10,
+    title: "Recursive Collapse Shrine",
+    description: "Spiraling cybernetic structure with recursive elements and dimensional staircases."
   }
 ];
 

@@ -36,6 +36,8 @@ export function useArtCanvasSketch() {
         if (canvas.parent) {
           canvas.parent(p.canvas.parentElement);
         }
+        // Set colorMode to HSB for more intuitive color control
+        p.colorMode(p.HSB, 360, 100, 100, 100);
         p.background(0);
         p.frameRate(targetFrameRate);
         

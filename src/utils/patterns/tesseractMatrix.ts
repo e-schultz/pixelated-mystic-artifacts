@@ -3,6 +3,7 @@
 import { RenderOptions } from "../patternTypes";
 import { drawRotatedCube } from './tesseractComponents/rotatedCube';
 import { connectTesseractVertices } from './tesseractComponents/tesseractConnections';
+import { drawHypercube } from './tesseractComponents/hypercube';
 
 // Pattern 2: Tesseract Matrix
 export function drawTesseractMatrix(
@@ -33,21 +34,24 @@ export function drawTesseractMatrix(
   
   // Create proper 3D-to-2D projection
   const scale = size * 0.35;
-  const innerScale = scale * 0.6;
   
   // Animation parameters with rotation speed parameter
   const rotationX = time * 0.2 * parameters.rotationSpeed;
   const rotationY = time * 0.15 * parameters.rotationSpeed;
   const rotationZ = time * 0.1 * parameters.rotationSpeed;
   
-  // Draw the outer cube first
-  drawRotatedCube(p, 0, 0, 0, scale, rotationX, rotationY, rotationZ, pixelSize, isPixelated);
+  // Determine the dimension of the hypercube based on complexity
+  // Map complexity 0-1 to dimensions 2-10
+  const dimension = Math.min(10, Math.max(2, Math.floor(2 + parameters.complexity * 8)));
   
-  // Draw the inner cube with different rotation
-  drawRotatedCube(p, 0, 0, 0, innerScale, rotationX * 1.5, rotationY * 1.2, rotationZ * 0.8, pixelSize, isPixelated);
+  // Draw the hypercube with the appropriate dimension
+  drawHypercube(p, dimension, scale, rotationX, rotationY, rotationZ, pixelSize, isPixelated, parameters.colorIntensity);
   
-  // Connect vertices between inner and outer cubes to create the tesseract effect
-  connectTesseractVertices(p, scale, innerScale, rotationX, rotationY, rotationZ, pixelSize, isPixelated);
+  // Add a pulsing center point
+  const pulseSize = (Math.sin(rotationX * 3) + 1) * 2 + 2;
+  p.fill(255, 220);
+  p.noStroke();
+  p.circle(0, 0, pulseSize * 2);
   
   p.pop();
 }

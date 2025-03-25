@@ -9,6 +9,7 @@ import { drawTesseractMatrix } from "./patterns/tesseractMatrix";
 import { drawSacredGeometry } from "./patterns/sacredGeometry";
 import { drawQuantumField } from "./patterns/quantumField";
 import { drawPulseGrid } from "./patterns/pulseGrid";
+import { drawSineWaveGrid } from "./patterns/sineWaveGrid";
 
 // Draw different patterns based on the currentPattern index
 export function drawPatterns(
@@ -22,7 +23,7 @@ export function drawPatterns(
   const { time, isPixelated, isLowPerformanceMode } = options;
   
   // Validate pattern index to ensure it's within bounds
-  const validPatternIndex = Math.max(0, Math.min(patternIndex, 5));
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 6));
   
   // Determine which pattern to draw
   switch (validPatternIndex) {
@@ -43,6 +44,9 @@ export function drawPatterns(
       break;
     case 5:
       drawPulseGrid(p, centerX, centerY, size, time, isPixelated);
+      break;
+    case 6:
+      drawSineWaveGrid(p, centerX, centerY, size, time, isPixelated);
       break;
     default:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);

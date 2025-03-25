@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { 
@@ -39,6 +40,11 @@ export const patterns = [
     id: 5,
     title: "Pulse Grid",
     description: "Rhythmic digital pulse patterns flowing through a geometric network."
+  },
+  {
+    id: 6,
+    title: "Sine Wave Grid",
+    description: "Dynamic grid of sine waves with frequency modulation creating flowing wave patterns."
   },
 ];
 

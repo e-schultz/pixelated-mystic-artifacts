@@ -11,6 +11,8 @@ import { drawQuantumField } from "./patterns/quantumField";
 import { drawPulseGrid } from "./patterns/pulseGrid";
 import { drawSineWaveGrid } from "./patterns/sineWaveGrid";
 import { drawCyberGrid } from "./patterns/cyberGrid";
+import { drawDiffusionOracle } from "./patterns/diffusionOracle";
+import { drawResonanceContour } from "./patterns/resonanceContour";
 
 // Draw different patterns based on the currentPattern index
 export function drawPatterns(
@@ -24,7 +26,7 @@ export function drawPatterns(
   const { time, isPixelated, isLowPerformanceMode } = options;
   
   // Validate pattern index to ensure it's within bounds
-  const validPatternIndex = Math.max(0, Math.min(patternIndex, 7));
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 9));
   
   // Determine which pattern to draw
   switch (validPatternIndex) {
@@ -51,6 +53,12 @@ export function drawPatterns(
       break;
     case 7:
       drawCyberGrid(p, centerX, centerY, size, time, isPixelated);
+      break;
+    case 8:
+      drawDiffusionOracle(p, centerX, centerY, size, time, isPixelated, options);
+      break;
+    case 9:
+      drawResonanceContour(p, centerX, centerY, size, time, isPixelated, options);
       break;
     default:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);

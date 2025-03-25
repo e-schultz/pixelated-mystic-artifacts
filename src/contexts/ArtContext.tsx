@@ -50,6 +50,16 @@ export const patterns = [
     id: 7,
     title: "Cyber Grid",
     description: "Cyberpunk-inspired geometric grid with floating elements and a central focal point."
+  },
+  {
+    id: 8,
+    title: "Diffusion Oracle",
+    description: "Reaction-diffusion system with binary states creating emergent patterns for divination."
+  },
+  {
+    id: 9,
+    title: "Resonance Contour",
+    description: "Minimalist topographical contour lines representing energy fields and resonant nodes."
   }
 ];
 

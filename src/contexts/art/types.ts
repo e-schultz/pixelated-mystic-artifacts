@@ -1,65 +1,56 @@
-
 // Pattern data with titles and descriptions
 export const patterns = [
   {
-    id: 0,
     title: "Digital Corridor",
-    description: "A perspective grid system with vector lines creating a digital space corridor."
+    description: "A digital corridor with perspective lines and dynamic central element."
   },
   {
-    id: 1,
     title: "Neural Lattice",
-    description: "Interconnected node system reminiscent of neural networks and digital consciousness."
+    description: "Connected nodes forming a neural network with pulse waves."
   },
   {
-    id: 2,
     title: "Tesseract Matrix",
-    description: "Multi-dimensional grid system representing higher dimensional space unfolding."
+    description: "A four-dimensional cube projection with matrix-like elements."
   },
   {
-    id: 3,
     title: "Sacred Geometry",
-    description: "Patterns based on the mathematical principles found throughout the natural world."
+    description: "Ancient geometric patterns with cosmic significance."
   },
   {
-    id: 4,
     title: "Quantum Field",
-    description: "Visualization of quantum probability fields and particle interactions."
+    description: "Particles in a quantum probability field with wave function."
   },
   {
-    id: 5,
     title: "Pulse Grid",
-    description: "Rhythmic digital pulse patterns flowing through a geometric network."
+    description: "Grid cells pulsing with energy in a synchronized pattern."
   },
   {
-    id: 6,
     title: "Sine Wave Grid",
-    description: "Dynamic grid of sine waves with frequency modulation creating flowing wave patterns."
+    description: "Modulated sine waves creating an undulating grid structure."
   },
   {
-    id: 7,
     title: "Cyber Grid",
-    description: "Cyberpunk-inspired geometric grid with floating elements and a central focal point."
+    description: "Digital matrix with perspective and floating elements."
   },
   {
-    id: 8,
     title: "Diffusion Oracle",
-    description: "Reaction-diffusion system with binary states creating emergent patterns for divination."
+    description: "Reaction-diffusion pattern resembling a mystical oracle."
   },
   {
-    id: 9,
     title: "Resonance Contour",
-    description: "Minimalist topographical contour lines representing energy fields and resonant nodes."
+    description: "Standing wave patterns with resonance points and vector field."
   },
   {
-    id: 10,
     title: "Recursive Collapse Shrine",
-    description: "Spiraling cybernetic structure with recursive elements and dimensional staircases."
+    description: "A spiraling, multi-layered structure with recursive elements."
   },
   {
-    id: 11,
     title: "Hybrid Constellation",
-    description: "Oracle crystalline center surrounded by floating geometric elements and energy fields."
+    description: "Celestial patterns forming hybrid geometric constellations."
+  },
+  {
+    title: "Fractal Harmonic Shrine",
+    description: "Sacred geometry shrine floating on a grid of harmonic waves with recursive fractal elements."
   }
 ];
 
@@ -69,21 +60,20 @@ export interface ArtState {
   speed: number;
   isTerminalMode: boolean;
   isPixelated: boolean;
-  isAutoPlaying: boolean;
   isLowPerformanceMode: boolean;
   isControlsVisible: boolean;
+  isAutoPlaying: boolean;
 }
 
 // Define context interface
 export interface ArtContextType extends ArtState {
-  setCurrentPattern: (index: number) => void;
-  nextPattern: () => void;
-  prevPattern: () => void;
-  setSpeed: (speed: number) => void;
   toggleTerminalMode: () => void;
   togglePixelated: () => void;
-  toggleAutoPlay: () => void;
+  toggleLowPerformanceMode: () => void;
   toggleControls: () => void;
-  selectPatternById: (id: number) => void;
-  selectRandomPattern: () => void;
+  toggleAutoPlay: () => void;
+  setCurrentPattern: (pattern: number) => void;
+  nextPattern: () => void;
+  previousPattern: () => void;
+  setSpeed: (speed: number) => void;
 }

@@ -15,6 +15,7 @@ import { drawDiffusionOracle } from "./patterns/diffusionOracle";
 import { drawResonanceContour } from "./patterns/resonanceContour";
 import { drawRecursiveCollapseShrine } from "./patterns/recursiveCollapseShrine";
 import { drawHybridConstellation } from "./patterns/hybridConstellation";
+import { drawFractalHarmonicShrine } from "./patterns/fractalHarmonicShrine";
 
 // Draw different patterns based on the currentPattern index
 export function drawPatterns(
@@ -28,7 +29,7 @@ export function drawPatterns(
   const { time, isPixelated, isLowPerformanceMode } = options;
   
   // Validate pattern index to ensure it's within bounds
-  const validPatternIndex = Math.max(0, Math.min(patternIndex, 11));
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 12));
   
   // Determine which pattern to draw
   switch (validPatternIndex) {
@@ -67,6 +68,9 @@ export function drawPatterns(
       break;
     case 11:
       drawHybridConstellation(p, centerX, centerY, size, time, isPixelated, options);
+      break;
+    case 12:
+      drawFractalHarmonicShrine(p, centerX, centerY, size, time, isPixelated, options);
       break;
     default:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);

@@ -18,19 +18,19 @@ export function drawCyberGrid(
   const pixelSize = isPixelated ? 2 : 1;
   
   // Draw perspective grid
-  drawPerspectiveGrid(p, size, time, pixelSize);
+  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated);
   
   // Draw floating elements
-  drawFloatingElements(p, size, time, pixelSize);
+  drawFloatingElements(p, size, time, pixelSize, isPixelated);
   
   // Draw center focal point
-  drawCenterFocalPoint(p, size, time, pixelSize);
+  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated);
   
   p.pop();
 }
 
 // Draw a perspective grid with vanishing point
-function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: number) {
+function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
   const gridLines = 12;
   const maxDistance = size * 0.8;
   
@@ -88,7 +88,7 @@ function drawPerspectiveGrid(p: any, size: number, time: number, pixelSize: numb
 }
 
 // Draw floating geometric elements
-function drawFloatingElements(p: any, size: number, time: number, pixelSize: number) {
+function drawFloatingElements(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
   const elementCount = 15;
   
   for (let i = 0; i < elementCount; i++) {
@@ -142,7 +142,7 @@ function drawFloatingElements(p: any, size: number, time: number, pixelSize: num
 }
 
 // Draw center focal point
-function drawCenterFocalPoint(p: any, size: number, time: number, pixelSize: number) {
+function drawCenterFocalPoint(p: any, size: number, time: number, pixelSize: number, isPixelated: boolean) {
   // Central pulsing elements
   const pulseSize = size * 0.08 * (p.sin(time * 2) * 0.2 + 0.8);
   

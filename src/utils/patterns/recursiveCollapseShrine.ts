@@ -1,3 +1,4 @@
+
 // Recursive Collapse Shrine pattern implementation
 import { RenderOptions } from "../patternTypes";
 import { drawPixelatedLine, drawPixelatedCircle } from './helpers';
@@ -90,7 +91,7 @@ function drawShrineCore(p: any, size: number, time: number, pixelSize: number, i
     // Add inner details
     const innerSize = levelSize * 0.7;
     if (useColor) {
-      // Fixed: Use the same levelHue variable that's in scope
+      // Use the same levelHue variable that's in scope
       p.stroke(levelHue, 100, 50, 150);
     } else {
       p.stroke(255, 100);

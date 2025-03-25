@@ -46,6 +46,11 @@ export const patterns = [
     title: "Sine Wave Grid",
     description: "Dynamic grid of sine waves with frequency modulation creating flowing wave patterns."
   },
+  {
+    id: 7,
+    title: "Cyber Grid",
+    description: "Cyberpunk-inspired geometric grid with floating elements and a central focal point."
+  }
 ];
 
 // Define action types

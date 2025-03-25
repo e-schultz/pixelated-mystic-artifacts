@@ -10,6 +10,7 @@ import { drawSacredGeometry } from "./patterns/sacredGeometry";
 import { drawQuantumField } from "./patterns/quantumField";
 import { drawPulseGrid } from "./patterns/pulseGrid";
 import { drawSineWaveGrid } from "./patterns/sineWaveGrid";
+import { drawCyberGrid } from "./patterns/cyberGrid";
 
 // Draw different patterns based on the currentPattern index
 export function drawPatterns(
@@ -23,7 +24,7 @@ export function drawPatterns(
   const { time, isPixelated, isLowPerformanceMode } = options;
   
   // Validate pattern index to ensure it's within bounds
-  const validPatternIndex = Math.max(0, Math.min(patternIndex, 6));
+  const validPatternIndex = Math.max(0, Math.min(patternIndex, 7));
   
   // Determine which pattern to draw
   switch (validPatternIndex) {
@@ -47,6 +48,9 @@ export function drawPatterns(
       break;
     case 6:
       drawSineWaveGrid(p, centerX, centerY, size, time, isPixelated);
+      break;
+    case 7:
+      drawCyberGrid(p, centerX, centerY, size, time, isPixelated);
       break;
     default:
       drawDigitalCorridor(p, centerX, centerY, size, time, isPixelated);

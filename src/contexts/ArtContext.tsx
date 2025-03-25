@@ -65,6 +65,11 @@ export const patterns = [
     id: 10,
     title: "Recursive Collapse Shrine",
     description: "Spiraling cybernetic structure with recursive elements and dimensional staircases."
+  },
+  {
+    id: 11,
+    title: "Hybrid Constellation",
+    description: "Oracle crystalline center surrounded by floating geometric elements and energy fields."
   }
 ];
 

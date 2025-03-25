@@ -8,7 +8,8 @@ export function drawSacredPattern(
   time: number, 
   pixelSize: number, 
   isPixelated: boolean, 
-  useColor: boolean
+  useColor: boolean,
+  colorMultiplier: number = 1.0
 ) {
   const patternSize = size * 0.4;
   const elements = 8;
@@ -29,7 +30,7 @@ export function drawSacredPattern(
       // Vibrant colors for pixelated or terminal mode
       p.colorMode(p.HSB, 360, 100, 100, 100);
       let hue = (i * 30 + time * 20) % 360;
-      color = p.color(hue, 80, 100, 70);
+      color = p.color(hue, 80 * colorMultiplier, 100 * colorMultiplier, 70);
       p.colorMode(p.RGB, 255, 255, 255, 255);
     } else {
       // Black and white for standard mode

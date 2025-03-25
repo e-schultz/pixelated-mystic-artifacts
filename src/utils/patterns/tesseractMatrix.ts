@@ -11,12 +11,22 @@ export function drawTesseractMatrix(
   centerY: number, 
   size: number, 
   time: number,
-  isPixelated: boolean
+  isPixelated: boolean,
+  options?: RenderOptions
 ) {
   p.push();
   p.translate(centerX, centerY);
   
-  const pixelSize = isPixelated ? 2 : 1;
+  // Apply parameters if available
+  const parameters = options?.parameters || {
+    complexity: 0.5,
+    rotationSpeed: 1.0,
+    colorIntensity: 0.7,
+    lineThickness: 0.5,
+    trailPersistence: 0.5
+  };
+  
+  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
   p.stroke(255, 180);
   p.strokeWeight(pixelSize);
   p.noFill();
@@ -25,10 +35,10 @@ export function drawTesseractMatrix(
   const scale = size * 0.35;
   const innerScale = scale * 0.6;
   
-  // Animation parameters
-  const rotationX = time * 0.2;
-  const rotationY = time * 0.15;
-  const rotationZ = time * 0.1;
+  // Animation parameters with rotation speed parameter
+  const rotationX = time * 0.2 * parameters.rotationSpeed;
+  const rotationY = time * 0.15 * parameters.rotationSpeed;
+  const rotationZ = time * 0.1 * parameters.rotationSpeed;
   
   // Draw the outer cube first
   drawRotatedCube(p, 0, 0, 0, scale, rotationX, rotationY, rotationZ, pixelSize, isPixelated);

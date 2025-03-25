@@ -12,15 +12,26 @@ export function drawNeuralLattice(
   centerY: number, 
   size: number, 
   time: number,
-  isPixelated: boolean
+  isPixelated: boolean,
+  options?: RenderOptions
 ) {
   p.push();
   p.translate(centerX, centerY);
-  p.rotate(time * 0.05);
+  
+  // Apply parameters if available
+  const parameters = options?.parameters || {
+    complexity: 0.5,
+    rotationSpeed: 1.0,
+    colorIntensity: 0.7,
+    lineThickness: 0.5,
+    trailPersistence: 0.5
+  };
+  
+  p.rotate(time * 0.05 * parameters.rotationSpeed);
   
   const nodeCount = 12;
   const radius = size * 0.4;
-  const pixelSize = isPixelated ? 2 : 1;
+  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
   
   // Generate nodes
   const nodes = generateNodes(p, nodeCount, radius, time);

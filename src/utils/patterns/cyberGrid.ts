@@ -42,16 +42,16 @@ export function drawCyberGrid(
   const colorMultiplier = parameters.colorIntensity;
   
   // Draw perspective grid with complexity parameter
-  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
+  drawPerspectiveGrid(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier);
   
   // Draw sacred geometry pattern
-  drawSacredPattern(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
+  drawSacredPattern(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier);
   
   // Draw floating elements
-  drawFloatingElements(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier, parameters.complexity);
+  drawFloatingElements(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier);
   
   // Draw center focal point
-  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated, useColor, colorMultiplier);
+  drawCenterFocalPoint(p, size, time, pixelSize, isPixelated, useColor);
   
   p.pop();
 }

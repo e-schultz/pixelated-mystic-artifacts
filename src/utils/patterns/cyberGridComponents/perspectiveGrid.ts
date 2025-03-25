@@ -8,16 +8,17 @@ export function drawPerspectiveGrid(
   time: number, 
   pixelSize: number, 
   isPixelated: boolean, 
-  useColor: boolean
+  useColor: boolean,
+  colorMultiplier: number = 1.0
 ) {
   const gridLines = 16;
   const maxDistance = size * 0.8;
   
   // Color palette inspired by the neon images
   const colors = useColor ? [
-    [0, 255, 255, 150],   // Cyan
-    [255, 0, 255, 150],   // Magenta
-    [255, 255, 0, 150],   // Yellow
+    [0, 255 * colorMultiplier, 255 * colorMultiplier, 150],   // Cyan
+    [255 * colorMultiplier, 0, 255 * colorMultiplier, 150],   // Magenta
+    [255 * colorMultiplier, 255 * colorMultiplier, 0, 150],   // Yellow
   ] : [
     [255, 255, 255, 150], // White
     [200, 200, 200, 150], // Light gray

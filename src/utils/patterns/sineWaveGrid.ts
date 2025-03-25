@@ -12,12 +12,22 @@ export function drawSineWaveGrid(
   centerY: number, 
   size: number, 
   time: number,
-  isPixelated: boolean
+  isPixelated: boolean,
+  options?: RenderOptions
 ) {
   p.push();
   p.translate(centerX, centerY);
   
-  const pixelSize = isPixelated ? 2 : 1;
+  // Apply parameters if available
+  const parameters = options?.parameters || {
+    complexity: 0.5,
+    rotationSpeed: 1.0,
+    colorIntensity: 0.7,
+    lineThickness: 0.5,
+    trailPersistence: 0.5
+  };
+  
+  const pixelSize = isPixelated ? 2 * (0.5 + parameters.lineThickness) : 1 * (0.5 + parameters.lineThickness);
   const gridSize = size * 0.8;
   
   // Grid parameters
@@ -26,9 +36,9 @@ export function drawSineWaveGrid(
   
   // Modulation parameters
   const baseFrequency = 0.2;
-  const frequencyModulation = 0.15 * Math.sin(time * 0.3) + 0.2; // Time-based FM
+  const frequencyModulation = 0.15 * Math.sin(time * 0.3 * parameters.rotationSpeed) + 0.2; // Time-based FM
   const baseAmplitude = gridSpacing * 0.8;
-  const amplitudeModulation = 0.5 * Math.sin(time * 0.2) + 0.8; // Time-based AM
+  const amplitudeModulation = 0.5 * Math.sin(time * 0.2 * parameters.rotationSpeed) + 0.8; // Time-based AM
   
   // Draw horizontal sine waves
   drawHorizontalWaves(

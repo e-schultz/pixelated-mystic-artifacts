@@ -1,10 +1,6 @@
 
 import { animations } from '@/data/animationData';
 
-// Pattern data with titles and descriptions
-export const animationTypes = animations;
-
-// Define state interface
 export interface AnimationState {
   currentAnimation: number;
   animationSpeed: number;
@@ -12,9 +8,9 @@ export interface AnimationState {
   showAsciiOverlay: boolean;
   performanceMode: boolean;
   randomOffset: number;
+  isScreenSaverMode: boolean; // Added for screen saver mode
 }
 
-// Define context interface
 export interface AnimationContextType extends AnimationState {
   setCurrentAnimation: (index: number) => void;
   handlePrevAnimation: () => void;
@@ -23,4 +19,5 @@ export interface AnimationContextType extends AnimationState {
   setIsAutoCycling: (isAuto: boolean) => void;
   setShowAsciiOverlay: (show: boolean) => void;
   setPerformanceMode: (isPerformanceMode: boolean) => void;
+  toggleScreenSaverMode: () => void; // Added for screen saver mode
 }

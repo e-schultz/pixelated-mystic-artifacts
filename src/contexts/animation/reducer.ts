@@ -10,7 +10,8 @@ export const initialAnimationState: AnimationState = {
   isAutoCycling: true,
   showAsciiOverlay: false,
   performanceMode: false,
-  randomOffset: Math.random() * 1000 // Initialize with a random value
+  randomOffset: Math.random() * 1000, // Initialize with a random value
+  isScreenSaverMode: false, // Added for screen saver mode
 };
 
 // Reducer function for managing animation state
@@ -55,6 +56,12 @@ export function animationReducer(state: AnimationState, action: AnimationActionT
       return {
         ...state,
         randomOffset: action.offset
+      };
+    case 'TOGGLE_SCREEN_SAVER_MODE':
+      return {
+        ...state,
+        isScreenSaverMode: !state.isScreenSaverMode,
+        isAutoCycling: !state.isScreenSaverMode, // Enable auto cycling when entering screen saver mode
       };
     default:
       return state;

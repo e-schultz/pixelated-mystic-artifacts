@@ -40,6 +40,10 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     dispatch({ type: 'SET_PERFORMANCE_MODE', isPerformanceMode });
   }, []);
   
+  const toggleScreenSaverMode = useCallback(() => {
+    dispatch({ type: 'TOGGLE_SCREEN_SAVER_MODE' });
+  }, []);
+  
   // Auto-cycling effect
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -70,7 +74,8 @@ export const AnimationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setAnimationSpeed,
     setIsAutoCycling,
     setShowAsciiOverlay,
-    setPerformanceMode
+    setPerformanceMode,
+    toggleScreenSaverMode
   };
   
   return (

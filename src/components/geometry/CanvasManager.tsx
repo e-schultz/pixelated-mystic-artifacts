@@ -2,17 +2,18 @@
 import React, { useRef } from 'react';
 import { useCanvasSetup } from './useCanvasSetup';
 import { useAnimationSketch } from './useAnimationSketch';
+import { useAnimation } from '@/contexts/AnimationContext';
 
 interface CanvasManagerProps {
   className?: string;
-  currentAnimation?: number;
-  animationSpeed?: number;
-  showAsciiOverlay?: boolean;
 }
 
-// This component now uses separate hooks for canvas setup and animation
+// This component now uses the animation context directly
 const CanvasManager: React.FC<CanvasManagerProps> = ({ className }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Get animation settings from context
+  const { currentAnimation, animationSpeed, showAsciiOverlay, performanceMode } = useAnimation();
   
   // Get the sketch function and its dependencies
   const { createSketch, dependencies } = useAnimationSketch();

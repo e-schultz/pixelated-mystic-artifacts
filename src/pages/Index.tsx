@@ -5,45 +5,25 @@ import OptimizedAnimationInfo from '@/components/OptimizedAnimationInfo';
 import OptimizedControlPanel from '@/components/OptimizedControlPanel';
 import PatternNavigation from '@/components/PatternNavigation';
 import PerformanceMonitor from '@/components/PerformanceMonitor';
+import ScreenSaverManager from '@/components/ScreenSaverManager';
 import { useAnimation } from '@/contexts/AnimationContext';
 import { animations } from '@/data/animationData';
 import { motion } from 'framer-motion';
+import { Play } from 'lucide-react';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showControlPanel, setShowControlPanel] = useState(false);
   
-  // Use try/catch to safely access the context
-  let animationContext = {
-    currentAnimation: 0,
-    isAutoCycling: true,
-    animationSpeed: 1,
-    showAsciiOverlay: false,
-    performanceMode: false
-  };
-
-  try {
-    const context = useAnimation();
-    if (context) {
-      animationContext = {
-        currentAnimation: context.currentAnimation,
-        isAutoCycling: context.isAutoCycling,
-        animationSpeed: context.animationSpeed,
-        showAsciiOverlay: context.showAsciiOverlay,
-        performanceMode: context.performanceMode
-      };
-    }
-  } catch (error) {
-    console.warn("Animation context not available, using defaults", error);
-  }
-
-  const {
-    currentAnimation,
-    isAutoCycling,
-    animationSpeed,
+  const { 
+    currentAnimation, 
+    isAutoCycling, 
+    animationSpeed, 
     showAsciiOverlay,
-    performanceMode
-  } = animationContext;
+    performanceMode,
+    isScreenSaverMode,
+    toggleScreenSaverMode
+  } = useAnimation();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,6 +39,9 @@ const Index = () => {
 
   return (
     <div className="relative w-full h-screen overflow-hidden crt-overlay">
+      {/* Screen Saver Manager */}
+      <ScreenSaverManager />
+      
       {isLoading && (
         <div className="fixed inset-0 bg-mystic-dark flex flex-col items-center justify-center z-50">
           <motion.div
@@ -93,92 +76,108 @@ const Index = () => {
 
       <SacredGeometryCanvas />
       
-      <header className="fixed top-0 left-0 right-0 p-6 z-10">
-        <motion.h1 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.8, duration: 0.5 }}
-          className="text-mystic text-2xl font-light tracking-[0.2em] text-center"
-        >
-          PIXELATED MYSTIC ARTIFACTS
-        </motion.h1>
-      </header>
-      
-      <OptimizedAnimationInfo />
-      
-      {/* Using our new PatternNavigation component */}
-      <PatternNavigation />
-      
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
-      >
-        <button
-          onClick={() => {}}
-          className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
-            showAsciiOverlay 
-              ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
-              : 'border-mystic/30 text-mystic/60 hover:bg-mystic/10 hover:text-mystic'
-          }`}
-        >
-          <span className="font-mono tracking-wide">
-            {showAsciiOverlay ? 'ASCII ON' : 'ASCII'}
-          </span>
-          {showAsciiOverlay && (
-            <span className="ml-2 h-2 w-2 rounded-full bg-green-400/90 animate-pulse"></span>
-          )}
-        </button>
-        
-        <p className="text-mystic/50 text-xs">
-          sacred geometry {new Date().getFullYear()}
-        </p>
-      </motion.div>
-      
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.5 }}
-        onClick={toggleControlPanel}
-        className="fixed top-6 right-6 z-10 w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
-      >
-        ⚙️
-      </motion.button>
-      
-      <PerformanceMonitor />
-      
-      {showControlPanel && (
-        <OptimizedControlPanel onClose={toggleControlPanel} />
-      )}
-      
-      {showAsciiOverlay && (
+      {!isScreenSaverMode && (
         <>
-          <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
-            <div className="flex justify-between items-center">
-              <div className="text-green-400/80 font-mono text-xs tracking-widest">
-                MYSTIC.SYS [VERSION 8.15.23]
-              </div>
-              <div className="text-green-400/60 font-mono text-xs tracking-widest">
-                {`${currentAnimation + 1}/${animations.length} | ${animationSpeed.toFixed(1)}X`}
-              </div>
-            </div>
+          <header className="fixed top-0 left-0 right-0 p-6 z-10">
+            <motion.h1 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.8, duration: 0.5 }}
+              className="text-mystic text-2xl font-light tracking-[0.2em] text-center"
+            >
+              PIXELATED MYSTIC ARTIFACTS
+            </motion.h1>
+          </header>
+          
+          <OptimizedAnimationInfo />
+          
+          <PatternNavigation />
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.2, duration: 0.5 }}
+            className="fixed bottom-6 right-6 z-10 flex items-center space-x-3"
+          >
+            <button
+              onClick={() => {}}
+              className={`flex items-center justify-center px-3 py-1 text-xs border rounded-full transition-all ${
+                showAsciiOverlay 
+                  ? 'border-green-400/50 text-green-400/90 bg-green-900/30' 
+                  : 'border-mystic/30 text-mystic/60 hover:bg-mystic/10 hover:text-mystic'
+              }`}
+            >
+              <span className="font-mono tracking-wide">
+                {showAsciiOverlay ? 'ASCII ON' : 'ASCII'}
+              </span>
+              {showAsciiOverlay && (
+                <span className="ml-2 h-2 w-2 rounded-full bg-green-400/90 animate-pulse"></span>
+              )}
+            </button>
+            
+            <p className="text-mystic/50 text-xs">
+              sacred geometry {new Date().getFullYear()}
+            </p>
+          </motion.div>
+          
+          <div className="fixed top-6 right-6 z-10 flex space-x-2">
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.2, duration: 0.5 }}
+              onClick={toggleScreenSaverMode}
+              className="w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+              title="Screen Saver Mode"
+            >
+              <Play size={18} />
+            </motion.button>
+            
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.2, duration: 0.5 }}
+              onClick={toggleControlPanel}
+              className="w-10 h-10 border border-mystic/30 rounded-full flex items-center justify-center text-mystic/70 hover:bg-mystic/10 hover:text-mystic transition-all"
+            >
+              ⚙️
+            </motion.button>
           </div>
           
-          <pre className="fixed left-6 bottom-32 z-9 text-green-400/60 text-xs font-mono">
+          <PerformanceMonitor />
+          
+          {showControlPanel && (
+            <OptimizedControlPanel onClose={toggleControlPanel} />
+          )}
+          
+          {showAsciiOverlay && (
+            <>
+              <div className="fixed top-16 left-6 right-6 z-8 border border-green-400/30 bg-black/40 rounded px-3 py-1">
+                <div className="flex justify-between items-center">
+                  <div className="text-green-400/80 font-mono text-xs tracking-widest">
+                    MYSTIC.SYS [VERSION 8.15.23]
+                  </div>
+                  <div className="text-green-400/60 font-mono text-xs tracking-widest">
+                    {`${currentAnimation + 1}/${animations.length} | ${animationSpeed.toFixed(1)}X`}
+                  </div>
+                </div>
+              </div>
+              
+              <pre className="fixed left-6 bottom-32 z-9 text-green-400/60 text-xs font-mono">
 {`,--.    ,--.   ,--. ,---.,---.  ,--.  ,---.  
 |   \\ ,-'  '-. \`.' |/ .--' ,-. \\ |  | /  .-'  
 |  . \\'-.  .-'  /  || \\--. | | | |\`-'' \`--.   
 |  |\\  \\|  |   /|  |\\.-. \\' | | |,--.  .-'   
 \`--' '--'   '--' '--'\`----' -----'/\`--' \`----'`}
-          </pre>
+              </pre>
+            </>
+          )}
+          
+          {performanceMode && (
+            <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
+              Performance Mode
+            </div>
+          )}
         </>
-      )}
-      
-      {performanceMode && (
-        <div className="fixed top-16 right-6 z-10 px-3 py-1 bg-amber-900/20 border border-amber-500/30 rounded text-amber-400/80 text-xs">
-          Performance Mode
-        </div>
       )}
     </div>
   );

@@ -33,55 +33,70 @@ export function drawFloatingCubes(p: any, size: number, time: number, pixelSize:
     p.noFill();
     p.strokeWeight(pixelSize);
     
-    // Draw cube at position
+    // Draw cube at position - using 2D rotation instead of 3D
     p.push();
     p.translate(x, y + z);
-    p.rotateX(time * 0.2 + i);
-    p.rotateY(time * 0.3 + i * 0.5);
     
-    drawCube(p, cubeSize, isPixelated, pixelSize);
+    // Use 2D rotation instead of 3D rotation to avoid WebGL requirement
+    const rotation = time * 0.2 + i;
+    
+    // Draw a 2D representation of a cube that simulates rotation
+    draw2DCube(p, cubeSize, rotation, isPixelated, pixelSize);
     
     p.pop();
   }
 }
 
-// Helper function to draw a 3D cube in 2D
-function drawCube(p: any, size: number, isPixelated: boolean, pixelSize: number) {
+// Helper function to draw a 2D cube representation that simulates rotation
+function draw2DCube(p: any, size: number, rotation: number, isPixelated: boolean, pixelSize: number) {
   const s = size / 2;
   
-  // Define cube vertices
-  const vertices = [
-    {x: -s, y: -s, z: -s},
-    {x: s, y: -s, z: -s},
-    {x: s, y: s, z: -s},
-    {x: -s, y: s, z: -s},
-    {x: -s, y: -s, z: s},
-    {x: s, y: -s, z: s},
-    {x: s, y: s, z: s},
-    {x: -s, y: s, z: s}
+  // Create a 2D representation of a cube
+  // Use sin/cos for rotation simulation
+  const rotX = Math.cos(rotation);
+  const rotY = Math.sin(rotation);
+  
+  // Define cube points in 2D
+  const points = [
+    {x: -s, y: -s}, // top-left front
+    {x: s, y: -s},  // top-right front
+    {x: s, y: s},   // bottom-right front
+    {x: -s, y: s},  // bottom-left front
   ];
   
-  // Define cube edges
-  const edges = [
-    [0, 1], [1, 2], [2, 3], [3, 0], // Bottom face
-    [4, 5], [5, 6], [6, 7], [7, 4], // Top face
-    [0, 4], [1, 5], [2, 6], [3, 7]  // Connecting edges
-  ];
+  // Add "depth" effect with offset points (simulating a cube back face)
+  const depthOffset = s * 0.6 * rotY;
+  const backPoints = points.map(pt => ({
+    x: pt.x + depthOffset * rotX,
+    y: pt.y + depthOffset * rotY
+  }));
   
-  // Draw each edge
-  for (const [a, b] of edges) {
+  // Draw front face
+  for (let i = 0; i < 4; i++) {
+    const next = (i + 1) % 4;
     if (isPixelated) {
-      drawPixelatedLine(
-        p, 
-        vertices[a].x, vertices[a].y, 
-        vertices[b].x, vertices[b].y, 
-        pixelSize
-      );
+      drawPixelatedLine(p, points[i].x, points[i].y, points[next].x, points[next].y, pixelSize);
     } else {
-      p.line(
-        vertices[a].x, vertices[a].y, 
-        vertices[b].x, vertices[b].y
-      );
+      p.line(points[i].x, points[i].y, points[next].x, points[next].y);
+    }
+  }
+  
+  // Draw back face
+  for (let i = 0; i < 4; i++) {
+    const next = (i + 1) % 4;
+    if (isPixelated) {
+      drawPixelatedLine(p, backPoints[i].x, backPoints[i].y, backPoints[next].x, backPoints[next].y, pixelSize);
+    } else {
+      p.line(backPoints[i].x, backPoints[i].y, backPoints[next].x, backPoints[next].y);
+    }
+  }
+  
+  // Draw connecting lines between front and back
+  for (let i = 0; i < 4; i++) {
+    if (isPixelated) {
+      drawPixelatedLine(p, points[i].x, points[i].y, backPoints[i].x, backPoints[i].y, pixelSize);
+    } else {
+      p.line(points[i].x, points[i].y, backPoints[i].x, backPoints[i].y);
     }
   }
 }

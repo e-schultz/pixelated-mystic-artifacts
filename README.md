@@ -1,69 +1,156 @@
-# Welcome to your Lovable project
 
-## Project info
+# Pixelated Mystic Artifacts
 
-**URL**: https://lovable.dev/projects/d8bc4ad9-4c88-4651-99d9-133692c7020e
+![Pixelated Mystic Artifacts](public/screenshot.png)
 
-## How can I edit this code?
+A mesmerizing generative art visualization experience featuring sacred geometry and cybernetic patterns with a retro-futuristic aesthetic.
 
-There are several ways of editing your application.
+## 🌟 Overview
 
-**Use Lovable**
+Pixelated Mystic Artifacts is an interactive web application that showcases a collection of algorithmically generated geometric patterns inspired by sacred geometry, quantum mechanics, and cybernetic aesthetics. The application features:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d8bc4ad9-4c88-4651-99d9-133692c7020e) and start prompting.
+- 12 unique animation patterns with detailed descriptions
+- Interactive controls for customizing the viewing experience
+- ASCII overlay mode for a retro terminal feel
+- Performance optimization settings for various devices
+- Auto-cycling animation mode
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🚀 Features
 
-**Use your preferred IDE**
+### Visualization Patterns
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Digital Corridor**: A dynamic perspective grid creating the illusion of movement through a digital corridor
+- **Neural Lattice**: An interconnected network of nodes and connections resembling neural pathways
+- **Tesseract Matrix**: A 4-dimensional cube visualization with rotating elements
+- **Sacred Geometry**: Patterns based on ancient geometric principles like the Flower of Life
+- **Quantum Field**: Particle simulations representing quantum field theory
+- **Pulse Grid**: A grid of elements that pulse and glow with changing intensity
+- **Sine Wave Grid**: Harmonic wave patterns creating mesmerizing interference patterns
+- **Cyber Grid**: A cybernetic landscape with perspective elements
+- **Diffusion Oracle**: A pattern inspired by diffusion and reaction processes
+- **Resonance Contour**: Visualizations of resonance and standing wave patterns
+- **Recursive Collapse Shrine**: A shrine-like structure with recursive elements
+- **Hybrid Constellation**: A blend of cosmic and digital elements forming a constellation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Interactive Controls
 
-Follow these steps:
+- Animation speed adjustment
+- Pattern selection and navigation
+- ASCII overlay toggle for retro terminal aesthetics
+- Auto-cycling toggle
+- Performance mode for lower-powered devices
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 💻 Technology Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **React**: For building the user interface
+- **TypeScript**: For type-safe code
+- **p5.js**: For creative coding and animations
+- **TailwindCSS**: For styling
+- **Framer Motion**: For UI animations and transitions
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🧰 Project Structure
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+The project is organized using a clean, modular architecture:
+
+```
+src/
+├── components/          # React components
+│   ├── geometry/        # Animation and canvas components
+│   └── ui/              # UI components
+├── contexts/            # React contexts for state management
+│   ├── animation/       # Animation state management
+│   └── art/             # Art pattern state management
+├── data/                # Static data like animation definitions
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility libraries
+├── pages/               # Page components
+└── utils/               # Utility functions
+    ├── geometry/        # Geometry utility functions
+    └── patterns/        # Pattern-specific rendering logic
+```
+
+## 🔄 State Management
+
+The application uses React Context API with reducers for state management:
+
+- **AnimationContext**: Manages animation state including current animation, speed, and visual options
+- **ArtContext**: Manages art pattern rendering state and options
+
+## 📱 Performance Optimization
+
+- Performance mode for lower-powered devices
+- Throttled rendering for complex animations
+- Memoized components to prevent unnecessary re-renders
+- Dynamic rendering quality based on device capabilities
+
+## 🖥️ Local Development
+
+### Prerequisites
+
+- Node.js (v16+)
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+
+# Navigate to the project directory
+cd pixelated-mystic-artifacts
+
+# Install dependencies
+npm install
+
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Building for Production
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+# Build the project
+npm run build
 
-**Use GitHub Codespaces**
+# Preview the production build
+npm run preview
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎮 Usage
 
-## What technologies are used for this project?
+1. Navigate to the application in your browser
+2. Use the left and right arrow buttons to change patterns
+3. Click the gear icon to access additional controls
+4. Toggle ASCII mode for a retro computer terminal aesthetic
+5. Adjust animation speed using the slider in settings
 
-This project is built with .
+## 🔍 Implementation Details
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Animation Engine
 
-## How can I deploy this project?
+The core animation engine uses p5.js for rendering, with a custom sketch factory that dynamically generates visualization patterns. Each pattern is implemented as a separate module with its own rendering logic.
 
-Simply open [Lovable](https://lovable.dev/projects/d8bc4ad9-4c88-4651-99d9-133692c7020e) and click on Share -> Publish.
+### Rendering Pipeline
 
-## I want to use a custom domain - is that possible?
+1. **Canvas Setup**: Initialize canvas and prepare rendering context
+2. **Pattern Selection**: Select current pattern based on user input
+3. **Animation Loop**: Continuously render the selected pattern
+4. **Post-processing**: Apply effects like ASCII overlay when enabled
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### ASCII Rendering
+
+When ASCII mode is enabled, the application transforms the visual output into ASCII characters, creating a retro terminal aesthetic reminiscent of early computer systems.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgements
+
+- Inspired by sacred geometry, cybernetic aesthetics, and digital mysticism
+- Built with [p5.js](https://p5js.org/)
+- Development facilitated by [Lovable](https://lovable.dev/)

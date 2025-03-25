@@ -56,10 +56,12 @@ function drawShrineCore(p: any, size: number, time: number, pixelSize: number, i
     p.translate(0, levelY);
     p.rotate(rotation);
     
+    // Define the level hue here so it's available throughout the scope
+    const levelHue = useColor ? p.map(i, 0, levels, 320, 180) : 0;
+    
     // Draw level polygon
     if (useColor) {
       // Magenta to cyan gradient based on level
-      const levelHue = p.map(i, 0, levels, 320, 180);
       p.stroke(levelHue, 100, 70, 180);
     } else {
       p.stroke(255, 140 + i * 20);
@@ -91,7 +93,7 @@ function drawShrineCore(p: any, size: number, time: number, pixelSize: number, i
     // Add inner details
     const innerSize = levelSize * 0.7;
     if (useColor) {
-      // Use the same levelHue variable that's in scope
+      // Use the levelHue variable that's now properly in scope
       p.stroke(levelHue, 100, 50, 150);
     } else {
       p.stroke(255, 100);

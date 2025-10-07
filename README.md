@@ -1,7 +1,11 @@
 
 # Pixelated Mystic Artifacts
 
-![Pixelated Mystic Artifacts](public/screenshot.png)
+<img width="628" height="500" alt="float-mystic00001" src="https://github.com/user-attachments/assets/e7aa113c-8d56-4d0e-a884-f61da80f37e3" />
+<img width="597" height="500" alt="float-mystic00002" src="https://github.com/user-attachments/assets/1426597c-48ac-4e67-b544-363248118e7c" />
+<img width="599" height="500" alt="float-mystic00003" src="https://github.com/user-attachments/assets/3c50c9a2-cd2d-4ea5-ae02-39d897c944ec" />
+<img width="586" height="500" alt="float-mystic00004" src="https://github.com/user-attachments/assets/62a36946-2c56-4e62-b84b-baa5bae7235c" />
+
 
 A mesmerizing generative art visualization experience featuring sacred geometry and cybernetic patterns with a retro-futuristic aesthetic.
 

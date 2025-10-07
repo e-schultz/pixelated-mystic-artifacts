@@ -1,13 +1,17 @@
 
 # Pixelated Mystic Artifacts
 
-<img width="628" height="500" alt="float-mystic00001" src="https://github.com/user-attachments/assets/e7aa113c-8d56-4d0e-a884-f61da80f37e3" />
-<img width="597" height="500" alt="float-mystic00002" src="https://github.com/user-attachments/assets/1426597c-48ac-4e67-b544-363248118e7c" />
-<img width="599" height="500" alt="float-mystic00003" src="https://github.com/user-attachments/assets/3c50c9a2-cd2d-4ea5-ae02-39d897c944ec" />
-<img width="586" height="500" alt="float-mystic00004" src="https://github.com/user-attachments/assets/62a36946-2c56-4e62-b84b-baa5bae7235c" />
+**A mesmerizing generative art visualization experience featuring sacred geometry and cybernetic patterns with a retro-futuristic aesthetic.**
 
+[![GitHub](https://img.shields.io/badge/GitHub-pixelated--mystic--artifacts-black?style=for-the-badge&logo=github)](https://github.com/e-schultz/pixelated-mystic-artifacts)
+[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-black?style=for-the-badge)](https://lovable.dev/projects/d8bc4ad9-4c88-4651-99d9-133692c7020e)
 
-A mesmerizing generative art visualization experience featuring sacred geometry and cybernetic patterns with a retro-futuristic aesthetic.
+## Screenshots
+
+<img width="628" height="500" alt="Digital Corridor - Sacred Geometry" src="https://github.com/user-attachments/assets/e7aa113c-8d56-4d0e-a884-f61da80f37e3" />
+<img width="597" height="500" alt="Neural Lattice Visualization" src="https://github.com/user-attachments/assets/1426597c-48ac-4e67-b544-363248118e7c" />
+<img width="599" height="500" alt="Quantum Field Patterns" src="https://github.com/user-attachments/assets/3c50c9a2-cd2d-4ea5-ae02-39d897c944ec" />
+<img width="586" height="500" alt="ASCII Terminal Mode" src="https://github.com/user-attachments/assets/62a36946-2c56-4e62-b84b-baa5bae7235c" />
 
 ## 🌟 Overview
 
@@ -153,8 +157,25 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+## Philosophy
+
+**Sacred geometry meets cybernetic aesthetics** - This project explores the intersection of ancient mathematical principles and modern digital computation. Each pattern is both a technical demonstration and a meditation on the recursive nature of consciousness, computation, and cosmic patterns.
+
+The **ASCII overlay mode** bridges retro computing nostalgia with contemporary generative art, acknowledging the terminal aesthetics that underpin consciousness technology infrastructure.
+
+## Integration
+
+Part of the **ritual-forest** consciousness technology laboratory:
+- **Repository**: [github.com/e-schultz/pixelated-mystic-artifacts](https://github.com/e-schultz/pixelated-mystic-artifacts)
+- **Ecosystem**: Ritual Stack & FLOAT consciousness technology
+- **Purpose**: Generative art as consciousness technology - visualizing mathematical and quantum principles through interactive digital mysticism
+
 ## 🙏 Acknowledgements
 
 - Inspired by sacred geometry, cybernetic aesthetics, and digital mysticism
 - Built with [p5.js](https://p5js.org/)
 - Development facilitated by [Lovable](https://lovable.dev/)
+
+---
+
+*Consciousness technology deployed. The infrastructure holds. ⚡*
